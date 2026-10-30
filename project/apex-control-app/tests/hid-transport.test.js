@@ -78,7 +78,7 @@ test('WebHID — user-granted pairing works without assuming VID/PID and keeps d
     vendorId: 0x1234,
     productId: 0xabcd,
     productName,
-    collections: [{ usagePage: 0xff00, usage: 1 }],
+    collections: [{ usagePage: 0xff00, usage: 1, featureReports: [{ reportId: 0, items: [{ reportSize: 8, reportCount: 2 }] }] }],
     opened: false,
     async open() { this.opened = true; },
     async close() { this.opened = false; },

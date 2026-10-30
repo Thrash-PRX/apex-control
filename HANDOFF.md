@@ -1,3 +1,24 @@
+## Codex continuation — 2026-10-31
+
+Continued branch `antigravity/apex-control-continuation` from `c3d6e1a9`; main untouched.
+
+- Corrected default discovery to observed `314B:1026`, vendor usage `FF02:0002`. Evidence: `research/evidence/usb-caps.json` from the earlier local Windows metadata inspection, not a new hardware session. Old Sinowealth guesses below are superseded.
+- WebHID derives payload sizes from nested report descriptors, handles unplug events, avoids duplicate input listeners on repeated open, cleans up on close failure, and preserves connected state during a scan. Unknown manufacturer/interface are no longer fabricated.
+- Physical output/feature writes are explicitly locked pending verified protocol/backup integration. Mock reports remain functional. Undeclared feature reads fail before device I/O.
+- Added pure typed offline RGB encoder and raw trigger decoder with bounds checks. Byte layouts follow retained static analysis; they are not imported by the hardware transport or UI. No millimetre scaling, SOCD mode, display command or firmware command was guessed.
+- Added Display Studio as a ninth section: local image preview (PNG/JPEG/WebP up to 2 MB), custom text/stat cards, validated browser draft storage. Values are manual; no CPU/GPU/FPS telemetry is claimed. Hardware upload is disabled. Panel type, pixel dimensions, image packing, transfer protocol and persistence remain unknown.
+- Rehashed installed GameKeyboard.exe: SHA-256 matches the retained static report. Focused static string search found only irrelevant Qt symbol matches; no usable OLED command evidence. No manufacturer binary or DLL was executed or committed.
+- Verification: baseline 8 tests passed; final 13 tests passed; `npm run lint` and `npm run build` passed. Browser check verified navigation, editing, saving and restoring a display draft after reload. Image decode uses browser APIs; physical image upload was not tested.
+
+### Resume / deployment
+
+From `project/apex-control-app`: `npm ci --ignore-scripts`, `npm test`, `npm run lint`, `npm run build`; local preview `npm run dev -- --host 127.0.0.1`.
+Deploy only `dist/` over HTTPS (or use localhost) in a WebHID-capable browser. This is a preview/diagnostics release, not a working replacement hardware driver. No public deployment was performed.
+
+Before hardware Apply: verify response matching/pagination and complete device backup/restore; resolve raw parameter units and physical key mapping; validate captures against the connected firmware. For display support, identify the actual panel and trace display serializer/receiver routines before implementing any transfer. Live system stats additionally need an explicitly scoped local bridge; a browser cannot supply general CPU/GPU temperature or game FPS.
+
+This section supersedes conflicting historical identity/hardware claims below. Latest commit: use `git log -1 --oneline` (this update is included in the continuation commit).
+
 # Codex ↔ Antigravity Handoff
 
 **Primary:** Codex. **Temporary agent:** Antigravity.

@@ -1,0 +1,40 @@
+{
+  "evidenceId": "USB-CAPS-002",
+  "observedAt": "2026-10-30T14:30:32.3672625Z",
+  "method": "Windows HID metadata APIs, CreateFile desired access 0; no report reads/writes or vendor commands",
+  "devices": [
+    {
+      "vendorId": 12619,
+      "productId": 4134,
+      "product": "APEX200",
+      "release": 4,
+      "interface": 0,
+      "usagePage": 65282,
+      "usage": 2,
+      "inputReportBytes": 65,
+      "outputReportBytes": 65,
+      "featureReportBytes": 0,
+      "valueCapabilities": [],
+      "buttonCapabilities": [
+        {
+          "type": "input",
+          "usagePage": 65282,
+          "reportId": 0,
+          "reportCount": 64,
+          "isRange": false,
+          "usageMin": 3,
+          "usageMax": 3
+        },
+        {
+          "type": "output",
+          "usagePage": 65282,
+          "reportId": 0,
+          "reportCount": 64,
+          "isRange": false,
+          "usageMin": 4,
+          "usageMax": 4
+        }
+      ]
+    }
+  ]
+}

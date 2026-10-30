@@ -1,3 +1,10 @@
+## Current continuation status (2026-10-31)
+
+- Discovery: observed identity `314B:1026 / FF02:0002`; descriptor sizing and disconnect behavior software-tested with fake HID devices. No new physical pairing verification in this continuation.
+- Offline codecs: static-evidence RGB report encoder / raw trigger decoder, software-tested; hardware writes remain locked.
+- Display Studio: local image and manual stat card preview, browser save/restore; hardware display support unknown. No live CPU/GPU/FPS provider.
+- Original eight sections preserved. Historical candidate VID/PID below are superseded. Profile import/export stubs remain stubs; editor drafts are not device backups.
+
 # Feature Matrix
 
 | Feature | Status | Evidence / Notes |

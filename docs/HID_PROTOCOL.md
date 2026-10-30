@@ -1,3 +1,16 @@
+# Current evidence — 2026-10-31
+
+The historical hypotheses below are superseded where they conflict with this section.
+Observed device: VID `314B`, PID `1026`, product `APEX200`, vendor collection `FF02:0002`, interface 0 in Windows enumeration. Retained metadata: [USB-CAPS-002](../research/evidence/usb-caps.json). Windows input/output lengths are 65 including report-ID byte; WebHID uses report ID 0 separately with 64 payload bytes. No feature reports were declared. This does not establish the MCU vendor, firmware version or display type.
+
+[Retained static analysis](../research/evidence/PROTOCOL.md) documents GameKeyboard.exe SHA-256 and instruction locations. Its 128-byte default is not the connected device size. The new offline RGB codec uses the observed 64-byte shape `[FA,10,1,1,00,length,rawParameter,R,G,B,keyIndices...,padding]`. Raw parameter semantics and physical key mapping are unresolved; tests are synthetic instruction-derived fixtures, not captures. Trigger readback payloads decode raw little-endian fields without claiming millimetres or RT mode meanings.
+
+No codecs are connected to transport writes. All real output/feature writes are locked. Readback transactions and restore remain unimplemented. No firmware/reset/calibration operations exist in this change.
+
+Display investigation: [static search](../research/evidence/display-static-search.json) matches irrelevant Qt symbols only. No command, resolution, OLED panel technology, pixel format or streaming support is established. UI drafts are local only. Original binaries remain outside Git.
+
+---
+
 # HID Protocol Documentation — Ant Esports APEX 200S
 
 > **Status:** Preliminary Reverse-Engineering Hypotheses (Awaiting Physical Device / Binary Capture)  

@@ -1,26 +1,18 @@
 # APEX CONTROL
 
-Temporary Antigravity workspace for the Ant Esports APEX 200S reverse-engineering project.
+React/TypeScript keyboard configurator continued from the existing application in `project/apex-control-app`.
 
-**Codex remains the primary development environment.**
+```powershell
+cd project/apex-control-app
+npm ci --ignore-scripts
+npm test
+npm run lint
+npm run build
+npm run dev -- --host 127.0.0.1
+```
 
-## Before opening in Antigravity
+Open the local URL printed by Vite. Use Chrome/Edge with WebHID for device discovery; mock mode is clearly labelled. Production files are generated in `dist/` and need HTTPS when hosted.
 
-1. Put your **existing Codex project source** inside `project/`, or clone its GitHub repository there.
-2. Copy the stock APEX 200S software files into `original-software/`.
-3. Copy any existing ChatGPT Work reports or HID captures into `research/`.
-4. Open this folder in Antigravity and paste the instructions in `ANTIGRAVITY_PROMPT.md`.
+**Current release:** local configuration previews and device diagnostics. Hardware writes are locked until verified readback/backup and protocol integration are complete. Display Studio supports local images and manual stat cards; OLED upload and live system telemetry are not yet supported.
 
-**Important:** This repository currently contains the directory scaffold and handoff instructions, not the original proprietary software or any verified Codex source. Those files have not been supplied to the repository.
-
-## Workspace
-
-- `project/` — existing application/repository (do not replace it).
-- `original-software/` — manufacturer's binaries and DLLs for local analysis.
-- `research/` — analysis reports, notes, and protocol captures.
-- `docs/` — protocol and feature verification notes.
-- `PROGRESS.md` — verified project status.
-- `HANDOFF.md` — instructions for returning to Codex.
-- `DECISIONS.md` — engineering decisions.
-
-Do not commit proprietary original software, private captures, or credentials to a public repository.
+Read [HANDOFF.md](HANDOFF.md), [PROGRESS.md](PROGRESS.md) and [docs/HID_PROTOCOL.md](docs/HID_PROTOCOL.md) for evidence, checks and blockers. No manufacturer binaries or private device identifiers are included.

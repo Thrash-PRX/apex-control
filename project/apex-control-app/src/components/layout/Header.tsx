@@ -13,6 +13,7 @@ import { ConnectionState } from '../../types';
 // ─── Page title mapping ─────────────────────────────────────────────────────
 
 const PAGE_TITLES: Record<AppPage, string> = {
+  display: 'Display Studio',
   dashboard:       'Dashboard',
   lighting:        'Lighting Studio',
   actuation:       'Actuation',

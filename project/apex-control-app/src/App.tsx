@@ -1,3 +1,4 @@
+import { DisplayPage } from './components/display/DisplayPage';
 import { useAppStore } from './stores/app-store';
 import { AppLayout } from './components/layout';
 import { DashboardPage } from './components/dashboard';
@@ -16,6 +17,8 @@ export function App() {
     switch (activePage) {
       case 'dashboard':
         return <DashboardPage />;
+      case 'display':
+        return <DisplayPage />;
       case 'lighting':
         return <LightingPage />;
       case 'actuation':

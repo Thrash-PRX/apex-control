@@ -1,15 +1,15 @@
 /**
  * Core device type definitions for the Ant Esports APEX 200S keyboard.
  *
- * VID/PID values are UNVERIFIED and must be confirmed via actual USB enumeration.
- * Do not treat these as ground truth until hardware verification is completed.
+ * VID/PID observed in USB-CAPS-002 for the connected APEX200.
+ * Identity does not establish firmware command support.
  */
 
 // ─── Device Identity ────────────────────────────────────────────────────────
 
-/** Known (but unverified) USB identifiers for the APEX 200S. */
-export const APEX_200S_VID = 0x3402;
-export const APEX_200S_PID = 0x0300;
+/** Observed identifiers; see docs/HID_PROTOCOL.md. */
+export const APEX_200S_VID = 0x314b;
+export const APEX_200S_PID = 0x1026;
 
 export interface DeviceIdentity {
   vendorId: number;

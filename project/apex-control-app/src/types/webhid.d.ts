@@ -14,6 +14,15 @@ interface HIDCollectionInfo {
   usagePage?: number;
   usage?: number;
   type?: number;
+  children?: HIDCollectionInfo[];
+  inputReports?: HIDReportInfo[];
+  outputReports?: HIDReportInfo[];
+  featureReports?: HIDReportInfo[];
+}
+
+interface HIDReportInfo {
+  reportId: number;
+  items: { reportSize: number; reportCount: number }[];
 }
 
 interface HIDInputReportEvent extends Event {

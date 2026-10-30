@@ -10,6 +10,7 @@ import React from 'react';
 import {
   LayoutDashboard,
   Palette,
+  Monitor,
   Gauge,
   Zap,
   ArrowLeftRight,
@@ -30,6 +31,7 @@ interface NavItem {
 
 const NAV_ITEMS: NavItem[] = [
   { page: 'dashboard',     label: 'Dashboard',       icon: LayoutDashboard },
+  { page: 'display', label: 'Display Studio', icon: Monitor },
   { page: 'lighting',      label: 'Lighting Studio',  icon: Palette },
   { page: 'actuation',     label: 'Actuation',       icon: Gauge },
   { page: 'rapid-trigger', label: 'Rapid Trigger',    icon: Zap },

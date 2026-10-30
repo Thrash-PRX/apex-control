@@ -47,7 +47,8 @@ export class DeviceManager {
   static readonly DEFAULT_FILTER: HidDeviceFilter = {
     vendorId: APEX_200S_VID,
     productId: APEX_200S_PID,
-    usagePage: 0xff00, // Vendor-defined — unverified
+    usagePage: 0xff02, // Observed in USB-CAPS-002.
+    usage: 2,
   };
 
   constructor(transport?: HidTransport) {
@@ -121,14 +122,13 @@ export class DeviceManager {
     });
 
     try {
-      // The candidate VID/PID is unverified. Do not hide a real keyboard just
-      // because its IDs differ from the research hypothesis.
-      const effectiveFilter = filter ?? (this.isMock ? DeviceManager.DEFAULT_FILTER : undefined);
+      // Default to observed APEX identity; an explicit filter can inspect other devices.
+      const effectiveFilter = filter ?? DeviceManager.DEFAULT_FILTER;
       const devices = await this._transport.enumerate(effectiveFilter);
 
       this._updateConnection({
         ...this._connection,
-        state: devices.length > 0 ? ConnectionState.Disconnected : ConnectionState.Disconnected,
+        state: this._transport.isOpen() ? ConnectionState.Connected : ConnectionState.Disconnected,
       });
 
       return devices;
@@ -151,7 +151,7 @@ export class DeviceManager {
     if (!this._transport.requestDevice) {
       throw new Error(`${this._transport.name} does not support device permission requests`);
     }
-    return this._transport.requestDevice(filter);
+    return this._transport.requestDevice(filter ?? DeviceManager.DEFAULT_FILTER);
   }
 
   /** Connect to a specific device. */

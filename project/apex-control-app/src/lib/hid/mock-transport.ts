@@ -26,8 +26,8 @@ const MOCK_DEVICE: HidDeviceInfo = {
   product: 'APEX 200S (Mock Device)',
   serialNumber: 'MOCK-000000',
   interfaceNumber: 1,
-  usagePage: 0xff00, // Vendor-defined (typical for config interface)
-  usage: 0x01,
+  usagePage: 0xff02, // Simulated observed APEX collection
+  usage: 0x02,
   maxInputReportLength: 64,
   maxOutputReportLength: 64,
   maxFeatureReportLength: 64,

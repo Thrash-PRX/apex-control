@@ -1,0 +1,23 @@
+{
+  "artifact": "GameKeyboard.exe",
+  "sha256": "8c8375bd4a7cee0c00fc8a0bf18f3618b8b4f9730a611998088c9c893e6f0c7d",
+  "method": "Static ASCII/UTF-16LE string search only; no execution",
+  "matches": [
+    {
+      "offset": "0x1885b6",
+      "encoding": "ascii",
+      "text": "?multiData@QStandardItemModel@@UEBAXAEBVQModelIndex@@VQModelRoleDataSpan@@@Z"
+    },
+    {
+      "offset": "0x188ac6",
+      "encoding": "ascii",
+      "text": "?multiData@QStandardItem@@UEBAXVQModelRoleDataSpan@@@Z"
+    },
+    {
+      "offset": "0x18d93c",
+      "encoding": "ascii",
+      "text": "?multiData@QAbstractItemModel@@UEBAXAEBVQModelIndex@@VQModelRoleDataSpan@@@Z"
+    }
+  ],
+  "limitation": "String matches do not prove display commands, panel type, resolution, format or support. Absence does not prove lack of support."
+}

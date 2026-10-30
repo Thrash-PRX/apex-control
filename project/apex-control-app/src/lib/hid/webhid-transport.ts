@@ -12,6 +12,7 @@ import type {
   TransportEventHandler,
   TransportEvent,
 } from './transport.ts';
+import { collectionsDeep, reportLengths } from './descriptors.ts';
 import { ReportType } from '../../types/index.ts';
 
 export class WebHidTransport implements HidTransport {
@@ -25,6 +26,18 @@ export class WebHidTransport implements HidTransport {
   private _devicePaths = new WeakMap<HIDDevice, string>();
   private _nextDeviceId = 0;
 
+  private _disconnectHandler: EventListener = (event) => {
+    if ((event as Event & { device: HIDDevice }).device === this._device) this._detach();
+  };
+  private _detach(): void {
+    const info = this._deviceInfo;
+    if (this._device && this._inputReportHandler) this._device.removeEventListener('inputreport', this._inputReportHandler);
+    navigator.hid.removeEventListener?.('disconnect', this._disconnectHandler);
+    this._inputReportHandler = null;
+    this._device = null;
+    this._deviceInfo = null;
+    if (info) this._emit({ type: 'device-disconnected', device: info, timestamp: Date.now() });
+  }
   isAvailable(): boolean {
     return typeof navigator !== 'undefined' && 'hid' in navigator;
   }
@@ -38,8 +51,8 @@ export class WebHidTransport implements HidTransport {
       .filter((d: HIDDevice) => {
         if (filter?.vendorId !== undefined && d.vendorId !== filter.vendorId) return false;
         if (filter?.productId !== undefined && d.productId !== filter.productId) return false;
-        if (filter?.usagePage !== undefined && !d.collections.some((c) => c.usagePage === filter.usagePage)) return false;
-        if (filter?.usage !== undefined && !d.collections.some((c) =>
+        if (filter?.usagePage !== undefined && !collectionsDeep(d.collections).some((c) => c.usagePage === filter.usagePage)) return false;
+        if (filter?.usage !== undefined && !collectionsDeep(d.collections).some((c) =>
           c.usage === filter.usage && (filter.usagePage === undefined || c.usagePage === filter.usagePage)
         )) return false;
         return true;
@@ -90,6 +103,8 @@ export class WebHidTransport implements HidTransport {
       throw new Error(`WebHID: device not found for path "${devicePath}"`);
     }
 
+    if (this._device === device && device.opened) return;
+    if (this._device) await this.close();
     if (!device.opened) {
       await device.open();
     }
@@ -110,6 +125,7 @@ export class WebHidTransport implements HidTransport {
       });
     };
     device.addEventListener('inputreport', this._inputReportHandler);
+    navigator.hid.addEventListener?.('disconnect', this._disconnectHandler);
 
     this._emit({
       type: 'device-connected',
@@ -121,25 +137,9 @@ export class WebHidTransport implements HidTransport {
   async close(): Promise<void> {
     if (!this._device) return;
 
-    if (this._inputReportHandler) {
-      this._device.removeEventListener('inputreport', this._inputReportHandler);
-      this._inputReportHandler = null;
-    }
-
-    if (this._device.opened) {
-      await this._device.close();
-    }
-    const info = this._deviceInfo;
-    this._device = null;
-    this._deviceInfo = null;
-
-    if (info) {
-      this._emit({
-        type: 'device-disconnected',
-        device: info,
-        timestamp: Date.now(),
-      });
-    }
+    const device = this._device;
+    try { if (device.opened) await device.close(); }
+    finally { this._detach(); }
   }
 
   isOpen(): boolean {
@@ -152,16 +152,19 @@ export class WebHidTransport implements HidTransport {
 
   async sendOutputReport(reportId: number, data: Uint8Array): Promise<void> {
     this._assertOpen();
-    await this._device!.sendReport(reportId, data as unknown as BufferSource);
+    void reportId; void data;
+    throw new Error('Hardware writes are locked until the APEX protocol and backup path are verified');
   }
 
   async sendFeatureReport(reportId: number, data: Uint8Array): Promise<void> {
     this._assertOpen();
-    await this._device!.sendFeatureReport(reportId, data as unknown as BufferSource);
+    void reportId; void data;
+    throw new Error('Hardware writes are locked until the APEX protocol and backup path are verified');
   }
 
   async getFeatureReport(reportId: number): Promise<Uint8Array> {
     this._assertOpen();
+    if (!reportLengths(this._device!.collections, 'featureReports').has(reportId)) throw new Error('Feature report is not declared by this device');
     const result = await this._device!.receiveFeatureReport(reportId);
     return new Uint8Array(result.buffer, result.byteOffset, result.byteLength);
   }
@@ -185,7 +188,7 @@ export class WebHidTransport implements HidTransport {
     }
     this._knownDevices.set(path, device);
 
-    const vendorCollection = device.collections?.find(
+    const vendorCollection = collectionsDeep(device.collections).find(
       (c: HIDCollectionInfo) => c.usagePage !== undefined && c.usagePage >= 0xff00
     );
     const firstCollection = device.collections?.[0];
@@ -195,15 +198,15 @@ export class WebHidTransport implements HidTransport {
       path,
       vendorId: device.vendorId,
       productId: device.productId,
-      manufacturer: device.productName || 'Unknown',
+      manufacturer: 'Unknown',
       product: device.productName || 'Unknown',
       serialNumber: '',
-      interfaceNumber: 0,
+      interfaceNumber: -1, // Not exposed by WebHID.
       usagePage: collection?.usagePage ?? 0,
       usage: collection?.usage ?? 0,
-      maxInputReportLength: 64,
-      maxOutputReportLength: 64,
-      maxFeatureReportLength: 64,
+      maxInputReportLength: Math.max(0, ...reportLengths(device.collections, 'inputReports').values()),
+      maxOutputReportLength: Math.max(0, ...reportLengths(device.collections, 'outputReports').values()),
+      maxFeatureReportLength: Math.max(0, ...reportLengths(device.collections, 'featureReports').values()),
     };
   }
 

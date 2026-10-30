@@ -29,6 +29,7 @@ import {
 
 export type AppPage =
   | 'dashboard'
+  | 'display'
   | 'lighting'
   | 'actuation'
   | 'rapid-trigger'
