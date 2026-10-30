@@ -1,0 +1,11 @@
+original-software/*
+!original-software/.gitkeep
+research/captures/*
+!research/captures/.gitkeep
+**/.env
+**/.env.*
+**/node_modules/
+**/target/
+**/dist/
+*.pcap
+*.pcapng
