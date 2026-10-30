@@ -55,6 +55,7 @@ interface AppState {
 
   // Device actions
   scanDevices: () => Promise<void>;
+  pairDevice: () => Promise<HidDeviceInfo | null>;
   connectDevice: (path: string) => Promise<void>;
   disconnectDevice: () => Promise<void>;
 
@@ -183,6 +184,37 @@ export const useAppStore = create<AppState>((set, get) => ({
     } catch (err) {
       const msg = err instanceof Error ? err.message : String(err);
       get().addLog('error', `Scan failed: ${msg}`);
+    }
+  },
+
+  pairDevice: async () => {
+    if (get().useMock) {
+      get().addLog('warn', 'Pairing requires hardware mode');
+      return null;
+    }
+
+    const dm = getDeviceManager(false);
+    get().addLog('info', 'Opening browser HID permission picker...');
+    try {
+      // This must invoke navigator.hid.requestDevice() before the next await
+      // on the click stack, or the browser can reject the user gesture.
+      const picked = await dm.requestDevice();
+      if (!picked) {
+        get().addLog('info', 'HID pairing cancelled');
+        return null;
+      }
+      set((state) => ({
+        discoveredDevices: [
+          ...state.discoveredDevices.filter((device) => device.path !== picked.path),
+          picked,
+        ],
+      }));
+      get().addLog('info', `HID access granted to ${picked.product} (${picked.vendorId.toString(16)}:${picked.productId.toString(16)})`);
+      return picked;
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : String(err);
+      get().addLog('error', `HID pairing failed: ${msg}`);
+      return null;
     }
   },
 

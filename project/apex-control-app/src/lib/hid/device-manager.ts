@@ -121,7 +121,10 @@ export class DeviceManager {
     });
 
     try {
-      const devices = await this._transport.enumerate(filter ?? DeviceManager.DEFAULT_FILTER);
+      // The candidate VID/PID is unverified. Do not hide a real keyboard just
+      // because its IDs differ from the research hypothesis.
+      const effectiveFilter = filter ?? (this.isMock ? DeviceManager.DEFAULT_FILTER : undefined);
+      const devices = await this._transport.enumerate(effectiveFilter);
 
       this._updateConnection({
         ...this._connection,
@@ -138,6 +141,17 @@ export class DeviceManager {
       });
       return [];
     }
+  }
+
+  /**
+   * Present a device permission chooser (supported transports only).
+   * The call chain must originate in a user's click to retain browser activation.
+   */
+  async requestDevice(filter?: HidDeviceFilter): Promise<HidDeviceInfo | null> {
+    if (!this._transport.requestDevice) {
+      throw new Error(`${this._transport.name} does not support device permission requests`);
+    }
+    return this._transport.requestDevice(filter);
   }
 
   /** Connect to a specific device. */

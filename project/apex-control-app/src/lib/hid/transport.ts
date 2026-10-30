@@ -81,6 +81,13 @@ export interface HidTransport {
   enumerate(filter?: HidDeviceFilter): Promise<HidDeviceInfo[]>;
 
   /**
+   * Ask the user to grant access through the browser's native HID chooser.
+   * Must be called from a direct user gesture; never use for silent discovery.
+   * Native and mock transports can omit this method.
+   */
+  requestDevice?(filter?: HidDeviceFilter): Promise<HidDeviceInfo | null>;
+
+  /**
    * Open a connection to a specific device.
    * @param devicePath Transport-specific device identifier from enumerate().
    */

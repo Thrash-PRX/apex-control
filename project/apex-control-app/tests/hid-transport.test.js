@@ -2,6 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 
 import { MockHidTransport } from '../src/lib/hid/mock-transport.ts';
+import { WebHidTransport } from '../src/lib/hid/webhid-transport.ts';
 import { DeviceManager } from '../src/lib/hid/device-manager.ts';
 import { ConnectionState, APEX_200S_VID, APEX_200S_PID } from '../src/types/device.ts';
 import { LIGHTING_EFFECTS } from '../src/types/lighting.ts';
@@ -70,4 +71,61 @@ test('Protocol & Settings Specifications — Unverified boundaries', () => {
 
   const unverifiedEffects = LIGHTING_EFFECTS.filter((e) => e.verification === 'unverified');
   assert.equal(unverifiedEffects.length, LIGHTING_EFFECTS.length, 'All lighting effects remain unverified until HW tested');
+});
+
+test('WebHID — user-granted pairing works without assuming VID/PID and keeps devices distinct', async () => {
+  const mockHidDevice = (productName) => ({
+    vendorId: 0x1234,
+    productId: 0xabcd,
+    productName,
+    collections: [{ usagePage: 0xff00, usage: 1 }],
+    opened: false,
+    async open() { this.opened = true; },
+    async close() { this.opened = false; },
+    addEventListener() {},
+    removeEventListener() {},
+    async sendReport() {},
+    async sendFeatureReport() {},
+    async receiveFeatureReport() {
+      const bytes = Uint8Array.from([0xaa, 0x21, 0x22, 0xbb]);
+      return new DataView(bytes.buffer, 1, 2);
+    },
+  });
+
+  const first = mockHidDevice('Device A');
+  const second = mockHidDevice('Device B');
+  let authorizedDevices = [];
+  const hid = {
+    async getDevices() { return authorizedDevices; },
+    async requestDevice({ filters }) {
+      assert.deepEqual(filters, [], 'Unknown VID/PID must not constrain the user picker');
+      authorizedDevices = [first, second];
+      return [first];
+    },
+  };
+
+  const existing = Object.getOwnPropertyDescriptor(navigator, 'hid');
+  Object.defineProperty(navigator, 'hid', { configurable: true, value: hid });
+
+  try {
+    const transport = new WebHidTransport();
+    assert.deepEqual(await transport.enumerate(), [], 'No device without prior permission');
+
+    const paired = await transport.requestDevice();
+    assert.ok(paired);
+    const devices = await transport.enumerate();
+    assert.equal(devices.length, 2);
+    assert.equal(devices[0].path, paired.path);
+    assert.notEqual(devices[0].path, devices[1].path, 'Same VID/PID needs distinct paths');
+
+    await transport.open(paired.path);
+    assert.equal(transport.isOpen(), true);
+    const report = await transport.getFeatureReport(0);
+    assert.deepEqual([...report], [0x21, 0x22], 'Respect DataView byte offset and length');
+    await transport.close();
+    assert.equal(transport.isOpen(), false);
+  } finally {
+    if (existing) Object.defineProperty(navigator, 'hid', existing);
+    else delete navigator.hid;
+  }
 });

@@ -21,6 +21,9 @@ export class WebHidTransport implements HidTransport {
   private _deviceInfo: HidDeviceInfo | null = null;
   private _handlers: Set<TransportEventHandler> = new Set();
   private _inputReportHandler: ((event: HIDInputReportEvent) => void) | null = null;
+  private _knownDevices = new Map<string, HIDDevice>();
+  private _devicePaths = new WeakMap<HIDDevice, string>();
+  private _nextDeviceId = 0;
 
   isAvailable(): boolean {
     return typeof navigator !== 'undefined' && 'hid' in navigator;
@@ -33,8 +36,12 @@ export class WebHidTransport implements HidTransport {
 
     return devices
       .filter((d: HIDDevice) => {
-        if (filter?.vendorId && d.vendorId !== filter.vendorId) return false;
-        if (filter?.productId && d.productId !== filter.productId) return false;
+        if (filter?.vendorId !== undefined && d.vendorId !== filter.vendorId) return false;
+        if (filter?.productId !== undefined && d.productId !== filter.productId) return false;
+        if (filter?.usagePage !== undefined && !d.collections.some((c) => c.usagePage === filter.usagePage)) return false;
+        if (filter?.usage !== undefined && !d.collections.some((c) =>
+          c.usage === filter.usage && (filter.usagePage === undefined || c.usagePage === filter.usagePage)
+        )) return false;
         return true;
       })
       .map((d: HIDDevice) => this._mapDevice(d));
@@ -70,10 +77,14 @@ export class WebHidTransport implements HidTransport {
       throw new Error('WebHID is not available in this browser');
     }
 
-    const devices = await navigator.hid.getDevices();
-    const device = devices.find(
-      (d: HIDDevice) => `webhid://${d.vendorId}:${d.productId}` === devicePath
-    );
+    // Prefer the exact HIDDevice selected in the permission dialog. VID/PID alone
+    // is not a unique device path when two identical keyboards are attached.
+    let device = this._knownDevices.get(devicePath);
+    if (!device) {
+      const authorized = await navigator.hid.getDevices();
+      authorized.forEach((d) => this._mapDevice(d));
+      device = this._knownDevices.get(devicePath);
+    }
 
     if (!device) {
       throw new Error(`WebHID: device not found for path "${devicePath}"`);
@@ -87,7 +98,7 @@ export class WebHidTransport implements HidTransport {
     this._deviceInfo = this._mapDevice(device);
 
     this._inputReportHandler = (event: HIDInputReportEvent) => {
-      const data = new Uint8Array(event.data.buffer);
+      const data = new Uint8Array(event.data.buffer, event.data.byteOffset, event.data.byteLength);
       this._emit({
         type: 'data-received',
         data: {
@@ -115,7 +126,9 @@ export class WebHidTransport implements HidTransport {
       this._inputReportHandler = null;
     }
 
-    await this._device.close();
+    if (this._device.opened) {
+      await this._device.close();
+    }
     const info = this._deviceInfo;
     this._device = null;
     this._deviceInfo = null;
@@ -150,7 +163,7 @@ export class WebHidTransport implements HidTransport {
   async getFeatureReport(reportId: number): Promise<Uint8Array> {
     this._assertOpen();
     const result = await this._device!.receiveFeatureReport(reportId);
-    return new Uint8Array(result.buffer);
+    return new Uint8Array(result.buffer, result.byteOffset, result.byteLength);
   }
 
   on(handler: TransportEventHandler): () => void {
@@ -165,6 +178,13 @@ export class WebHidTransport implements HidTransport {
   }
 
   private _mapDevice(device: HIDDevice): HidDeviceInfo {
+    let path = this._devicePaths.get(device);
+    if (!path) {
+      path = `webhid://${device.vendorId.toString(16)}:${device.productId.toString(16)}/${this._nextDeviceId++}`;
+      this._devicePaths.set(device, path);
+    }
+    this._knownDevices.set(path, device);
+
     const vendorCollection = device.collections?.find(
       (c: HIDCollectionInfo) => c.usagePage !== undefined && c.usagePage >= 0xff00
     );
@@ -172,7 +192,7 @@ export class WebHidTransport implements HidTransport {
     const collection = vendorCollection || firstCollection;
 
     return {
-      path: `webhid://${device.vendorId}:${device.productId}`,
+      path,
       vendorId: device.vendorId,
       productId: device.productId,
       manufacturer: device.productName || 'Unknown',

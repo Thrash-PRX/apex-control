@@ -141,6 +141,7 @@ export function DashboardPage() {
   const connection = useAppStore((s) => s.connection);
   const useMock = useAppStore((s) => s.useMock);
   const scanDevices = useAppStore((s) => s.scanDevices);
+  const pairDevice = useAppStore((s) => s.pairDevice);
   const connectDevice = useAppStore((s) => s.connectDevice);
   const disconnectDevice = useAppStore((s) => s.disconnectDevice);
   const setActivePage = useAppStore((s) => s.setActivePage);
@@ -155,6 +156,14 @@ export function DashboardPage() {
   // ── Connection actions ──────────────────────────────────────────────────
 
   async function handleConnect() {
+    if (!useMock) {
+      // Request permission directly within this user gesture. A scan alone
+      // only sees devices previously authorized by the browser.
+      const paired = await pairDevice();
+      if (paired) await connectDevice(paired.path);
+      return;
+    }
+
     await scanDevices();
     // After scanning, grab the fresh list from the store
     const devices = useAppStore.getState().discoveredDevices;
@@ -266,7 +275,7 @@ export function DashboardPage() {
                 ) : (
                   <Plug size={16} />
                 )}
-                {isBusy ? 'Working…' : 'Connect Device'}
+                {isBusy ? 'Working…' : useMock ? 'Connect Mock Device' : 'Pair & Connect Keyboard'}
               </button>
             ) : (
               <button

@@ -6,7 +6,7 @@
 - **URL:** `https://github.com/Thrash-PRX/apex-control`
 - **Base branch:** `main`
 - **Antigravity working branch:** `antigravity/apex-control-continuation`
-- **Latest commit hash:** `f78c17c` (plus handoff hash update)
+- **Antigravity handoff baseline:** `3f09c79` (use `git rev-parse HEAD` for the latest branch commit)
 
 ## Work Completed by Antigravity
 1. **Audited initial repository scaffold:** Confirmed all initial docs were placeholders and directories (`project/`, `original-software/`, `research/`) contained only `.gitkeep`.
@@ -82,3 +82,12 @@ From `project/apex-control-app`:
 3. **Capture dynamic HID traffic:** Use USBPcap + Wireshark while changing lighting and actuation settings in the vendor software to record exact report IDs and payload bytes in `docs/HID_PROTOCOL.md`.
 4. **Implement verified encoders/decoders:** Wire verified byte arrays into `src/lib/protocol/` and connect them to `DeviceManager.sendFeatureReport()`.
 5. **Optionally wrap in Tauri:** If desktop binary with low-level kernel driver bypass is desired, wrap `project/apex-control-app` with Tauri v2 (`cargo tauri init`) without modifying the React frontend.
+
+## Codex continuation after Antigravity (browser pairing)
+
+- Real-device discovery no longer relies on the unverified candidate VID/PID; a browser-native HID permission dialog is reachable from the Dashboard's **Pair & Connect Keyboard** button.
+- Device paths are unique per WebHID device object (even with matching VID/PID).
+- HID input and feature reports respect DataView offsets.
+- Added WebHID pairing regression coverage and a GitHub Actions npm test/lint/build workflow.
+- No keyboard packet writes, calibration or firmware operations were performed.
+- **Verify CI status for the continuation commit before claiming tests pass.** Physical USB verification remains outstanding.

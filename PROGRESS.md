@@ -50,3 +50,12 @@
 - Obtain physical keyboard connection or capture logs (Wireshark/USBPcap) to confirm exact VID/PID (test `0x3402:0x0300` vs actual USB enumeration).
 - Place stock Windows binaries (`GameKeyboard.exe`, `hidapi.dll`) under `original-software/` for disassembly and opcode extraction.
 - Sniff USB HID Feature Reports when changing RGB effects and actuation values to document exact packet byte offsets in `docs/HID_PROTOCOL.md`.
+
+## Codex continuation: browser HID discovery hardening
+
+- Reviewed Antigravity's source at baseline commit `3f09c79`.
+- Found first-time real keyboard pairing was blocked because the dashboard only called `getDevices()`, which lists previously granted devices.
+- Added direct user-gesture HID permission pairing, distinct paths for multiple devices with identical VID/PID, correct DataView slice handling, and removed unverified VID/PID constraints from hardware discovery.
+- Added a regression test for browser pairing and report view offsets plus CI workflow to run tests, lint, and production build.
+- **No physical hardware commands or reverse-engineered opcodes were introduced.**
+- Build/test results from this continuation depend on CI; do not confuse Antigravity's earlier 7/7 pass with a verified run of these changes.
