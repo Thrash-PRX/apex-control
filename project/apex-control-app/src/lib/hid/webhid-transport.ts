@@ -25,6 +25,7 @@ export class WebHidTransport implements HidTransport {
   private _knownDevices = new Map<string, HIDDevice>();
   private _devicePaths = new WeakMap<HIDDevice, string>();
   private _nextDeviceId = 0;
+  private _isClosing = false;
 
   private _disconnectHandler: EventListener = (event) => {
     if ((event as Event & { device: HIDDevice }).device === this._device) this._detach();
@@ -45,19 +46,25 @@ export class WebHidTransport implements HidTransport {
   async enumerate(filter?: HidDeviceFilter): Promise<HidDeviceInfo[]> {
     if (!this.isAvailable()) return [];
 
-    const devices = await navigator.hid.getDevices();
+    try {
+      const devices = await navigator.hid.getDevices();
 
-    return devices
-      .filter((d: HIDDevice) => {
-        if (filter?.vendorId !== undefined && d.vendorId !== filter.vendorId) return false;
-        if (filter?.productId !== undefined && d.productId !== filter.productId) return false;
-        if (filter?.usagePage !== undefined && !collectionsDeep(d.collections).some((c) => c.usagePage === filter.usagePage)) return false;
-        if (filter?.usage !== undefined && !collectionsDeep(d.collections).some((c) =>
-          c.usage === filter.usage && (filter.usagePage === undefined || c.usagePage === filter.usagePage)
-        )) return false;
-        return true;
-      })
-      .map((d: HIDDevice) => this._mapDevice(d));
+      return devices
+        .filter((d: HIDDevice) => {
+          if (filter?.vendorId !== undefined && d.vendorId !== filter.vendorId) return false;
+          if (filter?.productId !== undefined && d.productId !== filter.productId) return false;
+          if (filter?.usagePage !== undefined && !collectionsDeep(d.collections).some((c) => c.usagePage === filter.usagePage)) return false;
+          if (filter?.usage !== undefined && !collectionsDeep(d.collections).some((c) =>
+            c.usage === filter.usage && (filter.usagePage === undefined || c.usagePage === filter.usagePage)
+          )) return false;
+          return true;
+        })
+        .map((d: HIDDevice) => this._mapDevice(d));
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : String(err);
+      this._emit({ type: 'error', error: new Error(`Enumerate failed: ${msg}`), timestamp: Date.now() });
+      return [];
+    }
   }
 
   async requestDevice(filter?: HidDeviceFilter): Promise<HidDeviceInfo | null> {
@@ -78,8 +85,13 @@ export class WebHidTransport implements HidTransport {
       if (devices.length === 0) return null;
       return this._mapDevice(devices[0]);
     } catch (err) {
-      if (err instanceof DOMException && err.name === 'NotAllowedError') {
-        return null;
+      if (err instanceof DOMException) {
+        // User cancelled or denied permission - not an error
+        if (err.name === 'NotAllowedError' || err.name === 'AbortError') {
+          return null;
+        }
+        // SecurityError, NetworkError, etc. are actual errors
+        this._emit({ type: 'error', error: new Error(`WebHID requestDevice: ${err.name}: ${err.message}`), timestamp: Date.now() });
       }
       throw err;
     }
@@ -88,6 +100,12 @@ export class WebHidTransport implements HidTransport {
   async open(devicePath: string): Promise<void> {
     if (!this.isAvailable()) {
       throw new Error('WebHID is not available in this browser');
+    }
+    if (!devicePath || devicePath.trim() === '') {
+      throw new Error('Invalid device path: empty string');
+    }
+    if (this._isClosing) {
+      throw new Error('Transport is closing, cannot open new connection');
     }
 
     // Prefer the exact HIDDevice selected in the permission dialog. VID/PID alone
@@ -100,7 +118,7 @@ export class WebHidTransport implements HidTransport {
     }
 
     if (!device) {
-      throw new Error(`WebHID: device not found for path "${devicePath}"`);
+      throw new Error(`WebHID: device not found for path "${devicePath}". Device may have been disconnected or permission revoked.`);
     }
 
     if (this._device === device && device.opened) return;

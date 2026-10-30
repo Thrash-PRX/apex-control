@@ -154,8 +154,28 @@ export class DeviceManager {
     return this._transport.requestDevice(filter ?? DeviceManager.DEFAULT_FILTER);
   }
 
-  /** Connect to a specific device. */
+  /** Connect to a specific device.
+   * Validates device path and prevents duplicate connections. */
   async connect(devicePath: string): Promise<void> {
+    if (!devicePath || devicePath.trim() === '') {
+      throw new Error('Invalid device path: empty string');
+    }
+
+    // Prevent concurrent connection attempts
+    if (this._connection.state === ConnectionState.Connecting) {
+      throw new Error('Connection already in progress');
+    }
+
+    // If already connected to this device, return early
+    if (this._connection.state === ConnectionState.Connected && this._connection.device?.serialNumber === devicePath) {
+      return;
+    }
+
+    // If connected to a different device, disconnect first
+    if (this._transport.isOpen()) {
+      await this.disconnect();
+    }
+
     this._updateConnection({
       ...this._connection,
       state: ConnectionState.Connecting,
@@ -166,17 +186,19 @@ export class DeviceManager {
       await this._transport.open(devicePath);
       const dev = this._transport.getConnectedDevice();
 
+      if (!dev) {
+        throw new Error('Transport opened but no device info returned');
+      }
+
       this._updateConnection({
         state: ConnectionState.Connected,
-        device: dev
-          ? {
-              vendorId: dev.vendorId,
-              productId: dev.productId,
-              manufacturer: dev.manufacturer,
-              product: dev.product,
-              serialNumber: dev.serialNumber,
-            }
-          : null,
+        device: {
+          vendorId: dev.vendorId,
+          productId: dev.productId,
+          manufacturer: dev.manufacturer,
+          product: dev.product,
+          serialNumber: dev.serialNumber,
+        },
         isMock: this._transport.name === 'Mock',
         lastSeen: Date.now(),
         error: null,
