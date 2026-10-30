@@ -6,7 +6,7 @@
 - **URL:** `https://github.com/Thrash-PRX/apex-control`
 - **Base branch:** `main`
 - **Antigravity working branch:** `antigravity/apex-control-continuation`
-- **Latest commit hash:** Recorded upon git commit below
+- **Latest commit hash:** `f78c17c` (plus handoff hash update)
 
 ## Work Completed by Antigravity
 1. **Audited initial repository scaffold:** Confirmed all initial docs were placeholders and directories (`project/`, `original-software/`, `research/`) contained only `.gitkeep`.
