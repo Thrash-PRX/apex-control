@@ -80,3 +80,9 @@ This section supersedes conflicting historical identity/hardware claims below. L
 - Added a regression test for browser pairing and report view offsets plus CI workflow to run tests, lint, and production build.
 - **No physical hardware commands or reverse-engineered opcodes were introduced.**
 - Build/test results from this continuation depend on CI; do not confuse Antigravity's earlier 7/7 pass with a verified run of these changes.
+
+## 2026-10-31 integration
+
+Merged five pre-codex heads on integration/pre-codex-20261031 in a separate worktree. Source tests independently run: protocol 103 pass; reliability 36 pass / 1 fail (broken fixture); frontend 37 pass; display and research 13 pass each. Every source lint/build passed. Fixed reliability fixture and integration defects in device identity, frame bounds, profile persistence and display draft compatibility. See HANDOFF.md and docs/INTEGRATION-CAPTURE.md. Main and source branches unchanged; all hardware writes blocked.
+
+Final integration validation: 130 tests passed, 0 failed; lint and production build passed.

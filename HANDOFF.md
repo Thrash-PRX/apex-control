@@ -112,3 +112,15 @@ From `project/apex-control-app`:
 - Added WebHID pairing regression coverage and a GitHub Actions npm test/lint/build workflow.
 - No keyboard packet writes, calibration or firmware operations were performed.
 - **Verify CI status for the continuation commit before claiming tests pass.** Physical USB verification remains outstanding.
+
+## Integration verification — 2026-10-31
+
+Branch: integration/pre-codex-20261031, separate worktree ../integration. Source heads: protocol ca24bc064cd34ddb0a6b57d8671f9e25b949ee0b; reliability f47a09f19983b88f76e5bea6cc1164a80002a952; frontend bb5558ee95dc327658762878a8d85f8ee1a29797; display 84bae55aba62aa40b5c9d96fad0335b1ff1f616b; research e83a544bbf299e6b0b082a4c6f861bb6698db228.
+
+All five merged without modifying main, continuation, or source branches. Frontend carried overlapping reliability changes; retained the reliability branch's stronger concurrent-switch regression test. Fixed its undefined mock fixture reference. Source branch checks: protocol 103/103, frontend 37/37, display 13/13, research 13/13; reliability 36/37 (undefined mockHidDevice). All five lint and build checks passed. These are actual runs, superseding source handoff claims.
+
+Integration fixes: compare transport paths for repeated connect; prevent close re-entry; enforce 14-record RGB limit for 64-byte candidate frames, exact response length and RGB index bounds; persist profile creation/deletion; reject empty profile imports; migrate v1 display drafts; normalize nonfinite image transforms; keep Delete in text fields from deleting the preview image. Added integration regressions for connection identity, packet bounds and draft migration.
+
+Physical writes remain locked. No physical reads/writes, reset, calibration or flashing occurred. Read docs/INTEGRATION-CAPTURE.md for capture/readback/backup gates and unresolved candidate protocol assumptions. No complete device backup/restore exists. Original checkout's uncommitted readback/research files remain untouched and uncommitted. UI functionality is retained; browser visual verification was not performed in this integration session. Final validation and SHA: see git log and the integration validation entry below.
+
+Final integration validation: 130/130 tests passed; npm run lint passed; npm run build passed. Exact resulting commit: git rev-parse HEAD (this entry is included in that commit).

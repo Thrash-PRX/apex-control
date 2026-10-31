@@ -328,7 +328,7 @@ test('WebHID Transport — getFeatureReport validates declared reports', async (
   Object.defineProperty(navigator, 'hid', {
     configurable: true,
     value: {
-      async getDevices() { return [mockHidDevice]; },
+      async getDevices() { return [_mockHidDevice]; },
     },
   });
 

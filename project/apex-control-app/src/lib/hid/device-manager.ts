@@ -180,7 +180,7 @@ export class DeviceManager {
     }
 
     // If already connected to this device, return early
-    if (this._connection.state === ConnectionState.Connected && this._connection.device?.serialNumber === devicePath) {
+    if (this._connection.state === ConnectionState.Connected && this._transport.getConnectedDevice()?.path === devicePath) {
       return;
     }
 

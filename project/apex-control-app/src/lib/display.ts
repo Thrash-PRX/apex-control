@@ -104,11 +104,11 @@ export function parseDisplayDraft(value: unknown): DisplayDraft {
   if (d.imageSettings && typeof d.imageSettings === 'object') {
     const s = d.imageSettings as Record<string, unknown>;
     imageSettings = {
-      scale: typeof s.scale === 'number' ? Math.max(0.1, Math.min(3.0, s.scale)) : 1.0,
-      offsetX: typeof s.offsetX === 'number' ? Math.max(-50, Math.min(50, s.offsetX)) : 0,
-      offsetY: typeof s.offsetY === 'number' ? Math.max(-50, Math.min(50, s.offsetY)) : 0,
+      scale: typeof s.scale === 'number' && Number.isFinite(s.scale) ? Math.max(0.1, Math.min(3.0, s.scale)) : 1.0,
+      offsetX: typeof s.offsetX === 'number' && Number.isFinite(s.offsetX) ? Math.max(-50, Math.min(50, s.offsetX)) : 0,
+      offsetY: typeof s.offsetY === 'number' && Number.isFinite(s.offsetY) ? Math.max(-50, Math.min(50, s.offsetY)) : 0,
       rotation: [0, 90, 180, 270].includes(s.rotation as number) ? s.rotation as 0 | 90 | 180 | 270 : 0,
-      opacity: typeof s.opacity === 'number' ? Math.max(0, Math.min(1, s.opacity)) : 0.5,
+      opacity: typeof s.opacity === 'number' && Number.isFinite(s.opacity) ? Math.max(0, Math.min(1, s.opacity)) : 0.5,
     };
   }
   
@@ -141,7 +141,7 @@ export function parseDisplayDraft(value: unknown): DisplayDraft {
 
 export function loadDraft(): DisplayDraft {
   try {
-    const saved = localStorage.getItem(STORAGE_KEY);
+    const saved = localStorage.getItem(STORAGE_KEY) ?? localStorage.getItem('apex-control-display-v1');
     if (saved) {
       const parsed = JSON.parse(saved);
       return parseDisplayDraft(parsed);

@@ -164,7 +164,7 @@ export class WebHidTransport implements HidTransport {
   }
 
   async close(): Promise<void> {
-    if (!this._device) return;
+    if (!this._device || this._isClosing) return;
 
     this._isClosing = true;
     const device = this._device;

@@ -268,7 +268,7 @@ export function DisplayPage() {
         e.preventDefault();
         handleExport();
       }
-      if (e.key === 'Delete' && draft.image) {
+      if (e.key === 'Delete' && draft.image && !(e.target instanceof HTMLElement && (e.target.isContentEditable || ['INPUT', 'TEXTAREA', 'SELECT'].includes(e.target.tagName)))) {
         removeImage();
       }
     };

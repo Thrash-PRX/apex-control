@@ -26,7 +26,7 @@ export function encodeCustomRgbPayload(
   return Uint8Array.from([rawParameter, ...rgb, ...keyIndices].map(byte));
 }
 
-/** Known USB output wrapper; WebHID payload excludes the HIDAPI report-ID prefix.
+/** Candidate 64-byte output wrapper (not capture-verified); WebHID payload excludes the HIDAPI report-ID prefix.
  * Format: [FA, opcode, frameIndex, totalFrames, 0, payloadLength, payload..., padding] */
 export function encodeCustomRgbReport(
   rawParameter: number,
@@ -46,7 +46,7 @@ export function encodeBulkCustomRgbPayload(
   startIndex: number,
   records: readonly (readonly [number, number, number, number])[]
 ): Uint8Array {
-  if (records.length === 0 || records.length > 54) {
+  if (records.length === 0 || records.length > 14) {
     throw new RangeError('Invalid bulk record count');
   }
   if (startIndex < 0 || startIndex + records.length > 256) {
@@ -100,7 +100,7 @@ export interface ResponseFrame {
 /** Parse a raw input report (64 bytes from WebHID) into a ResponseFrame.
  * Returns null if the frame is malformed or doesn't match expected magic. */
 export function parseResponseFrame(data: Uint8Array): ResponseFrame | null {
-  if (data.length < 7) return null; // Minimum: magic + cmd + frame + total + field4 + len + 1 byte payload
+  if (data.length !== 64) return null; // Minimum: magic + cmd + frame + total + field4 + len + 1 byte payload
   if (data[0] !== 0xfa) return null; // Magic mismatch
 
   const command = data[1];
@@ -474,6 +474,7 @@ export function decodeBulkRgbReadback(payload: Uint8Array): BulkRgbRecord[] {
   }
   const startIndex = payload[0];
   const recordCount = (payload.length - 1) / 4;
+  if (startIndex + recordCount > 256) throw new RangeError('RGB readback index overflow');
   return Array.from({ length: recordCount }, (_, i) => {
     const base = 1 + i * 4;
     return {

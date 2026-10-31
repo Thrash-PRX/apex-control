@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import {
   FolderOpen,
   Plus,
@@ -52,7 +52,7 @@ const DEFAULT_PROFILES: ProfileItem[] = [
 
 // Validate imported profile data
 function validateProfileData(data: unknown): data is ProfileItem[] {
-  if (!Array.isArray(data)) return false;
+  if (!Array.isArray(data) || data.length < 1 || data.length > 100) return false;
   return data.every((item) =>
     typeof item === 'object' &&
     item !== null &&
@@ -107,6 +107,7 @@ function saveProfiles(profiles: ProfileItem[]): void {
 
 export const ProfilesPage: React.FC = () => {
   const [profiles, setProfiles] = useState<ProfileItem[]>(() => loadProfiles());
+  useEffect(() => { saveProfiles(profiles); }, [profiles]);
   const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' | 'info' } | null>(null);
 
   const showToast = useCallback((message: string, type: 'success' | 'error' | 'info' = 'info') => {
