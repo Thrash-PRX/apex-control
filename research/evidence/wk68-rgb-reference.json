@@ -1,0 +1,208 @@
+{
+  "installerSha256": "94ae1d82fe135b1957db5fcb97a6ab0593bff74a4f145d1dbcad17d9618dc378",
+  "labels": [
+    {
+      "label": "Fixed_on",
+      "resourceKey": "tc_kb_led1"
+    },
+    {
+      "label": "Respire",
+      "resourceKey": "tc_kb_led2"
+    },
+    {
+      "label": "Rainbow",
+      "resourceKey": "tc_kb_led3"
+    },
+    {
+      "label": "Flash_away",
+      "resourceKey": "tc_kb_led4"
+    },
+    {
+      "label": "Raindrops",
+      "resourceKey": "tc_kb_led5"
+    },
+    {
+      "label": "Rainbow_wheel",
+      "resourceKey": "tc_kb_led6"
+    },
+    {
+      "label": "Ripples_shining",
+      "resourceKey": "tc_kb_led7"
+    },
+    {
+      "label": "Stars_twinkle",
+      "resourceKey": "tc_kb_led8"
+    },
+    {
+      "label": "Shadow_disappear",
+      "resourceKey": "tc_kb_led9"
+    },
+    {
+      "label": "Retro_snake",
+      "resourceKey": "tc_kb_led10"
+    },
+    {
+      "label": "Neon_stream",
+      "resourceKey": "tc_kb_led11"
+    },
+    {
+      "label": "Reaction",
+      "resourceKey": "tc_kb_led12"
+    },
+    {
+      "label": "Sine_wave",
+      "resourceKey": "tc_kb_led13"
+    },
+    {
+      "label": "Retinue scanning",
+      "resourceKey": "tc_kb_led14"
+    },
+    {
+      "label": "Rotating windmill",
+      "resourceKey": "tc_kb_led15"
+    },
+    {
+      "label": "Colorful waterfall",
+      "resourceKey": "tc_kb_led16"
+    },
+    {
+      "label": "Blossoming",
+      "resourceKey": "tc_kb_led17"
+    },
+    {
+      "label": "Rotating storm",
+      "resourceKey": "tc_kb_led18"
+    },
+    {
+      "label": "Self-define",
+      "resourceKey": "tc_kb_led19"
+    },
+    {
+      "label": "OFF",
+      "resourceKey": "tc_kb_led20"
+    },
+    {
+      "label": "",
+      "resourceKey": "tc_kb_led21"
+    },
+    {
+      "label": "",
+      "resourceKey": "tc_kb_led22"
+    }
+  ],
+  "executableSha256": "91C954CAE6D463990487413509EED62B7879E7A0A0515553342839920CDDB5F8",
+  "configurations": [
+    {
+      "options": [
+        "VID=0x258a",
+        "PID=0x019d",
+        "VID_Wireless=0x258a",
+        "PID_Wireless=0x0150",
+        "Name=wk-65-75 keyboard",
+        "DefLedIndex=10",
+        "Light=0,1,2,3,4",
+        "LightHW=1,5,10,15,20",
+        "Speed=0,1,2,3,4",
+        "SpeedHW=0,1,2,3,4",
+        "LedMask=0x22020",
+        "LedOpt1=  1,1,0,1,0,1,1",
+        "LedOpt2=  2,3,1,1,0,1,1",
+        "LedOpt3=  3,2,1,1,0,0,0",
+        "LedOpt4=  4,19,1,1,0,1,1",
+        "LedOpt5=  5,15,1,1,0,1,1",
+        "LedOpt6=  6,13,1,1,0,1,1",
+        "LedOpt7=  7,20,1,1,0,1,1",
+        "LedOpt8=  8,16,1,1,0,1,1",
+        "LedOpt9=  9,18,1,1,0,1,1",
+        "LedOpt10=10,5,1,1,0,1,1",
+        "LedOpt11=11,7,1,1,0,1,1",
+        "LedOpt12=12,17,1,1,0,1,1",
+        "LedOpt13=13,12,1,1,0,1,1",
+        "LedOpt14=14,8,1,1,0,1,1",
+        "LedOpt15=15,28,1,1,0,0,0",
+        "LedOpt16=16,30,1,1,0,0,0",
+        "LedOpt17=17,14,1,1,0,0,0",
+        "LedOpt18=18,29,1,1,0,1,1",
+        "LedOpt19=21,0,0,0,0,0,0",
+        "LedOpt20=0,0,0,0,0,0,0"
+      ],
+      "sha256": "A79A83FC8024F7DC254BB290A03567F0B4BF4BCF3760C37FC74D48A5647888FF",
+      "path": "Dev/kb/1/KB.ini"
+    },
+    {
+      "options": [
+        "VID=0x258a",
+        "PID=0x019d",
+        "VID_Wireless=0x258a",
+        "PID_Wireless=0x0150",
+        "Name=wk-75 keyboard",
+        "DefLedIndex=10",
+        "Light=0,1,2,3,4",
+        "LightHW=1,5,10,15,20",
+        "Speed=0,1,2,3,4",
+        "SpeedHW=0,1,2,3,4",
+        "LedMask=0x22020",
+        "LedOpt1=  1,1,0,1,0,1,1",
+        "LedOpt2=  2,3,1,1,0,1,1",
+        "LedOpt3=  3,2,1,1,0,0,0",
+        "LedOpt4=  4,19,1,1,0,1,1",
+        "LedOpt5=  5,15,1,1,0,1,1",
+        "LedOpt6=  6,13,1,1,0,1,1",
+        "LedOpt7=  7,20,1,1,0,1,1",
+        "LedOpt8=  8,16,1,1,0,1,1",
+        "LedOpt9=  9,18,1,1,0,1,1",
+        "LedOpt10=10,5,1,1,0,1,1",
+        "LedOpt11=11,7,1,1,0,1,1",
+        "LedOpt12=12,17,1,1,0,1,1",
+        "LedOpt13=13,12,1,1,0,1,1",
+        "LedOpt14=14,8,1,1,0,1,1",
+        "LedOpt15=15,28,1,1,0,0,0",
+        "LedOpt16=16,30,1,1,0,0,0",
+        "LedOpt17=17,14,1,1,0,0,0",
+        "LedOpt18=18,29,1,1,0,1,1",
+        "LedOpt19=21,0,0,0,0,0,0",
+        "LedOpt20=0,0,0,0,0,0,0"
+      ],
+      "sha256": "EE39ABC368A8B424C60C895323D71799A50065FA980549AE0990F44673364172",
+      "path": "Dev/kb/2/KB.ini"
+    },
+    {
+      "options": [
+        "VID=0x258a",
+        "PID=0x010C",
+        "VID_Wireless=0x3554",
+        "PID_Wireless=0xfa09",
+        "Name=65 keyboard",
+        "DefLedIndex=10",
+        "Light=0,1,2,3,4",
+        "LightHW=1,5,10,15,20",
+        "Speed=0,1,2,3,4",
+        "SpeedHW=0,1,2,3,4",
+        "LedMask=0x22120",
+        "LedOpt1=  1,1,0,1,0,1,1",
+        "LedOpt2=  2,3,1,1,0,1,1",
+        "LedOpt3=  3,2,1,1,0,0,0",
+        "LedOpt4=  4,19,1,1,0,1,1",
+        "LedOpt5=  5,15,1,1,0,1,1",
+        "LedOpt6=  6,13,1,1,0,1,1",
+        "LedOpt7=  7,20,1,1,0,1,1",
+        "LedOpt8=  8,16,1,1,0,1,1",
+        "LedOpt9=  9,18,1,1,0,1,1",
+        "LedOpt10=10,5,1,1,0,1,1",
+        "LedOpt11=11,7,1,1,0,1,1",
+        "LedOpt12=12,17,1,1,0,1,1",
+        "LedOpt13=13,12,1,1,0,1,1",
+        "LedOpt14=14,8,1,1,0,1,1",
+        "LedOpt15=15,28,1,1,0,0,0",
+        "LedOpt16=16,30,1,1,0,0,0",
+        "LedOpt17=17,14,1,1,0,0,0",
+        "LedOpt18=18,29,1,1,0,1,1",
+        "LedOpt19=21,0,0,0,0,0,0",
+        "LedOpt20=0,0,0,0,0,0,0"
+      ],
+      "sha256": "43F885777EA2BD546F79BDBB25DA4304C37B29BF99155B19AAAAB8636F5D87E6",
+      "path": "Dev/kb/3/KB.ini"
+    }
+  ],
+  "limitations": "Static resources only. Numeric LED options are WK package data, never APEX opcodes. Labels may include modes hidden by masks; runtime algorithms not observed."
+}

@@ -86,3 +86,7 @@ This section supersedes conflicting historical identity/hardware claims below. L
 Merged five pre-codex heads on integration/pre-codex-20261031 in a separate worktree. Source tests independently run: protocol 103 pass; reliability 36 pass / 1 fail (broken fixture); frontend 37 pass; display and research 13 pass each. Every source lint/build passed. Fixed reliability fixture and integration defects in device identity, frame bounds, profile persistence and display draft compatibility. See HANDOFF.md and docs/INTEGRATION-CAPTURE.md. Main and source branches unchanged; all hardware writes blocked.
 
 Final integration validation: 130 tests passed, 0 failed; lint and production build passed.
+
+## WK68 RGB investigation
+
+Unpacked WK68 and retained resource/configuration hashes and mode labels. Added independent local lighting animation and regression tests. No vendor application or HID command executed. See docs/WK68-REFERENCE.md; reference algorithms are still unverified.

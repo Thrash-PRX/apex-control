@@ -132,3 +132,9 @@ Final integration validation: 130/130 tests passed; npm run lint passed; npm run
 3. Our own OLED screen customizer.
 
 Reference applications guide UX only until APEX-specific protocol evidence establishes compatibility. Never reuse another keyboard's USB commands without validation. Reference installers/URLs and captures are not present in this checkout. Existing local UI remains available; physical writes stay locked.
+
+## RGB continuation — 2026-10-31
+
+Extracted supplied WK68 installer without executing its application. Saved hashed RGB resource/configuration findings in docs/WK68-REFERENCE.md and research/evidence/wk68-rgb-reference.json. Identified different target USB IDs; no WK68 device values are reused for APEX. Added authored local animated previews for existing APEX lighting effects, brightness/speed/direction controls and reduced-motion handling. Reactive/ripple are explicitly demonstrations from selected keys. Remaining WK68 mode algorithm/mask mappings and APEX capture/readback remain unresolved; hardware writes locked.
+
+RGB continuation validation: 133/133 tests pass; lint and production build pass. No browser visual check or physical-device test claimed.

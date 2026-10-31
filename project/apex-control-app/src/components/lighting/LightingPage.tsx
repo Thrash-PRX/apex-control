@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   Palette,
   Sliders,
@@ -11,6 +11,8 @@ import { useAppStore } from '../../stores/app-store';
 import { LIGHTING_EFFECTS, LightingEffect, type RgbColor } from '../../types';
 import { KeyboardVisualizer } from '../keyboard';
 
+import { previewLighting } from '../../lib/lighting-preview';
+import { APEX_200S_LAYOUT } from '../../lib/keyboard-layout';
 const PRESET_COLORS: RgbColor[] = [
   { r: 0, g: 150, b: 255 },   // Electric Blue
   { r: 255, g: 50, b: 50 },   // Cyber Red
@@ -37,15 +39,15 @@ export const LightingPage: React.FC = () => {
     });
   };
 
-  const keyColorsMap = new Map<string, RgbColor>();
-  if (lightingConfig.effect !== LightingEffect.Off) {
-    // When an effect is active, preview it on keys
-    // In per-key or static mode, show the primary color
-    if (selectedKeys.length > 0) {
-      selectedKeys.forEach((k) => keyColorsMap.set(k, lightingConfig.primaryColor));
-    }
-  }
-
+  const [seconds, setSeconds] = useState(0);
+  useEffect(() => {
+    const motion = window.matchMedia('(prefers-reduced-motion: reduce)');
+    if (motion.matches) return;
+    const start = performance.now();
+    const timer = window.setInterval(() => setSeconds((performance.now() - start) / 1000), 50);
+    return () => window.clearInterval(timer);
+  }, []);
+  const keyColorsMap = previewLighting(lightingConfig, APEX_200S_LAYOUT, seconds, selectedKeys);
   return (
     <div className="space-y-6 max-w-6xl mx-auto pb-12">
       {/* Page Header */}
@@ -62,7 +64,7 @@ export const LightingPage: React.FC = () => {
             </span>
           </div>
           <p className="text-sm text-[#8888a0] mt-1">
-            Configure RGB lighting profiles, onboard illumination presets, and per-key styling.
+            Preview RGB effects locally. Hardware Apply is locked. Reactive and ripple use selected keys as demonstration origins.
           </p>
         </div>
 
@@ -86,7 +88,7 @@ export const LightingPage: React.FC = () => {
       <div className="rounded-xl border border-[#333355] bg-[#16162a] p-4 shadow-lg">
         <div className="flex items-center justify-between mb-2 px-2">
           <span className="text-xs font-semibold text-[#8888a0] uppercase tracking-wider">
-            Live Preview (Selected Keys: {selectedKeys.length})
+            Local Preview (Selected Keys: {selectedKeys.length})
           </span>
           {selectedKeys.length > 0 && (
             <button
