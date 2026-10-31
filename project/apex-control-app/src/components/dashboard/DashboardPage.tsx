@@ -172,6 +172,14 @@ export function DashboardPage() {
     }
   }
 
+  // Keyboard accessibility for nav shortcuts
+  function handleNavKeyDown(e: React.KeyboardEvent, page: AppPage) {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      setActivePage(page);
+    }
+  }
+
   // ── Helpers ─────────────────────────────────────────────────────────────
 
   function formatTimestamp(ts: number | null): string {
@@ -267,23 +275,28 @@ export function DashboardPage() {
               <button
                 onClick={handleConnect}
                 disabled={isBusy}
+                aria-busy={isBusy}
+                aria-label={isBusy ? 'Connection in progress' : useMock ? 'Connect mock device' : 'Pair and connect keyboard'}
                 className="inline-flex items-center gap-2 rounded-md bg-[#0096ff] px-4 py-2 text-sm font-medium text-white
-                           hover:bg-[#0077cc] disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                           hover:bg-[#0077cc] disabled:opacity-50 disabled:cursor-not-allowed transition-colors
+                           focus:outline-none focus:ring-2 focus:ring-[#0096ff] focus:ring-offset-2 focus:ring-offset-[#1a1a2e]"
               >
                 {isBusy ? (
-                  <Loader2 size={16} className="animate-spin" />
+                  <Loader2 size={16} className="animate-spin" aria-hidden="true" />
                 ) : (
-                  <Plug size={16} />
+                  <Plug size={16} aria-hidden="true" />
                 )}
                 {isBusy ? 'Working…' : useMock ? 'Connect Mock Device' : 'Pair & Connect Keyboard'}
               </button>
             ) : (
               <button
                 onClick={disconnectDevice}
+                aria-label="Disconnect from keyboard"
                 className="inline-flex items-center gap-2 rounded-md border border-[#333355] bg-[#1a1a2e] px-4 py-2 text-sm font-medium text-[#e4e4ef]
-                           hover:bg-[#2d2d4a] transition-colors"
+                           hover:bg-[#2d2d4a] transition-colors
+                           focus:outline-none focus:ring-2 focus:ring-[#0096ff] focus:ring-offset-2 focus:ring-offset-[#1a1a2e]"
               >
-                <Unplug size={16} />
+                <Unplug size={16} aria-hidden="true" />
                 Disconnect
               </button>
             )}
@@ -331,10 +344,15 @@ export function DashboardPage() {
             <button
               key={nav.page}
               onClick={() => setActivePage(nav.page)}
+              onKeyDown={(e) => handleNavKeyDown(e, nav.page)}
+              tabIndex={0}
+              role="menuitem"
+              aria-label={`Navigate to ${nav.label}: ${nav.description}`}
               className="group flex items-start gap-3 rounded-lg border border-[#333355] bg-[#252540] px-4 py-3
-                         hover:border-[#0096ff]/50 hover:bg-[#2d2d4a] transition-colors text-left"
+                         hover:border-[#0096ff]/50 hover:bg-[#2d2d4a] transition-colors text-left
+                         focus:outline-none focus:ring-2 focus:ring-[#0096ff] focus:ring-offset-2 focus:ring-offset-[#1a1a2e]"
             >
-              <div className="mt-0.5 text-[#8888a0] group-hover:text-[#0096ff] transition-colors">
+              <div className="mt-0.5 text-[#8888a0] group-hover:text-[#0096ff] transition-colors" aria-hidden="true">
                 {nav.icon}
               </div>
               <div className="min-w-0">

@@ -112,7 +112,7 @@ export const LightingPage: React.FC = () => {
             Lighting Effects
           </h2>
 
-          <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-3" role="group" aria-label="Lighting effects">
             {LIGHTING_EFFECTS.map((eff) => {
               const isSelected = lightingConfig.effect === eff.effect;
               return (
@@ -120,16 +120,26 @@ export const LightingPage: React.FC = () => {
                   key={eff.effect}
                   type="button"
                   onClick={() => updateLighting({ effect: eff.effect })}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      e.preventDefault();
+                      updateLighting({ effect: eff.effect });
+                    }
+                  }}
+                  tabIndex={0}
+                  role="radio"
+                  aria-checked={isSelected}
+                  aria-label={eff.label}
                   className={`flex flex-col items-start p-3 rounded-lg border text-left transition-all ${
                     isSelected
                       ? 'border-[#0096ff] bg-[#0096ff]/10 text-white shadow-md shadow-[#0096ff]/10'
                       : 'border-[#2b2b45] bg-[#1c1c30] text-[#a0a0b8] hover:border-[#3d3d60] hover:text-white'
-                  }`}
+                  } focus:outline-none focus:ring-2 focus:ring-[#0096ff] focus:ring-offset-2 focus:ring-offset-[#1a1a2e]`}
                 >
                   <span className="text-xs font-bold leading-tight flex items-center justify-between w-full">
                     {eff.label}
                     {isSelected && (
-                      <span className="w-2 h-2 rounded-full bg-[#0096ff]" />
+                      <span className="w-2 h-2 rounded-full bg-[#0096ff]" aria-hidden="true" />
                     )}
                   </span>
                   <span className="text-[11px] text-[#70708c] mt-1 line-clamp-2">
@@ -170,15 +180,17 @@ export const LightingPage: React.FC = () => {
             </div>
 
             {/* Quick Palettes */}
-            <div className="grid grid-cols-4 gap-2 mb-4">
+            <div className="grid grid-cols-4 gap-2 mb-4" role="group" aria-label="Color presets">
               {PRESET_COLORS.map((col, idx) => (
                 <button
                   key={idx}
                   onClick={() => updateLighting({ primaryColor: col })}
-                  className="h-7 rounded border border-[#333355] transition-transform hover:scale-105 active:scale-95"
+                  className="h-7 rounded border border-[#333355] transition-transform hover:scale-105 active:scale-95
+                             focus:outline-none focus:ring-2 focus:ring-[#0096ff] focus:ring-offset-2 focus:ring-offset-[#1a1a2e]"
                   style={{
                     backgroundColor: `rgb(${col.r}, ${col.g}, ${col.b})`,
                   }}
+                  aria-label={`Preset color: rgb(${col.r}, ${col.g}, ${col.b})`}
                 />
               ))}
             </div>
@@ -186,47 +198,53 @@ export const LightingPage: React.FC = () => {
             {/* Sliders for R, G, B */}
             <div className="space-y-2.5 text-xs">
               <div className="space-y-1">
-                <div className="flex justify-between text-[#8888a0]">
+                <label htmlFor="rgb-r" className="flex justify-between text-[#8888a0]">
                   <span>Red</span>
                   <span className="font-mono">{lightingConfig.primaryColor.r}</span>
-                </div>
+                </label>
                 <input
+                  id="rgb-r"
                   type="range"
                   min="0"
                   max="255"
                   value={lightingConfig.primaryColor.r}
                   onChange={(e) => handleColorChange('r', parseInt(e.target.value))}
                   className="w-full accent-[#ff4d4d]"
+                  aria-label="Red channel (0-255)"
                 />
               </div>
 
               <div className="space-y-1">
-                <div className="flex justify-between text-[#8888a0]">
+                <label htmlFor="rgb-g" className="flex justify-between text-[#8888a0]">
                   <span>Green</span>
                   <span className="font-mono">{lightingConfig.primaryColor.g}</span>
-                </div>
+                </label>
                 <input
+                  id="rgb-g"
                   type="range"
                   min="0"
                   max="255"
                   value={lightingConfig.primaryColor.g}
                   onChange={(e) => handleColorChange('g', parseInt(e.target.value))}
                   className="w-full accent-[#00e676]"
+                  aria-label="Green channel (0-255)"
                 />
               </div>
 
               <div className="space-y-1">
-                <div className="flex justify-between text-[#8888a0]">
+                <label htmlFor="rgb-b" className="flex justify-between text-[#8888a0]">
                   <span>Blue</span>
                   <span className="font-mono">{lightingConfig.primaryColor.b}</span>
-                </div>
+                </label>
                 <input
+                  id="rgb-b"
                   type="range"
                   min="0"
                   max="255"
                   value={lightingConfig.primaryColor.b}
                   onChange={(e) => handleColorChange('b', parseInt(e.target.value))}
                   className="w-full accent-[#0096ff]"
+                  aria-label="Blue channel (0-255)"
                 />
               </div>
             </div>
@@ -240,34 +258,38 @@ export const LightingPage: React.FC = () => {
             </h2>
 
             <div className="space-y-1 text-xs">
-              <div className="flex justify-between text-[#8888a0]">
+              <label htmlFor="brightness" className="flex justify-between text-[#8888a0]">
                 <span className="flex items-center gap-1.5">
-                  <Sun className="w-3.5 h-3.5" /> Brightness
+                  <Sun className="w-3.5 h-3.5" aria-hidden="true" /> Brightness
                 </span>
                 <span className="font-mono">{lightingConfig.brightness}%</span>
-              </div>
+              </label>
               <input
+                id="brightness"
                 type="range"
                 min="0"
                 max="100"
                 value={lightingConfig.brightness}
                 onChange={(e) => updateLighting({ brightness: parseInt(e.target.value) })}
                 className="w-full accent-[#0096ff]"
+                aria-label="Brightness (0-100%)"
               />
             </div>
 
             <div className="space-y-1 text-xs">
-              <div className="flex justify-between text-[#8888a0]">
+              <label htmlFor="speed" className="flex justify-between text-[#8888a0]">
                 <span>Speed</span>
                 <span className="font-mono">{lightingConfig.speed}%</span>
-              </div>
+              </label>
               <input
+                id="speed"
                 type="range"
                 min="0"
                 max="100"
                 value={lightingConfig.speed}
                 onChange={(e) => updateLighting({ speed: parseInt(e.target.value) })}
                 className="w-full accent-[#0096ff]"
+                aria-label="Effect speed (0-100%)"
               />
             </div>
           </div>
