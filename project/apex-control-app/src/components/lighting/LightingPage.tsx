@@ -1,5 +1,5 @@
 import { nativeRgbMode } from '../../lib/native-rgb-mode';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import {
   Palette,
   Sliders,
@@ -26,6 +26,9 @@ const PRESET_COLORS: RgbColor[] = [
 ];
 
 export const LightingPage: React.FC = () => {
+  const playController = useRef<AbortController | null>(null);
+  const playRgb = useAppStore(s=>s.playRgb);
+  useEffect(()=>()=>{playController.current?.abort();},[]);
   const [overlay, setOverlay] = useState<'none'|'reactive'|'ripple'>('none');
   const [applying, setApplying] = useState(false);
   const [applyStatus, setApplyStatus] = useState('');
@@ -96,6 +99,11 @@ export const LightingPage: React.FC = () => {
       <div className="rounded-xl border border-[#333355] p-4 space-y-2">
         <button disabled={applying || nativeRgbMode(lightingConfig)===null || overlay!=='none'} className="px-4 py-2 rounded bg-[#0096ff] disabled:opacity-50" onClick={async()=>{setApplying(true);setApplyStatus('Backing up RGB settings and applying…');try{await applyRgb();setApplyStatus('RGB settings acknowledged and read back from APEX.');}catch(e){setApplyStatus(e instanceof Error?e.message:String(e));}finally{setApplying(false);}}}>{applying?'Applying…':'Apply RGB to Keyboard'}</button>
         <button className="ml-3 text-sm underline" onClick={()=>{const raw=localStorage.getItem("apex-rgb-device-backup-v1");if(!raw){setApplyStatus("No device RGB backup yet. Apply reads and saves it before changing settings.");return;}const url=URL.createObjectURL(new Blob([raw],{type:"application/json"}));const a=document.createElement("a");a.href=url;a.download="apex-rgb-backup.json";a.click();URL.revokeObjectURL(url);}}>Export RGB backup</button><p className="text-xs text-[#8888a0]">Hardware: APEX native effects only; other effects and overlays are browser previews. Close MKeyboard first, switch to hardware mode and pair APEX from Dashboard. Current RGB records are backed up in this browser before applying.</p>
+        <div className="flex gap-3">
+          <button className="px-3 py-2 rounded bg-purple-700 disabled:opacity-50" disabled={applying || lightingConfig.effect==='native_layer' || overlay!=='none'} onClick={async()=>{const controller=new AbortController();playController.current=controller;setApplying(true);setApplyStatus('Backing up palette; running bounded hardware animation…');try{await playRgb(controller.signal);setApplyStatus('Animation test ended; palette restore readback confirmed. Custom mode remains selected.');}catch(e){setApplyStatus(e instanceof Error?e.message:String(e));}finally{playController.current=null;setApplying(false);}}}>Test hardware animation (8 frames)</button>
+          <button className="px-3 py-2 border rounded" onClick={()=>playController.current?.abort()}>Stop animation and restore colors</button>
+        </div>
+<button className="text-sm underline" onClick={()=>{const raw=localStorage.getItem("apex-custom-rgb-history-v1");if(!raw){setApplyStatus("No animation palette backup yet.");return;}const url=URL.createObjectURL(new Blob([raw],{type:"application/json"}));const a=document.createElement("a");a.href=url;a.download="apex-animation-palettes.json";a.click();URL.revokeObjectURL(url);}}>Export animation palette backups</button><p className="text-xs text-[#8888a0]">Experimental host playback: keep this page open. Eight frames at up to 2 fps, followed by palette restore/readback. Custom mode remains selected. Reactive previews use keys typed while this page has focus. Unplugging prevents automatic restore; the backup remains in browser storage.</p>
         <p role="status" className="text-sm">{applyStatus}</p>
       </div>
       <div className="flex flex-wrap gap-4 text-sm">

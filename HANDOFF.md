@@ -173,3 +173,6 @@ Added full captured native IDs0–11 through existing backed-up/acknowledged/rea
 
 ## Expanded native RGB user verification — 2026-10-31
 User completed the requested Wave and Ripple hardware test and reported both work. This confirms physical Wave in the tested direction and Ripple key-press behavior through APEX CONTROL; the prompt also requested readback confirmation, but the short reply does not independently specify the status text. Do not infer all four Flow directions or all native modes were individually tested. Reference animations/overlays remain preview-only; streaming remains unverified. Implementation commit200a9720000ac9dd17feb6f7d79001844dda40b6.
+
+## Remaining-effects experiment
+Added a dedicated bounded Custom255 playback test using captured10/16/19 commands. Full palette readback/backup history precedes mutation;8 frames at2fps then acknowledged restore and readback; Stop and unmount cancellation; generic writes locked. Database-derived82 active positions, physical W34 confirmed, other spatial mappings not individually verified. No continuous playback claim yet.147 tests/lint/build pass; user has been asked to run Rainbow wheel test and report animation/restoration. See docs/CUSTOM-RGB-PLAYBACK.md.

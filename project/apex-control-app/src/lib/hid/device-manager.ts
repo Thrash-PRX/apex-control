@@ -1,3 +1,4 @@
+import type { LightingConfig } from '../../types/lighting.ts';
 /**
  * Device Manager — high-level device connection management.
  *
@@ -278,6 +279,10 @@ export class DeviceManager {
     return data;
   }
 
+  async playRgb(config: LightingConfig, signal: AbortSignal): Promise<void> {
+    if(!(this._transport instanceof WebHidTransport))throw new Error('Connect real APEX first');
+    await this._transport.playRgb(config,signal);
+  }
   async applyRgb(mode: number, rgb: readonly [number,number,number], brightness: number, speed: number): Promise<void> {
     if(!(this._transport instanceof WebHidTransport))throw new Error('Connect a real APEX using WebHID first');
     await this._transport.applyRgb(mode,rgb,brightness,speed);

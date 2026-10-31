@@ -62,6 +62,7 @@ interface AppState {
   disconnectDevice: () => Promise<void>;
 
   // Lighting
+  playRgb: (signal: AbortSignal) => Promise<void>;
   applyRgb: () => Promise<void>;
   lightingConfig: LightingConfig;
   updateLighting: (config: Partial<LightingConfig>) => void;
@@ -293,6 +294,7 @@ export const useAppStore = create<AppState>((set, get) => ({
   },
 
   // Lighting
+  playRgb: async (signal) => {if(get().useMock)throw new Error('Pair real APEX first');await getOrCreateDeviceManager(false).playRgb(get().lightingConfig,signal);},
   applyRgb: async () => {
     const s=get(),c=s.lightingConfig;if(s.useMock)throw new Error('Switch to hardware mode and connect APEX first');
     const mode=nativeRgbMode(c);
