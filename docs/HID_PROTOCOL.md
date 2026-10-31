@@ -22,39 +22,40 @@ Display investigation: [static search](../research/evidence/display-static-searc
 
 | Parameter | Hypothesized Value | Status | Verification Method |
 |---|---|---|---|
-| **Vendor ID (VID)** | `0x3402` (Sinowealth / Sino Wealth Electronic) | Candidate (Unverified) | Check Windows Device Manager: `HID\VID_XXXX&PID_YYYY` |
-| **Product ID (PID)** | `0x0300` | Candidate (Unverified) | USB Enumeration check |
-| **Manufacturer String** | "Ant Esports" or OEM default ("Gaming Keyboard") | Unverified | USB String Descriptor 0x01 |
-| **Product String** | "APEX 200S" | Unverified | USB String Descriptor 0x02 |
+| **Vendor ID (VID)** | `0x314B` (observed in USB-CAPS-002) | Observed | Check Windows Device Manager: `HID\VID_314B&PID_1026` |
+| **Product ID (PID)** | `0x1026` (observed in USB-CAPS-002) | Observed | USB Enumeration check |
+| **Manufacturer String** | "Ant Esports" or OEM default | Unverified | USB String Descriptor 0x01 |
+| **Product String** | "APEX200" (observed) | Observed | USB String Descriptor 0x02 |
 | **USB Class** | 0x03 (Human Interface Device) | Expected | USB Standard Descriptor |
-| **Config Interface** | Usage Page `0xFF00`, Usage `0x01` | Expected | Standard OEM Sinowealth configuration channel |
+| **Config Interface** | Usage Page `0xFF02`, Usage `0x0002` (observed) | Observed | Vendor-specific collection on Interface 0 |
+
+> **Note:** Historical Sinowealth VID `0x3402` / PID `0x0300` hypothesis is superseded by USB-CAPS-002. The observed `314B:1026` identity should be used for discovery.
 
 ---
 
-## 2. Chipset & Firmware Architecture Hypotheses
+## 2. Chipset & Firmware Architecture
 
-1. **OEM Microcontroller:**
-   - Budget magnetic Hall-effect keyboards from Indian brands (Ant Esports, Cosmic Byte, Kreo) typically license white-label OEM boards manufactured with **Sinowealth (SH68F90 / SH68F83 / 32-bit ARM Cortex-M variants)** or **Sonix** MCUs.
-   - Reference open-source projects for similar Sinowealth architectures:
-     - `sinowealth-kb-tool` / `sinowisp`
-     - OpenRGB Sinowealth keyboard controller
-2. **Switch Technology:**
-   - **Haimu Linear Hall-Effect Switches:** Contactless magnetic flux measurement.
-   - Actuation sensitivity is calculated by ADC readings of magnetic flux density as the stem magnet approaches the PCB Hall sensor.
-   - Actuation depth range: 0.1mm to 3.6mm (claimed).
+**MCU Vendor:** Unconfirmed. Static analysis of GameKeyboard.exe shows Sinowealth-related strings but the connected device reports VID `314B` (not `3402`). OEM platform may differ from static analysis assumptions.
+
+**Switch Technology:** Haimu Linear Hall-Effect (contactless magnetic flux). Actuation depth claimed 0.1mm–3.6mm; ADC scaling unverified.
 
 ---
 
-## 3. Communication Channel Hypotheses
+## 3. Communication Channel
 
-### USB Interface Mapping
-Gaming keyboards with configuration software typically present 2–4 USB HID interfaces:
-- **Interface 0:** Standard Boot Keyboard (Usage Page `0x01`, Usage `0x06` - 8-byte Input Report for BIOS/OS keystrokes).
-- **Interface 1:** Consumer / Media Keys (Usage Page `0x0C`, Usage `0x01`).
-- **Interface 2:** Mouse / System Keys (Usage Page `0x01`, Usage `0x02`).
-- **Interface 3:** **Vendor Configuration Channel (Usage Page `0xFF00`–`0xFF05`):**
-  - Uses **HID Feature Reports** (64 bytes) or **Interrupt OUT/IN endpoints** (64 bytes).
-  - This is the target interface for `APEX CONTROL`.
+### USB Interface Mapping (Observed)
+- **Interface 0:** Vendor collection `FF02:0002` — 64-byte Input/Output reports, 0 Feature reports. Target for APEX CONTROL.
+
+> **Note:** Standard Boot Keyboard, Consumer, and Mouse interfaces were not observed in USB-CAPS-002 enumeration. The vendor configuration channel appears on Interface 0, not Interface 3 as commonly assumed for Sinowealth.
+
+### Report Framing Discrepancy (Critical)
+| Source | Frame Size | Details |
+|---|---|---|
+| Static analysis (GameKeyboard.exe) | 129 bytes HIDAPI (1 report ID + 128 payload) | Global at VA `0x140194990` initialized to 128; HIDAPI `hid_write` called with 129 bytes |
+| Observed USB device (USB-CAPS-002) | 65 bytes Windows (1 report ID + 64 payload) | WebHID uses 64-byte payload with separate report ID |
+| Offline codec (this repo) | 64 bytes WebHID payload | Magic `0xFA`, opcode, frame, total, field4, length, payload, padding |
+
+**Resolution pending:** Physical device captures needed to determine if firmware supports both framings or if 128-byte setting is a default not used by this firmware version.
 
 ---
 
@@ -70,11 +71,11 @@ When physical keyboard or official software (`GameKeyboard.exe`) is available:
 
 ### Step 2: Dynamic USB Traffic Capture (USBPcap + Wireshark)
 1. Install Wireshark with USBPcap on Windows.
-2. Filter for device USB bus: `usb.idVendor == 0x3402 || usb.transfer_type == 0x01 || usb.transfer_type == 0x02`.
+2. Filter for device USB bus: `usb.idVendor == 0x314B`.
 3. Perform isolated single-variable changes:
    - **Baseline:** Record idle traffic.
    - **Static RGB Color Change:** Change static color from Red (`#FF0000`) to Green (`#00FF00`). Diff packet payloads to isolate RGB byte offsets.
-   - **Actuation Point Change:** Change global actuation from 2.0mm to 1.0mm. Diff packets to isolate actuation scaling factor (e.g. `1.0mm = 0x0A` or raw 0–255 ADC value).
+   - **Actuation Point Change:** Change global actuation from 2.0mm to 1.0mm. Diff packets to isolate actuation scaling factor.
    - **Rapid Trigger Toggle:** Enable/disable Rapid Trigger.
    - **SOCD Mode Change:** Switch between Neutral and Last-Input.
 4. Record exact report IDs, opcode bytes, checksum algorithm (XOR/CRC8/None), and payload schemas below.
@@ -88,10 +89,10 @@ When physical keyboard or official software (`GameKeyboard.exe`) is available:
 ```
 [Template]
 Command: <Name>
-Direction: Host -> Device (Feature Report / Output Report)
+Direction: Host -> Device (Output Report / Feature Report)
 Report ID: 0x??
-Payload Length: 64 bytes
+Payload Length: 64 bytes (WebHID) / 128 bytes (HIDAPI)
 Opcode: 0x??
-Data Bytes: [Offset 0: Opcode] [Offset 1: Subcommand] [Offset 2..N: Parameters] [Offset 63: Checksum]
+Data Bytes: [Offset 0: Magic 0xFA] [Offset 1: Opcode] [Offset 2: Frame] [Offset 3: Total] [Offset 4: Field4] [Offset 5: Length] [Offset 6+: Payload]
 Expected Device Response: 0x?? ACK
 ```
