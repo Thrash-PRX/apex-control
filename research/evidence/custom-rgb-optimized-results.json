@@ -1,0 +1,147 @@
+{
+  "date": "2026-10-31",
+  "device": "314B:1026",
+  "transport": "native USB adapter executing the app playback engine; not browser verification",
+  "webHidPayloadBytes": 64,
+  "inactiveIndicesExcluded": [
+    14,
+    15
+  ],
+  "results": [
+    {
+      "effect": "snake",
+      "frames": 59,
+      "fps": 11.509876976582394,
+      "packets": 81,
+      "transfer": "delta10-11",
+      "restorationConfirmedByApp": true
+    },
+    {
+      "effect": "color_cycle",
+      "frames": 63,
+      "fps": 12.579454480175707,
+      "packets": 63,
+      "transfer": "native-static13",
+      "restorationConfirmedByApp": true
+    },
+    {
+      "effect": "rainbow",
+      "frames": 14,
+      "fps": 2.6246494288565994,
+      "packets": 84,
+      "transfer": "delta10-11",
+      "restorationConfirmedByApp": true
+    },
+    {
+      "effect": "gradient",
+      "frames": 14,
+      "fps": 2.617644517068706,
+      "packets": 84,
+      "transfer": "delta10-11",
+      "restorationConfirmedByApp": true
+    },
+    {
+      "effect": "flash-away",
+      "frames": 23,
+      "fps": 4.555739261889823,
+      "packets": 78,
+      "transfer": "delta10-11",
+      "restorationConfirmedByApp": true
+    },
+    {
+      "effect": "rain",
+      "frames": 14,
+      "fps": 2.624148267076212,
+      "packets": 84,
+      "transfer": "delta10-11",
+      "restorationConfirmedByApp": true
+    },
+    {
+      "effect": "wheel",
+      "frames": 14,
+      "fps": 2.630512106593761,
+      "packets": 84,
+      "transfer": "delta10-11",
+      "restorationConfirmedByApp": true
+    },
+    {
+      "effect": "twinkle",
+      "frames": 14,
+      "fps": 2.640953986526644,
+      "packets": 84,
+      "transfer": "delta10-11",
+      "restorationConfirmedByApp": true
+    },
+    {
+      "effect": "neon-stream",
+      "frames": 14,
+      "fps": 2.6419030775208157,
+      "packets": 84,
+      "transfer": "delta10-11",
+      "restorationConfirmedByApp": true
+    },
+    {
+      "effect": "sine-wave",
+      "frames": 14,
+      "fps": 2.624041683576897,
+      "packets": 84,
+      "transfer": "delta10-11",
+      "restorationConfirmedByApp": true
+    },
+    {
+      "effect": "scanner",
+      "frames": 15,
+      "fps": 2.9040857156000204,
+      "packets": 81,
+      "transfer": "delta10-11",
+      "restorationConfirmedByApp": true
+    },
+    {
+      "effect": "windmill",
+      "frames": 14,
+      "fps": 2.631992447234474,
+      "packets": 84,
+      "transfer": "delta10-11",
+      "restorationConfirmedByApp": true
+    },
+    {
+      "effect": "waterfall",
+      "frames": 14,
+      "fps": 2.642907182798752,
+      "packets": 84,
+      "transfer": "delta10-11",
+      "restorationConfirmedByApp": true
+    },
+    {
+      "effect": "blossom",
+      "frames": 15,
+      "fps": 2.8397794180511964,
+      "packets": 83,
+      "transfer": "delta10-11",
+      "restorationConfirmedByApp": true
+    },
+    {
+      "effect": "storm",
+      "frames": 14,
+      "fps": 2.6399229896750662,
+      "packets": 84,
+      "transfer": "delta10-11",
+      "restorationConfirmedByApp": true
+    },
+    {
+      "effect": "fireworks",
+      "frames": 17,
+      "fps": 3.3883726636697036,
+      "packets": 79,
+      "transfer": "delta10-11",
+      "restorationConfirmedByApp": true
+    }
+  ],
+  "limits": [
+    "Palette/settings readback confirms transmitted values, not perceived smoothness or brightness.",
+    "Only W34 has isolated physical-key capture verification; other positions remain vendor-data-derived.",
+    "Tests are bounded, not long-duration or power-cycle validation.",
+    "Full-board effects remain too slow for demo-like motion."
+  ],
+  "recovery": "Every completed run returned after the app verified restoration; custom255 remains selected."
+}

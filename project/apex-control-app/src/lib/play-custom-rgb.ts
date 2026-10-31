@@ -1,3 +1,5 @@
+import { planPaletteDelta } from './rgb-delta.ts';
+import {playNativeColorCycle,restoreNativeColorCycle} from './native-color-cycle.ts';
 import layout from './device-rgb-layout.json' with { type: 'json' };
 import { sampleEffect, EFFECTS } from './reference-effects.mjs';
 import type { LightingConfig } from '../types/lighting.ts';
@@ -8,6 +10,8 @@ export async function playCustomRgb(device:HIDDevice,config:LightingConfig,signa
  if(!restoreOnly&&(!EFFECTS.includes(effect)||[config.speed,config.brightness].some(v=>!Number.isFinite(v)||v<0||v>100)))throw Error('Unsupported animation settings');
  if(signal.aborted)throw new DOMException('Playback cancelled','AbortError');
  if(device.vendorId!==0x314b||device.productId!==0x1026)throw Error('APEX required');
+ const nativeRecovered=await restoreNativeColorCycle(device);if(restoreOnly&&nativeRecovered)return;
+ if(!restoreOnly&&fast&&effect==='spectrum')return playNativeColorCycle(device,config,signal,loop);
  const exchange=(p:Uint8Array):Promise<Uint8Array>=>new Promise((resolve,reject)=>{
   const done=()=>{clearTimeout(timer);device.removeEventListener('inputreport',onData);};
   const onData=(e:HIDInputReportEvent)=>{const r=new Uint8Array(e.data.buffer,e.data.byteOffset,e.data.byteLength);if(r[0]!==250||r[1]!==(p[1]|128))return;done();if(r.length!==64||r[2]!==p[2]||r[5]>58)reject(Error('Custom RGB response mismatch: request '+JSON.stringify([...p.slice(0,6)])+' response '+JSON.stringify([...r.slice(0,7)])));else resolve(r.slice());};
@@ -47,16 +51,25 @@ export async function playCustomRgb(device:HIDDevice,config:LightingConfig,signa
    };
    // Inactive14/15 are never written. Full palette readback must match.
    const probe=new Map([...previous].map(([i,r])=>[i,[...r]]));for(const k of layout){const old=previous.get(k.index)!;probe.set(k.index,[old[0],old[1],old[2],old[3]^1]);}probe.set(34,[100,255,0,255]);let verified=false;
-   for(const spacing of [12,25,50]){gap=spacing;if(await bulk(probe)){verified=true;break;}}
-   if(!verified)throw Error('Bulk palette readback failed at all tested spacings; playback blocked');   const started=performance.now();let frames=0;
+   for(const spacing of [60,80]){gap=spacing;if(await bulk(probe)){verified=true;break;}}
+   if(!verified)throw Error('Bulk palette readback failed at all tested spacings; playback blocked');   const started=performance.now();let frames=0,packets=0;
+   let confirmed=probe;lastWrite=performance.now();const cadence=Math.max(60,gap);
    for(;!signal.aborted&&(loop||performance.now()-started<5000);frames++){
     const now=performance.now(),records=new Map([...previous].map(([i,r])=>[i,[...r]]));
     for(let i=0;i<layout.length;i++){const k=layout[i],sample=sampleEffect(profile,String(k.index),{x:k.x,y:k.y,index:i,count:layout.length},now-start,hits);records.set(k.index,[100,...sample.color.match(/[\d.]+/g)!.map(Number)]);}
-    if(!await bulk(records))throw Error('Live palette readback differs; stopped playback');
-    if(frames===0||frames%10===0)window.dispatchEvent?.(new CustomEvent('apex-rgb-progress',{detail:{frames:frames+1,fps:(frames+1)/((performance.now()-started)/1000),gap}}));
+    const updates=planPaletteDelta(confirmed,records,indices);
+    for(const update of updates){
+     const pause=Math.max(0,cadence-(performance.now()-lastWrite));if(pause)await new Promise(resolve=>setTimeout(resolve,pause));
+     if(update.command===16)await write(update.payload[0],update.payload.slice(1,4),update.indices);
+     else {await device.sendReport(0,packet(17,update.payload));lastWrite=performance.now();}
+     packets++;
+    }
+    if(updates.length){await new Promise(resolve=>setTimeout(resolve,35));if(!matches(await read(),records))throw Error('Live palette readback differs; stopped playback');}
+    confirmed=records;
+    if(frames===0||frames%10===0)window.dispatchEvent?.(new CustomEvent('apex-rgb-progress',{detail:{frames:frames+1,fps:(frames+1)/((performance.now()-started)/1000),gap:cadence,packets}}));
     const delay=Math.max(0,50-(performance.now()-now));if(delay)await new Promise(resolve=>setTimeout(resolve,delay));
    }
-   localStorage.setItem('apex-last-playback-metrics-v1',JSON.stringify({frames,fps:frames/((performance.now()-started)/1000),transfer:'bulk11'}));
+   localStorage.setItem('apex-last-playback-metrics-v1',JSON.stringify({frames,fps:frames/((performance.now()-started)/1000),packets,transfer:'delta10-11'}));
   }else{
   // Deliberately bounded initial device test: 8 frames at 2 fps, one in-flight request.
   for(let frame=0;frame<8&&!signal.aborted;frame++){

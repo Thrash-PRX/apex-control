@@ -28,8 +28,8 @@ test('Unsupported bulk transfer fails without animation and restores through cap
 });
 
 test('Bulk probe verifies every active chunk and increases spacing when writes are dropped',async()=>{
- environment({setItem(){}});const d=fake(),c=new AbortController();d.minBulkGap=20;d.onBulk=n=>{if(n===12)c.abort()};
- await playCustomRgb(d,config,c.signal,false,true);assert.equal(d.bulkCount,12);for(const k of layout)assert.deepEqual(d.colors[k.index],[80,10,20,30]);delete globalThis.window;delete globalThis.localStorage;
+ environment({setItem(){}});const d=fake(),c=new AbortController();d.minBulkGap=70;d.onBulk=n=>{if(n===18)c.abort()};
+ await playCustomRgb(d,config,c.signal,false,true);assert.equal(d.bulkCount,18);for(const k of layout)assert.deepEqual(d.colors[k.index],[80,10,20,30]);delete globalThis.window;delete globalThis.localStorage;
 });
 
 test('Continuous playback completes the current frame on Stop and restores original colors',async()=>{
