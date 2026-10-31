@@ -42,6 +42,7 @@ export class DeviceManager {
   private _capabilities: DeviceCapabilities;
   private _handlers: Set<DeviceManagerEventHandler> = new Set();
   private _unsubTransport: (() => void) | null = null;
+  private _isSwitchingTransport = false;
 
   /** Default filter targeting the APEX 200S vendor-specific interface. */
   static readonly DEFAULT_FILTER: HidDeviceFilter = {
@@ -92,26 +93,38 @@ export class DeviceManager {
     return this._transport.name === 'Mock';
   }
 
-  /** Switch to a different transport (e.g., from WebHID to Mock). */
+  /** Switch to a different transport (e.g., from WebHID to Mock).
+   * Guards against concurrent transport switches. */
   async switchTransport(transport: HidTransport): Promise<void> {
-    // Close current connection
-    if (this._transport.isOpen()) {
-      await this._transport.close();
+    // Prevent concurrent transport switches
+    if (this._isSwitchingTransport) {
+      throw new Error('Transport switch already in progress');
     }
-    if (this._unsubTransport) {
-      this._unsubTransport();
+    this._isSwitchingTransport = true;
+
+    try {
+      // Close current connection gracefully
+      if (this._transport.isOpen()) {
+        await this._transport.close();
+      }
+      if (this._unsubTransport) {
+        this._unsubTransport();
+        this._unsubTransport = null;
+      }
+
+      this._transport = transport;
+      this._unsubTransport = this._transport.on(this._handleTransportEvent.bind(this));
+
+      this._updateConnection({
+        state: ConnectionState.Disconnected,
+        device: null,
+        isMock: transport.name === 'Mock',
+        lastSeen: null,
+        error: null,
+      });
+    } finally {
+      this._isSwitchingTransport = false;
     }
-
-    this._transport = transport;
-    this._unsubTransport = this._transport.on(this._handleTransportEvent.bind(this));
-
-    this._updateConnection({
-      state: ConnectionState.Disconnected,
-      device: null,
-      isMock: transport.name === 'Mock',
-      lastSeen: null,
-      error: null,
-    });
   }
 
   /** Scan for APEX 200S devices. */
@@ -154,8 +167,28 @@ export class DeviceManager {
     return this._transport.requestDevice(filter ?? DeviceManager.DEFAULT_FILTER);
   }
 
-  /** Connect to a specific device. */
+  /** Connect to a specific device.
+   * Validates device path and prevents duplicate connections. */
   async connect(devicePath: string): Promise<void> {
+    if (!devicePath || devicePath.trim() === '') {
+      throw new Error('Invalid device path: empty string');
+    }
+
+    // Prevent concurrent connection attempts
+    if (this._connection.state === ConnectionState.Connecting) {
+      throw new Error('Connection already in progress');
+    }
+
+    // If already connected to this device, return early
+    if (this._connection.state === ConnectionState.Connected && this._connection.device?.serialNumber === devicePath) {
+      return;
+    }
+
+    // If connected to a different device, disconnect first
+    if (this._transport.isOpen()) {
+      await this.disconnect();
+    }
+
     this._updateConnection({
       ...this._connection,
       state: ConnectionState.Connecting,
@@ -166,17 +199,19 @@ export class DeviceManager {
       await this._transport.open(devicePath);
       const dev = this._transport.getConnectedDevice();
 
+      if (!dev) {
+        throw new Error('Transport opened but no device info returned');
+      }
+
       this._updateConnection({
         state: ConnectionState.Connected,
-        device: dev
-          ? {
-              vendorId: dev.vendorId,
-              productId: dev.productId,
-              manufacturer: dev.manufacturer,
-              product: dev.product,
-              serialNumber: dev.serialNumber,
-            }
-          : null,
+        device: {
+          vendorId: dev.vendorId,
+          productId: dev.productId,
+          manufacturer: dev.manufacturer,
+          product: dev.product,
+          serialNumber: dev.serialNumber,
+        },
         isMock: this._transport.name === 'Mock',
         lastSeen: Date.now(),
         error: null,
@@ -192,10 +227,21 @@ export class DeviceManager {
     }
   }
 
-  /** Disconnect from the current device. */
+  /** Disconnect from the current device.
+   * Idempotent - safe to call multiple times. */
   async disconnect(): Promise<void> {
+    // Idempotent: if already disconnected, nothing to do
+    if (!this._transport.isOpen() && this._connection.state === ConnectionState.Disconnected) {
+      return;
+    }
+
     try {
-      await this._transport.close();
+      if (this._transport.isOpen()) {
+        await this._transport.close();
+      }
+    } catch (err) {
+      // Log but don't throw - we still want to update state
+      console.error('[DeviceManager] Error during transport close:', err);
     } finally {
       this._updateConnection({
         state: ConnectionState.Disconnected,

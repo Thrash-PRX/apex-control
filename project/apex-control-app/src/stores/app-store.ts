@@ -93,16 +93,28 @@ export interface LogEntry {
   message: string;
 }
 
-// ─── Device Manager Singleton ───────────────────────────────────────────────
+// ─── Device Manager Management ──────────────────────────────────────────────
 
 let deviceManager: DeviceManager | null = null;
 let logCounter = 0;
 
-function getDeviceManager(useMock: boolean): DeviceManager {
+function createDeviceManager(useMock: boolean): DeviceManager {
+  const transport = useMock ? new MockHidTransport() : new WebHidTransport();
+  return new DeviceManager(transport);
+}
+
+function getOrCreateDeviceManager(useMock: boolean): DeviceManager {
   if (!deviceManager) {
-    const transport = useMock ? new MockHidTransport() : new WebHidTransport();
-    deviceManager = new DeviceManager(transport);
+    deviceManager = createDeviceManager(useMock);
   }
+  return deviceManager;
+}
+
+function replaceDeviceManager(useMock: boolean): DeviceManager {
+  if (deviceManager) {
+    deviceManager.dispose();
+  }
+  deviceManager = createDeviceManager(useMock);
   return deviceManager;
 }
 
@@ -162,10 +174,7 @@ export const useAppStore = create<AppState>((set, get) => ({
     const newUseMock = !useMock;
 
     // Recreate device manager with new transport
-    if (deviceManager) {
-      deviceManager.dispose();
-      deviceManager = null;
-    }
+    replaceDeviceManager(newUseMock);
 
     set({ useMock: newUseMock });
     get().addLog('info', `Switched to ${newUseMock ? 'Mock' : 'WebHID'} transport`);
@@ -174,7 +183,12 @@ export const useAppStore = create<AppState>((set, get) => ({
   // Device actions
   scanDevices: async () => {
     const { useMock } = get();
-    const dm = getDeviceManager(useMock);
+    const dm = getOrCreateDeviceManager(useMock);
+
+    // Don't scan if already scanning
+    if (get().connection.state === ConnectionState.Scanning) {
+      return;
+    }
 
     get().addLog('info', 'Scanning for devices...');
 
@@ -194,7 +208,7 @@ export const useAppStore = create<AppState>((set, get) => ({
       return null;
     }
 
-    const dm = getDeviceManager(false);
+    const dm = getOrCreateDeviceManager(false);
     get().addLog('info', 'Opening browser HID permission picker...');
     try {
       // This must invoke navigator.hid.requestDevice() before the next await
@@ -221,7 +235,19 @@ export const useAppStore = create<AppState>((set, get) => ({
 
   connectDevice: async (path) => {
     const { useMock } = get();
-    const dm = getDeviceManager(useMock);
+    const dm = getOrCreateDeviceManager(useMock);
+
+    // Validate path
+    if (!path || path.trim() === '') {
+      get().addLog('error', 'Invalid device path: empty string');
+      return;
+    }
+
+    // Don't connect if already connecting
+    if (get().connection.state === ConnectionState.Connecting) {
+      get().addLog('warn', 'Connection already in progress');
+      return;
+    }
 
     set({
       connection: {
