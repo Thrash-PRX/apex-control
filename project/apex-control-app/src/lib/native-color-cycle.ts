@@ -8,7 +8,7 @@ function session(device:HIDDevice){
  const exchange=(cmd:number,payload:number[]=[],page=1,total=1):Promise<Uint8Array>=>new Promise((resolve,reject)=>{
   const cleanup=()=>{clearTimeout(timer);device.removeEventListener('inputreport',handler);};
   const handler=(event:HIDInputReportEvent)=>{const r=new Uint8Array(event.data.buffer,event.data.byteOffset,event.data.byteLength);if(r[0]!==250||r[1]!==(cmd|128))return;cleanup();if(r.length!==64||r[2]!==page||r[5]>58)reject(Error('Color cycle response mismatch'));else resolve(r.slice());};
-  const timer=setTimeout(()=>{cleanup();reject(Error('Color cycle timeout; reconnect and restore saved RGB settings'));},2000);
+  const timer=setTimeout(()=>{cleanup();reject(Error('Color cycle timeout at command 0x'+cmd.toString(16)+' page '+page+'/'+total+'; reconnect and restore saved RGB settings'));},2000);
   device.addEventListener('inputreport',handler);device.sendReport(0,packet(cmd,payload,page,total)).catch(e=>{cleanup();reject(e);});
  });
  const ack=async(cmd:number,payload:number[])=>{const r=await exchange(cmd,payload);if(r[3]!==1||r[5]!==1||r[6]!==0)throw Error('Color cycle not acknowledged');};
