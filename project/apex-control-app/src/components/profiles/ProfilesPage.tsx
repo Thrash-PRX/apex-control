@@ -125,7 +125,7 @@ export const ProfilesPage: React.FC = () => {
     saveProfiles(
       profiles.map((p) => ({ ...p, active: p.id === id }))
     );
-    showToast('Profile activated', 'success');
+    showToast('Local profile selected', 'success');
   };
 
   const deleteProfile = (id: string) => {
@@ -238,7 +238,7 @@ export const ProfilesPage: React.FC = () => {
             Configuration Profiles
           </h1>
           <p className="text-sm text-[#8888a0] mt-1">
-            Store, export, and toggle actuation, Rapid Trigger, and RGB presets across your favorite games.
+            Manage local profile summaries. Selecting a profile does not configure the keyboard.
           </p>
         </div>
 
@@ -321,7 +321,7 @@ export const ProfilesPage: React.FC = () => {
                 </button>
               ) : (
                 <span className="text-xs text-[#00c853] font-semibold">
-                  Applied to Keyboard
+                  Selected locally
                 </span>
               )}
 

@@ -90,3 +90,5 @@ Final integration validation: 130 tests passed, 0 failed; lint and production bu
 ## WK68 RGB investigation
 
 Unpacked WK68 and retained resource/configuration hashes and mode labels. Added independent local lighting animation and regression tests. No vendor application or HID command executed. See docs/WK68-REFERENCE.md; reference algorithms are still unverified.
+
+Release preview packaged and browser checked. USBPcap 1.5.4.0 installed with user approval; driver stopped pending user restart. Hardware functionality remains unverified and writes locked. See HANDOFF.md for exact next capture step.
