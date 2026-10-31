@@ -124,3 +124,11 @@ Integration fixes: compare transport paths for repeated connect; prevent close r
 Physical writes remain locked. No physical reads/writes, reset, calibration or flashing occurred. Read docs/INTEGRATION-CAPTURE.md for capture/readback/backup gates and unresolved candidate protocol assumptions. No complete device backup/restore exists. Original checkout's uncommitted readback/research files remain untouched and uncommitted. UI functionality is retained; browser visual verification was not performed in this integration session. Final validation and SHA: see git log and the integration validation entry below.
 
 Final integration validation: 130/130 tests passed; npm run lint passed; npm run build passed. Exact resulting commit: git rev-parse HEAD (this entry is included in that commit).
+
+## User priority order — 2026-10-31
+
+1. RGB modes and application workflow referenced from Weikav WK68 software.
+2. SOCD and Rapid Trigger workflow referenced from Wooting software.
+3. Our own OLED screen customizer.
+
+Reference applications guide UX only until APEX-specific protocol evidence establishes compatibility. Never reuse another keyboard's USB commands without validation. Reference installers/URLs and captures are not present in this checkout. Existing local UI remains available; physical writes stay locked.
