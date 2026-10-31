@@ -98,3 +98,5 @@ Physical RGB capture obtained: red and green confirmed by user in stock MKeyboar
 Further captures establish brightness and speed bytes independently; user confirms final Breath100/80/green. Physical fixtures retained without full private captures. Hardware write lock remains.
 
 RGB hardware Apply implemented at user request for captured Static/Breath modes: pre-change RGB backup, acknowledgements, mode selection and readback verification. Generic writes stay locked.142 tests/lint/build pass; live user test pending.
+
+User verified real RGB Apply: keyboard color changed and app readback confirmed. First physical end-to-end APEX CONTROL RGB success. Other hardware features remain unverified/locked.
