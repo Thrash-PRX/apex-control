@@ -167,3 +167,6 @@ Dedicated WebHID workflow requires314B:1026,64-byte output report0 and Static1 o
 
 ## User hardware verification — 2026-10-31
 User completed the live Chrome/Edge pairing and RGB Apply test and reported: RGB changed and readback confirmed. This is user-observed physical RGB success for the tested workflow, not an agent-observed test. Static/Breath implementation remains limited to captured RGB controls; no inference of testing every mode, brightness/speed boundary, reconnect, persistence after power cycle, backup restore, SOCD, RT or display support. Implementation commit f2f2532c564cd8250a5e8fdc69529941f2b97216.
+
+## Expanded RGB effects
+Added full captured native IDs0–11 through existing backed-up/acknowledged/readback-verified RGB workflow. Wave direction maps5–8. Other WK68-inspired effects and Wootility-style Reactive/Ripple overlays are explicit browser previews; overlay disables hardware Apply. Layer2 is not custom255. All preserved native mode records are covered by fake-device regression tests; only earlier Static is user-verified in-app. New per-key capture confirms physical W→34 with blue [FA,10,1,1,0,5,80,0,0,255,34]; no streaming or per-key hardware editor enabled because persistence/full mapping remains unverified. See docs/EXPANDED-RGB.md.

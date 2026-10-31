@@ -1,7 +1,7 @@
 import { decodeCapturedEffectRecords, encodeCapturedEffect } from './protocol/captured-effect.ts';
 /** Narrow RGB workflow. Generic transport writes remain locked. */
 export async function applyDeviceRgb(device: HIDDevice, mode: number, rgb: readonly [number,number,number], brightness: number, speed: number): Promise<void> {
- if(device.vendorId!==0x314b||device.productId!==0x1026||![1,3].includes(mode))throw Error('Only captured APEX Static and Breath modes are enabled');
+ if(device.vendorId!==0x314b||device.productId!==0x1026||(!Number.isInteger(mode)||mode<0||mode>11))throw Error('Only the captured APEX native mode IDs 0–11 are enabled');
  if([brightness,speed].some(v=>!Number.isInteger(v)||v<0||v>100)||rgb.some(v=>!Number.isInteger(v)||v<0||v>255))throw Error('Invalid RGB settings');
  const exchange=(packet:Uint8Array,expected:number):Promise<Uint8Array>=>new Promise((resolve,reject)=>{
   const cleanup=()=>{clearTimeout(timer);device.removeEventListener('inputreport',handler);};

@@ -1,3 +1,4 @@
+import { sampleEffect } from './reference-effects.mjs';
 /** Authored browser previews, not recovered WK68 firmware algorithms. No device I/O. */
 import type { LightingConfig, RgbColor } from '../types/lighting.ts';
 import type { KeyDefinition } from './keyboard-layout.ts';
@@ -27,6 +28,16 @@ export function previewLighting(config: LightingConfig, keys: readonly KeyDefini
    case 'ripple': { const origin=keys.find(k=>selected.includes(k.id)); gain=origin?Math.max(0,1-Math.abs(Math.hypot(key.x-origin.x,key.y-origin.y)-(time%3)*6)):0; break; }
    case 'custom': gain=selected.includes(key.id)?1:0; break;
   }
+  const reference = ['flash-away','rain','wheel','twinkle','shadow','snake','neon-stream','sine-wave','scanner','windmill','waterfall','blossom','storm','fireworks','heatmap','star'].includes(config.effect);
+  if(reference){
+   const hex='#'+[config.primaryColor.r,config.primaryColor.g,config.primaryColor.b].map(v=>v.toString(16).padStart(2,'0')).join('');
+   const hits=keys.filter(k=>selected.includes(k.id)).map(k=>({key:k.id,x:k.x/17,y:k.y/6,time:Math.floor(seconds/3)*3000}));
+   const effect=config.effect==='star'?'twinkle':config.effect;
+   const sampled=sampleEffect({effect,speed:config.speed,brightness:config.brightness,keys:{[key.id]:{color:hex}}},key.id,{x:key.x/17,y:key.y/6,index:keys.indexOf(key),count:keys.length},seconds*1000,hits);
+   const channels=sampled.color.match(/[\d.]+/g)!.map(Number);result.set(key.id,{r:channels[0],g:channels[1],b:channels[2]});continue;
+  }
+  if(config.effect==='native_layer')gain=0;
+  if(config.effect==='cross'){const origin=keys.find(k=>selected.includes(k.id));gain=origin&&(origin.row===key.row||origin.col===key.col)?(Math.sin(time*Math.PI*2)+1)/2:0;}
   const scale=(v:number)=>Math.round(Math.max(0,Math.min(255,v*gain*brightness)));
   result.set(key.id,{r:scale(color.r),g:scale(color.g),b:scale(color.b)});
  }

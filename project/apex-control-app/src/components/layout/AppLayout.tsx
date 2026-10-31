@@ -15,7 +15,7 @@ export const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
       <Sidebar />
       <div className="flex flex-col flex-1 min-w-0 overflow-hidden">
         <Header />
-        <div role="status" className="px-6 py-2 text-xs bg-amber-500/10 text-amber-300 border-b border-amber-500/20">RGB Apply supports Static and Breathing on paired APEX devices. Rapid Trigger, SOCD and display edits remain local previews.</div>
+        <div role="status" className="px-6 py-2 text-xs bg-amber-500/10 text-amber-300 border-b border-amber-500/20">RGB Apply supports APEX native effects on paired devices; reference animations and overlays are previews. Rapid Trigger, SOCD and display edits remain local previews.</div>
         <main
           className="flex-1 overflow-y-auto p-6"
           style={{ backgroundColor: '#1a1a2e' }}

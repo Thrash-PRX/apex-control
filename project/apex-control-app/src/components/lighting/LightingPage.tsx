@@ -1,3 +1,4 @@
+import { nativeRgbMode } from '../../lib/native-rgb-mode';
 import React, { useEffect, useState } from 'react';
 import {
   Palette,
@@ -25,6 +26,7 @@ const PRESET_COLORS: RgbColor[] = [
 ];
 
 export const LightingPage: React.FC = () => {
+  const [overlay, setOverlay] = useState<'none'|'reactive'|'ripple'>('none');
   const [applying, setApplying] = useState(false);
   const [applyStatus, setApplyStatus] = useState('');
   const applyRgb = useAppStore(s => s.applyRgb);
@@ -51,6 +53,10 @@ export const LightingPage: React.FC = () => {
     return () => window.clearInterval(timer);
   }, []);
   const keyColorsMap = previewLighting(lightingConfig, APEX_200S_LAYOUT, seconds, selectedKeys);
+  if(overlay!=='none'){
+    const top=previewLighting({...lightingConfig,effect:overlay},APEX_200S_LAYOUT,seconds,selectedKeys);
+    for(const [id,c] of top){const base=keyColorsMap.get(id)!;keyColorsMap.set(id,{r:Math.max(base.r,c.r),g:Math.max(base.g,c.g),b:Math.max(base.b,c.b)});}
+  }
   return (
     <div className="space-y-6 max-w-6xl mx-auto pb-12">
       {/* Page Header */}
@@ -67,7 +73,7 @@ export const LightingPage: React.FC = () => {
             </span>
           </div>
           <p className="text-sm text-[#8888a0] mt-1">
-            Preview RGB effects locally. Static and Breathing can be applied after pairing. Reactive and ripple use selected keys as demonstration origins.
+            Preview RGB effects locally. Native APEX modes can be applied after pairing. Reactive and ripple use selected keys as demonstration origins.
           </p>
         </div>
 
@@ -88,9 +94,16 @@ export const LightingPage: React.FC = () => {
       </div>
 
       <div className="rounded-xl border border-[#333355] p-4 space-y-2">
-        <button disabled={applying} className="px-4 py-2 rounded bg-[#0096ff] disabled:opacity-50" onClick={async()=>{setApplying(true);setApplyStatus('Backing up RGB settings and applying…');try{await applyRgb();setApplyStatus('RGB settings acknowledged and read back from APEX.');}catch(e){setApplyStatus(e instanceof Error?e.message:String(e));}finally{setApplying(false);}}}>{applying?'Applying…':'Apply RGB to Keyboard'}</button>
-        <button className="ml-3 text-sm underline" onClick={()=>{const raw=localStorage.getItem("apex-rgb-device-backup-v1");if(!raw){setApplyStatus("No device RGB backup yet. Apply reads and saves it before changing settings.");return;}const url=URL.createObjectURL(new Blob([raw],{type:"application/json"}));const a=document.createElement("a");a.href=url;a.download="apex-rgb-backup.json";a.click();URL.revokeObjectURL(url);}}>Export RGB backup</button><p className="text-xs text-[#8888a0]">Hardware: Static and Breathing only. Close MKeyboard first, switch to hardware mode and pair APEX from Dashboard. Current RGB records are backed up in this browser before applying.</p>
+        <button disabled={applying || nativeRgbMode(lightingConfig)===null || overlay!=='none'} className="px-4 py-2 rounded bg-[#0096ff] disabled:opacity-50" onClick={async()=>{setApplying(true);setApplyStatus('Backing up RGB settings and applying…');try{await applyRgb();setApplyStatus('RGB settings acknowledged and read back from APEX.');}catch(e){setApplyStatus(e instanceof Error?e.message:String(e));}finally{setApplying(false);}}}>{applying?'Applying…':'Apply RGB to Keyboard'}</button>
+        <button className="ml-3 text-sm underline" onClick={()=>{const raw=localStorage.getItem("apex-rgb-device-backup-v1");if(!raw){setApplyStatus("No device RGB backup yet. Apply reads and saves it before changing settings.");return;}const url=URL.createObjectURL(new Blob([raw],{type:"application/json"}));const a=document.createElement("a");a.href=url;a.download="apex-rgb-backup.json";a.click();URL.revokeObjectURL(url);}}>Export RGB backup</button><p className="text-xs text-[#8888a0]">Hardware: APEX native effects only; other effects and overlays are browser previews. Close MKeyboard first, switch to hardware mode and pair APEX from Dashboard. Current RGB records are backed up in this browser before applying.</p>
         <p role="status" className="text-sm">{applyStatus}</p>
+      </div>
+      <div className="flex flex-wrap gap-4 text-sm">
+        <label>Wave direction <select className="bg-[#252540] p-2 ml-2 rounded" value={lightingConfig.direction??'left-to-right'} onChange={e=>updateLighting({direction:e.target.value as 'left-to-right'|'right-to-left'|'top-to-bottom'|'bottom-to-top'})}>
+          <option value="left-to-right">Left → right</option><option value="right-to-left">Right → left</option><option value="top-to-bottom">Top → bottom</option><option value="bottom-to-top">Bottom → top</option>
+        </select></label>
+        <label>Preview overlay <select className="bg-[#252540] p-2 ml-2 rounded" value={overlay} onChange={e=>setOverlay(e.target.value as typeof overlay)}><option value="none">None</option><option value="reactive">Reactive</option><option value="ripple">Ripple</option></select></label>
+        <p className="text-xs text-[#8888a0]">WK68-inspired animations and Wootility-style overlays are local interpretations. Overlays cannot be sent to APEX. Layer is a native firmware mode; its preview is blank. Per-key Custom is separate and is not enabled for hardware painting yet.</p>
       </div>
       {/* Keyboard Visual Preview */}
       <div className="rounded-xl border border-[#333355] bg-[#16162a] p-4 shadow-lg">
@@ -153,7 +166,7 @@ export const LightingPage: React.FC = () => {
                     )}
                   </span>
                   <span className="text-[11px] text-[#70708c] mt-1 line-clamp-2">
-                    {eff.description}
+                    {nativeRgbMode({effect:eff.effect})!==null?'APEX native · ':'Preview only · '}{eff.description}
                   </span>
                 </button>
               );

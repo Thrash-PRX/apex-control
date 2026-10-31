@@ -18,4 +18,4 @@ const server = createServer(async (req,res)=>{
  } catch {res.writeHead(404).end();}
 });
 server.on('error',error=>{console.error(error.code==='EADDRINUSE'?'APEX preview is already running. Open http://127.0.0.1:5175':error.message);process.exitCode=1;});
-server.listen(port,'127.0.0.1',()=>{ if(process.argv.includes('--open') && process.platform==='win32') spawn('cmd.exe',['/c','start','','http://127.0.0.1:5175'],{windowsHide:true,stdio:'ignore'}); console.log('APEX CONTROL local preview: http://127.0.0.1:5175\nStatic/Breath RGB Apply is enabled for paired APEX devices. Other hardware writes remain locked. Close this window to stop.'); });
+server.listen(port,'127.0.0.1',()=>{ if(process.argv.includes('--open') && process.platform==='win32') spawn('cmd.exe',['/c','start','','http://127.0.0.1:5175'],{windowsHide:true,stdio:'ignore'}); console.log('APEX CONTROL local preview: http://127.0.0.1:5175\nAPEX native RGB effects are enabled; reference effects and overlays are local previews. Other hardware writes remain locked. Close this window to stop.'); });

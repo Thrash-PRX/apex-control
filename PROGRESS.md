@@ -100,3 +100,5 @@ Further captures establish brightness and speed bytes independently; user confir
 RGB hardware Apply implemented at user request for captured Static/Breath modes: pre-change RGB backup, acknowledgements, mode selection and readback verification. Generic writes stay locked.142 tests/lint/build pass; live user test pending.
 
 User verified real RGB Apply: keyboard color changed and app readback confirmed. First physical end-to-end APEX CONTROL RGB success. Other hardware features remain unverified/locked.
+
+Expanded native RGB support to the12 captured IDs and added reference previews/overlays with hardware distinction. Verified isolated stock-software W blue capture establishes index34. Streaming remains unavailable. Tests145 pass; lint/build pass before final label-only refinements.

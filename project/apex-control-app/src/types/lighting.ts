@@ -22,6 +22,8 @@ export interface HslColor {
 // ─── Lighting Effects ───────────────────────────────────────────────────────
 
 export const LightingEffect = {
+  NativeLayer: 'native_layer', Star: 'star', Cross: 'cross',
+  FlashAway: 'flash-away', Rain: 'rain', Wheel: 'wheel', Twinkle: 'twinkle', Shadow: 'shadow', Snake: 'snake', NeonStream: 'neon-stream', SineWave: 'sine-wave', Scanner: 'scanner', Windmill: 'windmill', Waterfall: 'waterfall', Blossom: 'blossom', Storm: 'storm', Fireworks: 'fireworks', Heatmap: 'heatmap',
   Static: 'static',
   Breathing: 'breathing',
   Wave: 'wave',
@@ -170,3 +172,9 @@ export const LIGHTING_EFFECTS: EffectInfo[] = [
     supportsDirection: false,
   },
 ];
+
+const referenceEffects: [LightingEffect,string,string][] = [
+ ['native_layer','Layer (native)','APEX Layer mode; uses stored native settings'],['star','Star','APEX native Star mode'],['cross','Cross (press)','APEX native key-triggered cross effect'],
+ ['flash-away','Flash away','WK68-inspired moving flash'],['rain','Raindrops','WK68-inspired falling color droplets'],['wheel','Rainbow wheel','WK68-inspired rotating spectrum'],['twinkle','Stars twinkle','WK68-inspired scattered stars'],['shadow','Shadow disappear','WK68-inspired fading key shadows'],['snake','Retro snake','WK68-inspired moving trail'],['neon-stream','Neon stream','WK68-inspired diagonal bands'],['sine-wave','Sine wave','WK68-inspired oscillating ribbon'],['scanner','Retinue scanning','WK68-inspired scanning beam'],['windmill','Rotating windmill','WK68-inspired rotating blades'],['waterfall','Colorful waterfall','WK68-inspired falling cascades'],['blossom','Blossoming','WK68-inspired expanding petals'],['storm','Rotating storm','WK68-inspired spiral'],['fireworks','Fireworks','Original expanding color bursts'],['heatmap','Heatmap demo','Illustrative selected-key heat visualization'],
+];
+LIGHTING_EFFECTS.push(...referenceEffects.map(([effect,label,description])=>({effect,label,description,verification:'unverified' as const,supportsPerKey:null,supportsSpeed:true,supportsDirection:null})));
