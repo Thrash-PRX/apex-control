@@ -106,3 +106,5 @@ Expanded native RGB support to the12 captured IDs and added reference previews/o
 User confirms physical Wave and Ripple both work via APEX CONTROL. Static RGB, Wave in one tested direction, and Ripple now have user-reported physical success. Remaining native modes and streaming are not thereby verified.
 
 Remaining-effects host playback prototype: captured Custom255/10/16 path, palette backup history, bounded8-frame2fps hardware test, restore/readback and cancellation.147 tests/lint/build pass. User live test pending; continuous streaming not enabled.
+
+Custom RGB loop now has packet pacing, grouped original-palette recovery, adaptive verified bulk transfer and actualFPS. Native benchmark demonstrates tested path ~3fps; user rejects smoothness. This requirement is not complete. White comparison restored original palette successfully; subjective brightness pending.

@@ -176,3 +176,9 @@ User completed the requested Wave and Ripple hardware test and reported both wor
 
 ## Remaining-effects experiment
 Added a dedicated bounded Custom255 playback test using captured10/16/19 commands. Full palette readback/backup history precedes mutation;8 frames at2fps then acknowledged restore and readback; Stop and unmount cancellation; generic writes locked. Database-derived82 active positions, physical W34 confirmed, other spatial mappings not individually verified. No continuous playback claim yet.147 tests/lint/build pass; user has been asked to run Rainbow wheel test and report animation/restoration. See docs/CUSTOM-RGB-PLAYBACK.md.
+
+## Physical playback debugging and limit
+User reported slideshow/low brightness. Paced grouped restore now user-confirmed. Full-color looping bulk path measures2.8fps in browser. Native node-hid benchmark independently restored/verified palette and matched82/82 only at60ms chunk spacing (311.7ms transfer), faster4/12/30ms lost records. No inspected separate real-time path found. Do not claim smooth remaining effects completed. See native-rgb-throughput.json and CUSTOM-RGB-PLAYBACK.md. White100 native-vs-custom comparison ran and original palette restore was verified; awaiting user visual brightness comparison. All captures stopped; native handles closed.
+
+## Latest checkpoint
+Continuous full-color loop/Stop/restore implemented with real FPS and preflight/per-frame readback. User reports2.8fps, dim and unacceptable slide-like motion. Native benchmark reproduces missing records at4/12/30ms;60ms complete, original palette restored/readback verified. Smooth remaining effects remain UNSOLVED. White100 comparison completed with palette restore confirmed; user visual comparison pending. No unsupported real-time/firmware command guessed. All captures stopped and native handles closed. Native Static/Wave/Ripple remain prior user-confirmed.
