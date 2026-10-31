@@ -1,3 +1,4 @@
+import {snakeAt} from './key-timeline.ts';
 import { sampleEffect } from './reference-effects.mjs';
 /** Authored browser previews, not recovered WK68 firmware algorithms. No device I/O. */
 import type { LightingConfig, RgbColor } from '../types/lighting.ts';
@@ -10,9 +11,11 @@ function spectrum(h: number): RgbColor {
 }
 export function previewLighting(config: LightingConfig, keys: readonly KeyDefinition[], seconds: number, selected: readonly string[]=[]): Map<string,RgbColor> {
  const result=new Map<string,RgbColor>();
+ const timedSnake=config.effect==='snake'?snakeAt(seconds*1000,config.speed,config.brightness):null;
  const time=seconds*(0.15+config.speed/100*1.85), brightness=Math.max(0,Math.min(1,config.brightness/100));
  for(const key of keys){
   if(key.isSpecial) continue;
+  if(timedSnake&&key.deviceIndex!==undefined){const c=timedSnake.get(key.deviceIndex)!;result.set(key.id,{r:c[1],g:c[2],b:c[3]});continue;}
   const vertical=config.direction==='top-to-bottom'||config.direction==='bottom-to-top';
   let position=vertical?key.y/6:key.x/17;
   if(config.direction==='right-to-left'||config.direction==='bottom-to-top')position=1-position;

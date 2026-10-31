@@ -1,3 +1,5 @@
+import {SnakeTimeline} from './key-timeline.ts';
+import {exchangeRgb} from './rgb-exchange.ts';
 import { planPaletteDelta } from './rgb-delta.ts';
 import {playNativeColorCycle,restoreNativeColorCycle} from './native-color-cycle.ts';
 import layout from './device-rgb-layout.json' with { type: 'json' };
@@ -12,11 +14,7 @@ export async function playCustomRgb(device:HIDDevice,config:LightingConfig,signa
  if(device.vendorId!==0x314b||device.productId!==0x1026)throw Error('APEX required');
  const nativeRecovered=await restoreNativeColorCycle(device);if(restoreOnly&&nativeRecovered)return;
  if(!restoreOnly&&fast&&effect==='spectrum')return playNativeColorCycle(device,config,signal,loop);
- const exchange=(p:Uint8Array):Promise<Uint8Array>=>new Promise((resolve,reject)=>{
-  const done=()=>{clearTimeout(timer);device.removeEventListener('inputreport',onData);};
-  const onData=(e:HIDInputReportEvent)=>{const r=new Uint8Array(e.data.buffer,e.data.byteOffset,e.data.byteLength);if(r[0]!==250||r[1]!==(p[1]|128))return;done();if(r.length!==64||r[2]!==p[2]||r[5]>58)reject(Error('Custom RGB response mismatch: request '+JSON.stringify([...p.slice(0,6)])+' response '+JSON.stringify([...r.slice(0,7)])));else resolve(r.slice());};
-  const timer=setTimeout(()=>{done();reject(Error('Custom RGB timeout at command 0x'+p[1].toString(16)+' page '+p[2]+'/'+p[3]+'; reconnect and restore saved RGB settings'));},2000);device.addEventListener('inputreport',onData);device.sendReport(0,p).catch(e=>{done();reject(e);});
- });
+ const exchange=(p:Uint8Array)=>exchangeRgb(device,p);
  const packet=(cmd:number,payload:number[],frame=1,total=1)=>{const p=new Uint8Array(64);if(payload.length>58)throw Error('RGB payload overflow');p.set([250,cmd,frame,total,0,payload.length,...payload]);return p;};
  const read=async()=>{const records=new Map<number,number[]>();let total=1;for(let page=1;page<=total;page++){const r=await exchange(packet(22,[],page,total));if(page===1){total=r[3];if(total<1||total>16)throw Error('Invalid palette page count');}if(r[3]!==total||r[5]<5||(r[5]-1)%4!==0||r[6]+(r[5]-1)/4>256)throw Error('Invalid palette readback');for(let i=0;i<(r[5]-1)/4;i++){const index=r[6]+i;if(records.has(index))throw Error('Duplicate palette index');records.set(index,[...r.slice(7+i*4,11+i*4)]);}}return records;};
  const live=await read();
@@ -39,7 +37,19 @@ export async function playCustomRgb(device:HIDDevice,config:LightingConfig,signa
   const effect=aliases[config.effect]??config.effect;
   const hex='#'+[config.primaryColor.r,config.primaryColor.g,config.primaryColor.b].map(v=>v.toString(16).padStart(2,'0')).join('');
   const profile={effect,speed:config.speed,brightness:config.brightness,keys:Object.fromEntries(layout.map(k=>[String(k.index),{color:hex}]))};
-  if(fast){
+  if(fast&&effect==='snake'){
+   const indices=layout.map(k=>k.index),timeline=new SnakeTimeline(config.speed,config.brightness);
+   let confirmed=previous;const target=new Map([...previous].map(([i,r])=>[i,[...r]]));for(const i of indices)target.set(i,[100,0,0,0]);
+   const started=performance.now();let frames=0,packets=0;
+   while(!signal.aborted&&(loop||performance.now()-started<5000)){
+    for(const [i,r] of timeline.advance(performance.now()-started))target.set(i,r);
+    const plan=planPaletteDelta(confirmed,target,indices,'grouped');
+    for(const update of plan){const delay=Math.max(0,80-(performance.now()-lastWrite));if(delay)await new Promise(resolve=>setTimeout(resolve,delay));if(update.command===16)await write(update.payload[0],update.payload.slice(1,4),update.indices);else{await device.sendReport(0,packet(17,update.payload));lastWrite=performance.now();}packets++;}
+    if(plan.length){await new Promise(resolve=>setTimeout(resolve,100));const actual=await read();if(indices.some(i=>JSON.stringify(actual.get(i))!==JSON.stringify(target.get(i))))throw Error('Per-key timeline readback differs; playback stopped');confirmed=new Map([...target].map(([i,r])=>[i,[...r]]));frames++;window.dispatchEvent?.(new CustomEvent('apex-rgb-progress',{detail:{frames,fps:frames/((performance.now()-started)/1000),packets,transfer:'per-key-timeline'}}));}
+    const delay=Math.max(0,timeline.nextDue-(performance.now()-started));if(delay)await new Promise(resolve=>setTimeout(resolve,delay));
+   }
+   localStorage.setItem('apex-last-playback-metrics-v1',JSON.stringify({frames,packets,fps:frames/((performance.now()-started)/1000),transfer:'per-key-timeline'}));
+  }else if(fast){
    if(Array.from({length:84},(_,i)=>i).some(i=>!previous.has(i)))throw Error('Bulk transfer needs the complete 84-record palette');
    const indices=layout.map(k=>k.index).sort((a,b)=>a-b),chunks:number[][]=[];
    for(const index of indices){const last=chunks.at(-1);if(last&&last.length<14&&last.at(-1)===index-1)last.push(index);else chunks.push([index]);}
@@ -47,7 +57,7 @@ export async function playCustomRgb(device:HIDDevice,config:LightingConfig,signa
    const matches=(a:Map<number,number[]>,b:Map<number,number[]>)=>[...b].every(([i,r])=>JSON.stringify(a.get(i))===JSON.stringify(r));
    const bulk=async(records:Map<number,number[]>)=>{
     for(let page=0;page<chunks.length;page++){const ids=chunks[page],payload=[ids[0],...ids.flatMap(i=>records.get(i)!)];await device.sendReport(0,packet(17,payload,page+1,chunks.length));if(page<chunks.length-1)await new Promise(resolve=>setTimeout(resolve,gap));}
-    await new Promise(resolve=>setTimeout(resolve,35));return matches(await read(),records);
+    await new Promise(resolve=>setTimeout(resolve,100));return matches(await read(),records);
    };
    // Inactive14/15 are never written. Full palette readback must match.
    const probe=new Map([...previous].map(([i,r])=>[i,[...r]]));for(const k of layout){const old=previous.get(k.index)!;probe.set(k.index,[old[0],old[1],old[2],old[3]^1]);}probe.set(34,[100,255,0,255]);let verified=false;
@@ -64,7 +74,7 @@ export async function playCustomRgb(device:HIDDevice,config:LightingConfig,signa
      else {await device.sendReport(0,packet(17,update.payload));lastWrite=performance.now();}
      packets++;
     }
-    if(updates.length){await new Promise(resolve=>setTimeout(resolve,35));if(!matches(await read(),records))throw Error('Live palette readback differs; stopped playback');}
+    if(updates.length){await new Promise(resolve=>setTimeout(resolve,100));if(!matches(await read(),records))throw Error('Live palette readback differs; stopped playback');}
     confirmed=records;
     if(frames===0||frames%10===0)window.dispatchEvent?.(new CustomEvent('apex-rgb-progress',{detail:{frames:frames+1,fps:(frames+1)/((performance.now()-started)/1000),gap:cadence,packets}}));
     const delay=Math.max(0,50-(performance.now()-now));if(delay)await new Promise(resolve=>setTimeout(resolve,delay));

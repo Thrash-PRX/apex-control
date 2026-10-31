@@ -1,3 +1,4 @@
+import {exchangeRgb} from './rgb-exchange.ts';
 import {sampleEffect} from './reference-effects.mjs';
 import type {LightingConfig} from '../types/lighting.ts';
 const BACKUP='apex-native-color-cycle-backup-v1';
@@ -5,12 +6,7 @@ const pause=(ms:number)=>new Promise(resolve=>setTimeout(resolve,ms));
 function session(device:HIDDevice){
  if(device.vendorId!==0x314b||device.productId!==0x1026)throw Error('APEX required');
  const packet=(cmd:number,payload:number[]=[],page=1,total=1)=>{const p=new Uint8Array(64);if(payload.length>58)throw Error('RGB payload overflow');p.set([250,cmd,page,total,0,payload.length,...payload]);return p;};
- const exchange=(cmd:number,payload:number[]=[],page=1,total=1):Promise<Uint8Array>=>new Promise((resolve,reject)=>{
-  const cleanup=()=>{clearTimeout(timer);device.removeEventListener('inputreport',handler);};
-  const handler=(event:HIDInputReportEvent)=>{const r=new Uint8Array(event.data.buffer,event.data.byteOffset,event.data.byteLength);if(r[0]!==250||r[1]!==(cmd|128))return;cleanup();if(r.length!==64||r[2]!==page||r[5]>58)reject(Error('Color cycle response mismatch'));else resolve(r.slice());};
-  const timer=setTimeout(()=>{cleanup();reject(Error('Color cycle timeout at command 0x'+cmd.toString(16)+' page '+page+'/'+total+'; reconnect and restore saved RGB settings'));},2000);
-  device.addEventListener('inputreport',handler);device.sendReport(0,packet(cmd,payload,page,total)).catch(e=>{cleanup();reject(e);});
- });
+ const exchange=(cmd:number,payload:number[]=[],page=1,total=1)=>exchangeRgb(device,packet(cmd,payload,page,total));
  const ack=async(cmd:number,payload:number[])=>{const r=await exchange(cmd,payload);if(r[3]!==1||r[5]!==1||r[6]!==0)throw Error('Color cycle not acknowledged');};
  const read=async()=>{let total=1;let record:number[]|undefined;const seen=new Set<number>();for(let page=1;page<=total;page++){const r=await exchange(23,[255],page,total);if(page===1)total=r[3];if(total<1||total>16||r[3]!==total||r[5]===0||r[5]%8)throw Error('Invalid effect settings');for(let at=6;at<6+r[5];at+=8){if(seen.has(r[at]))throw Error('Duplicate effect settings');seen.add(r[at]);if(r[at]===1)record=[...r.slice(at,at+8)];}}if(!record)throw Error('Static settings unavailable');return record;};
  const restore=async(record:number[])=>{await pause(65);await ack(19,record);await pause(65);if(JSON.stringify(await read())!==JSON.stringify(record))throw Error('Static settings restore readback mismatch');await ack(25,[255]);await pause(65);};
