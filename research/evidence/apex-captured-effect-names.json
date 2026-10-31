@@ -1,0 +1,54 @@
+{
+  "sourceCommand": 24,
+  "responseCommand": 152,
+  "names": [
+    {
+      "id": 0,
+      "label": "Close"
+    },
+    {
+      "id": 1,
+      "label": "Static"
+    },
+    {
+      "id": 2,
+      "label": "Layer"
+    },
+    {
+      "id": 3,
+      "label": "Breath"
+    },
+    {
+      "id": 4,
+      "label": "Star"
+    },
+    {
+      "id": 5,
+      "label": "Flow L->R"
+    },
+    {
+      "id": 6,
+      "label": "Flow R->L"
+    },
+    {
+      "id": 7,
+      "label": "Flow Up->Dn"
+    },
+    {
+      "id": 8,
+      "label": "Flow Dn->Up"
+    },
+    {
+      "id": 9,
+      "label": "Dot(Press)"
+    },
+    {
+      "id": 10,
+      "label": "Cross(Press)"
+    },
+    {
+      "id": 11,
+      "label": "Ripple(Press)"
+    }
+  ]
+}

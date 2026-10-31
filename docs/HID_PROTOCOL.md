@@ -96,3 +96,6 @@ Opcode: 0x??
 Data Bytes: [Offset 0: Magic 0xFA] [Offset 1: Opcode] [Offset 2: Frame] [Offset 3: Total] [Offset 4: Field4] [Offset 5: Length] [Offset 6+: Payload]
 Expected Device Response: 0x?? ACK
 ```
+
+## Physical capture supersedes offline hypotheses — 2026-10-31
+See [APEX-RGB-CAPTURE.md](APEX-RGB-CAPTURE.md): 64-byte configuration reports observed on 314B:1026; captured red/green command13 and response93; host-driven readback pages and response opcode OR80 observed. Existing generic start/count getters and opcode-echo assumptions are not hardware proof. Writes remain locked.

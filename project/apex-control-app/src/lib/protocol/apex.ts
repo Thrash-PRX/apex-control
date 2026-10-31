@@ -72,7 +72,7 @@ export function encodeBulkCustomRgbReport(
   return report;
 }
 
-/** Opcode 0x16 readback request payload: [startIndex, count] */
+/** @deprecated Unverified legacy start/count reconstruction. Physical capture uses a zero-length request and host-driven header pagination; see APEX-RGB-CAPTURE.md. Offline only. */
 export function encodeCustomRgbReadbackRequest(startIndex: number, count: number): Uint8Array {
   if (count <= 0 || count > 60) throw new RangeError('Invalid readback count');
   if (startIndex < 0 || startIndex + count > 256) throw new RangeError('Readback index overflow');
@@ -87,7 +87,7 @@ export function encodeCustomRgbReadbackRequest(startIndex: number, count: number
  * Format: [FA, command, frameIndex, totalFrames, field4, payloadLength, payload..., padding] */
 export interface ResponseFrame {
   magic: number;           // Expected 0xFA
-  command: number;         // Opcode echo
+  command: number;         // Raw response opcode; captured responses use request | 0x80
   frameIndex: number;      // 1-based
   totalFrames: number;     // Total frames in this transaction
   field4: number;          // Unknown purpose (checksum? flags?)
@@ -367,7 +367,7 @@ export function encodeKeyboardConfigRequest(): Uint8Array {
   return report;
 }
 
-/** Opcode 0x17 effect name getter */
+/** Legacy name: physical capture establishes 0x17 as effect-settings readback. Parameter 0xff requests the full table. Effect names use 0x18. Offline only. */
 export function encodeEffectNameRequest(effectIndex: number): Uint8Array {
   const payload = new Uint8Array([byte(effectIndex)]);
   const report = new Uint8Array(64);

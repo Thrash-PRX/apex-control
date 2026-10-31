@@ -92,3 +92,7 @@ Final integration validation: 130 tests passed, 0 failed; lint and production bu
 Unpacked WK68 and retained resource/configuration hashes and mode labels. Added independent local lighting animation and regression tests. No vendor application or HID command executed. See docs/WK68-REFERENCE.md; reference algorithms are still unverified.
 
 Release preview packaged and browser checked. USBPcap 1.5.4.0 installed with user approval; driver stopped pending user restart. Hardware functionality remains unverified and writes locked. See HANDOFF.md for exact next capture step.
+
+Physical RGB capture obtained: red and green confirmed by user in stock MKeyboard; matching64-byte command13 packets and response93 observed. Added capture-backed offline fixtures/code and section export. All app writes still blocked; see docs/APEX-RGB-CAPTURE.md.
+
+Further captures establish brightness and speed bytes independently; user confirms final Breath100/80/green. Physical fixtures retained without full private captures. Hardware write lock remains.
