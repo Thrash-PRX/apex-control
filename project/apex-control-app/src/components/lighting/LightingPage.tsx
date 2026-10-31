@@ -25,6 +25,9 @@ const PRESET_COLORS: RgbColor[] = [
 ];
 
 export const LightingPage: React.FC = () => {
+  const [applying, setApplying] = useState(false);
+  const [applyStatus, setApplyStatus] = useState('');
+  const applyRgb = useAppStore(s => s.applyRgb);
   const lightingConfig = useAppStore((s) => s.lightingConfig);
   const updateLighting = useAppStore((s) => s.updateLighting);
   const selectedKeys = useAppStore((s) => s.selectedKeys);
@@ -64,7 +67,7 @@ export const LightingPage: React.FC = () => {
             </span>
           </div>
           <p className="text-sm text-[#8888a0] mt-1">
-            Preview RGB effects locally. Hardware Apply is locked. Reactive and ripple use selected keys as demonstration origins.
+            Preview RGB effects locally. Static and Breathing can be applied after pairing. Reactive and ripple use selected keys as demonstration origins.
           </p>
         </div>
 
@@ -84,6 +87,11 @@ export const LightingPage: React.FC = () => {
         </button>
       </div>
 
+      <div className="rounded-xl border border-[#333355] p-4 space-y-2">
+        <button disabled={applying} className="px-4 py-2 rounded bg-[#0096ff] disabled:opacity-50" onClick={async()=>{setApplying(true);setApplyStatus('Backing up RGB settings and applying…');try{await applyRgb();setApplyStatus('RGB settings acknowledged and read back from APEX.');}catch(e){setApplyStatus(e instanceof Error?e.message:String(e));}finally{setApplying(false);}}}>{applying?'Applying…':'Apply RGB to Keyboard'}</button>
+        <button className="ml-3 text-sm underline" onClick={()=>{const raw=localStorage.getItem("apex-rgb-device-backup-v1");if(!raw){setApplyStatus("No device RGB backup yet. Apply reads and saves it before changing settings.");return;}const url=URL.createObjectURL(new Blob([raw],{type:"application/json"}));const a=document.createElement("a");a.href=url;a.download="apex-rgb-backup.json";a.click();URL.revokeObjectURL(url);}}>Export RGB backup</button><p className="text-xs text-[#8888a0]">Hardware: Static and Breathing only. Close MKeyboard first, switch to hardware mode and pair APEX from Dashboard. Current RGB records are backed up in this browser before applying.</p>
+        <p role="status" className="text-sm">{applyStatus}</p>
+      </div>
       {/* Keyboard Visual Preview */}
       <div className="rounded-xl border border-[#333355] bg-[#16162a] p-4 shadow-lg">
         <div className="flex items-center justify-between mb-2 px-2">

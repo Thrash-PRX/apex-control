@@ -278,6 +278,10 @@ export class DeviceManager {
     return data;
   }
 
+  async applyRgb(mode: number, rgb: readonly [number,number,number], brightness: number, speed: number): Promise<void> {
+    if(!(this._transport instanceof WebHidTransport))throw new Error('Connect a real APEX using WebHID first');
+    await this._transport.applyRgb(mode,rgb,brightness,speed);
+  }
   /** Send an output report. */
   async sendOutputReport(reportId: number, data: Uint8Array): Promise<void> {
     if (!this._transport.isOpen()) {

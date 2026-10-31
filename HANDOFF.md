@@ -156,3 +156,11 @@ Capture continuation: user confirmed red, green,100→50 brightness dimming, the
 
 
 Final capture continuation verification:140/140 tests passed; lint and production build passed. Exact SHA is the following commit (git rev-parse HEAD). All four correctly scoped captures stopped. Native RGB settings encoder remains offline; physical write lock unchanged.
+
+## RGB Apply enabled at user request — 2026-10-31
+
+User explicitly requested real app RGB control after the physical captures. This supersedes the prior blanket write lock ONLY for the dedicated captured RGB workflow. Generic sendOutputReport and all feature writes remain locked. SOCD, RT, display, reset/calibration/flashing remain disabled.
+
+Dedicated WebHID workflow requires314B:1026,64-byte output report0 and Static1 or Breath3. Reads effect table17→97 with FF selector and host pagination; saves exact raw records to browser storage before mutation (storage failure blocks mutation); changes brightness/speed/RGB while preserving unknown fields; sends captured13→93; selects captured mode19→99; rereads17 and compares exact settings. Sequential acknowledgements, timeouts, response bounds and per-transport concurrency guard included. Failures explicitly warn settings may have changed; no automatic retry or unverified rollback. Backup is RGB-table-only, not full device backup. Export RGB backup button provided.
+
+142 automated tests pass, including fake-device full transaction/readback and backup-failure fail-closed coverage. Lint and production build pass. No agent-triggered physical RGB Apply performed; awaiting user browser test. Close stock MKeyboard first; Chrome/Edge → localhost5175 → disable Mock Mode → Dashboard Pair & Connect → Lighting Studio Static/Breath → Apply RGB. WebHID chooser is user-owned. Source changes do not imply physical runtime success.

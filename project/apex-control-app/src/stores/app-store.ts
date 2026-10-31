@@ -61,6 +61,7 @@ interface AppState {
   disconnectDevice: () => Promise<void>;
 
   // Lighting
+  applyRgb: () => Promise<void>;
   lightingConfig: LightingConfig;
   updateLighting: (config: Partial<LightingConfig>) => void;
   selectedKeys: string[];
@@ -291,6 +292,12 @@ export const useAppStore = create<AppState>((set, get) => ({
   },
 
   // Lighting
+  applyRgb: async () => {
+    const s=get(),c=s.lightingConfig;if(s.useMock)throw new Error('Switch to hardware mode and connect APEX first');
+    const mode=c.effect===LightingEffect.Static?1:c.effect===LightingEffect.Breathing?3:0;
+    if(!mode)throw new Error('Hardware Apply supports Static and Breathing only');
+    await getOrCreateDeviceManager(false).applyRgb(mode,[c.primaryColor.r,c.primaryColor.g,c.primaryColor.b],c.brightness,c.speed);
+  },
   lightingConfig: defaultLighting,
   updateLighting: (config) =>
     set((s) => ({

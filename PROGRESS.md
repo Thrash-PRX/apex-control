@@ -96,3 +96,5 @@ Release preview packaged and browser checked. USBPcap 1.5.4.0 installed with use
 Physical RGB capture obtained: red and green confirmed by user in stock MKeyboard; matching64-byte command13 packets and response93 observed. Added capture-backed offline fixtures/code and section export. All app writes still blocked; see docs/APEX-RGB-CAPTURE.md.
 
 Further captures establish brightness and speed bytes independently; user confirms final Breath100/80/green. Physical fixtures retained without full private captures. Hardware write lock remains.
+
+RGB hardware Apply implemented at user request for captured Static/Breath modes: pre-change RGB backup, acknowledgements, mode selection and readback verification. Generic writes stay locked.142 tests/lint/build pass; live user test pending.
