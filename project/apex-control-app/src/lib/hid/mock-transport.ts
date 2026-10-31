@@ -23,7 +23,7 @@ const MOCK_DEVICE: HidDeviceInfo = {
   vendorId: APEX_200S_VID,
   productId: APEX_200S_PID,
   manufacturer: 'Ant Esports (Mock)',
-  product: 'APEX 200S (Mock Device)',
+  product: 'APEX 200 (Mock Device)',
   serialNumber: 'MOCK-000000',
   interfaceNumber: 1,
   usagePage: 0xff02, // Simulated observed APEX collection

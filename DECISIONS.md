@@ -30,3 +30,5 @@
 ### 5. Clear Feature Status Labeling
 - **Decision:** Features whose exact HID opcode is unverified are clearly flagged in the UI with an amber "⚠ Protocol Unverified" or "⚠ Sensor Limits Unverified" badge.
 - **Rationale:** Adheres to the prompt requirement: "Do not implement fake hardware functionality. A feature must only be described as working when its command structure, supported capabilities, and behavior have been verified."
+
+2026-10-31 correction: Decision4's guessed APEX200S/84-key layout is superseded by user-confirmed APEX200/82 active-key geometry. See latest HANDOFF for evidence and mapping limitations.

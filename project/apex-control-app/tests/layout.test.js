@@ -11,14 +11,14 @@ import {
 
 test('Keyboard Layout — Key count & structure', () => {
   assert.equal(typeof APEX_200S_KEY_COUNT, 'number');
-  assert.equal(APEX_200S_KEY_COUNT, 84, 'APEX 200S has 84 standard keys (75% compact)');
+  assert.equal(APEX_200S_KEY_COUNT, 82, 'APEX 200S has 82 physical keys (75% compact)');
 
   const knob = APEX_200S_LAYOUT.find((k) => k.id === 'knob');
   assert.ok(knob, 'Layout contains dedicated rotary encoder/knob');
   assert.equal(knob.isSpecial, true);
 
   // Total items = 84 keys + 1 knob = 85
-  assert.equal(APEX_200S_LAYOUT.length, 85);
+  assert.equal(APEX_200S_LAYOUT.length, 83);
 });
 
 test('Keyboard Layout — Unique key IDs', () => {
@@ -41,4 +41,12 @@ test('Keyboard Layout — Dimensions and bounds', () => {
 
 test('Keyboard Layout — Verification metadata', () => {
   assert.equal(LAYOUT_VERIFIED, false, 'Layout must be marked unverified until checked with physical device');
+});
+
+
+test('APEX 200 physical geometry excludes inactive slots and places knob beside Up',()=>{
+ assert.equal(APEX_200S_LAYOUT.find(k=>k.id==='w').deviceIndex,34);
+ assert.ok(!APEX_200S_LAYOUT.some(k=>k.deviceIndex===14||k.deviceIndex===15));
+ const up=APEX_200S_LAYOUT.find(k=>k.id==='up'),knob=APEX_200S_LAYOUT.find(k=>k.id==='knob');assert.equal(up.y,knob.y);assert.ok(knob.x>up.x);
+ assert.equal(APEX_200S_LAYOUT.find(k=>k.id==='insert').row,1);assert.equal(APEX_200S_LAYOUT.find(k=>k.id==='pgdn').row,2);
 });

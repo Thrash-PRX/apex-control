@@ -1,7 +1,7 @@
 import React from 'react';
 import {
   APEX_200S_LAYOUT,
-  LAYOUT_BOUNDS,
+  LAYOUT_BOUNDS, APEX_DISPLAY, APEX_LIGHT_BAR, APEX_200S_KEY_COUNT,
   type KeyDefinition,
 } from '../../lib/keyboard-layout';
 import type { RgbColor } from '../../types';
@@ -67,14 +67,15 @@ export const KeyboardVisualizer: React.FC<KeyboardVisualizerProps> = ({
         <div
           className="absolute flex items-center justify-center text-[9px] font-mono tracking-wider px-2 py-0.5 rounded border border-[#0096ff]/40 bg-[#16162a] text-[#0096ff]"
           style={{
-            top: `${padding}px`,
-            right: `${padding + 64}px`,
-            height: '24px',
+            top: `${padding + APEX_DISPLAY.y * unitSize}px`,
+            left: `${padding + APEX_DISPLAY.x * unitSize}px`,
+            height: APEX_DISPLAY.h * unitSize - gap, width: APEX_DISPLAY.w * unitSize - gap,
           }}
         >
-          APEX 200S [OLED]
+          APEX 200
         </div>
 
+<div aria-label="APEX light bar" className="absolute rounded bg-gradient-to-r from-purple-400 to-green-400" style={{left:padding+APEX_LIGHT_BAR.x*unitSize,top:padding+APEX_LIGHT_BAR.y*unitSize,width:APEX_LIGHT_BAR.w*unitSize-gap,height:APEX_LIGHT_BAR.h*unitSize}} />
         {APEX_200S_LAYOUT.map((key) => {
           const isSelected = selectedKeys.includes(key.id);
           const customColor = keyColors?.get(key.id);
@@ -174,7 +175,7 @@ export const KeyboardVisualizer: React.FC<KeyboardVisualizerProps> = ({
           </span>
         </div>
         <div>
-          <span>Total: 84 Keys + Rotary Encoder (75% Compact)</span>
+          <span>APEX 200 · {APEX_200S_KEY_COUNT} keys + volume knob</span>
         </div>
       </div>
     </div>

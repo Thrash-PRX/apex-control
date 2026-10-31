@@ -38,7 +38,7 @@ export const SettingsPage: React.FC = () => {
           <div className="space-y-2 text-xs font-mono">
             <div className="flex justify-between p-2 rounded bg-[#1e1e32]">
               <span className="text-[#8888a0]">Product Model:</span>
-              <span className="text-white font-bold">Ant Esports APEX 200S</span>
+              <span className="text-white font-bold">Ant Esports APEX 200</span>
             </div>
             <div className="flex justify-between p-2 rounded bg-[#1e1e32]">
               <span className="text-[#8888a0]">USB Vendor ID (VID):</span>
@@ -50,7 +50,7 @@ export const SettingsPage: React.FC = () => {
             </div>
             <div className="flex justify-between p-2 rounded bg-[#1e1e32]">
               <span className="text-[#8888a0]">Layout Form Factor:</span>
-              <span className="text-white">75% Compact (84 Keys + Encoder)</span>
+              <span className="text-white">APEX 200 · 82 keys + volume knob</span>
             </div>
             <div className="flex justify-between p-2 rounded bg-[#1e1e32]">
               <span className="text-[#8888a0]">Switches:</span>
