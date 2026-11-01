@@ -1,21 +1,20 @@
 import React from 'react';
 import {
-  Gauge,
   Sliders,
-  AlertTriangle,
   RotateCcw,
   Check,
 } from 'lucide-react';
 import { useAppStore } from '../../stores/app-store';
 import { ACTUATION_LIMITS } from '../../types';
-import { KeyboardVisualizer } from '../keyboard';
+import { KeyWorkspace } from '../keyboard/KeyWorkspace';
+import { PageHeader } from '../layout/PageHeader';
 import { DeviceActuationPanel } from './DeviceActuationPanel';
 
 export const ActuationPage: React.FC = () => {
   const actuationConfig = useAppStore((s) => s.actuationConfig);
   const updateActuation = useAppStore((s) => s.updateActuation);
   const selectedKeys = useAppStore((s) => s.selectedKeys);
-  const setSelectedKeys = useAppStore((s) => s.setSelectedKeys);
+
 
   const keySubtitles = new Map<string, string>();
   // Mark keys with current actuation
@@ -55,63 +54,12 @@ export const ActuationPage: React.FC = () => {
   };
 
   return (
-    <div className="space-y-6 max-w-6xl mx-auto pb-12">
+    <div className="page-stack">
+      <PageHeader title="Actuation" description="Choose how far a key travels before it registers. Read your keyboard, select keys and fine-tune their trigger point." badge={<span className="available-tag">DEVICE CONTROLS</span>} />
+      <KeyWorkspace subtitles={keySubtitles} />
       <DeviceActuationPanel />
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <div className="flex items-center gap-3">
-            <h1 className="text-2xl font-bold tracking-tight text-white flex items-center gap-2">
-              <Gauge className="w-6 h-6 text-[#f28b50]" />
-              Actuation workspace
-            </h1>
-            <span className="flex items-center gap-1 text-[11px] font-semibold tracking-wider uppercase px-2.5 py-0.5 rounded-full bg-amber-500/10 text-amber-400 border border-amber-500/30">
-              <AlertTriangle className="w-3 h-3" />
-              Local draft controls below
-            </span>
-          </div>
-          <p className="text-sm text-[#999fac] mt-1">
-            Use Device actuation above for hardware read, Apply and restore. Draft controls below do not change the keyboard.
-          </p>
-        </div>
-
-        <button
-          onClick={() =>
-            updateActuation({
-              actuationPoint: ACTUATION_LIMITS.defaultActuation,
-              resetPoint: ACTUATION_LIMITS.defaultReset,
-              perKeyOverrides: [],
-            })
-          }
-          className="flex items-center gap-2 px-3 py-1.5 text-xs font-medium rounded-md border border-[#393d46] text-[#999fac] hover:text-white hover:bg-[#25282f] transition-colors"
-        >
-          <RotateCcw className="w-3.5 h-3.5" />
-          Reset local draft
-        </button>
-      </div>
-
-      {/* Visual Keyboard */}
-      <div className="rounded-xl border border-[#393d46] bg-[#1c1e22] p-4 shadow-lg">
-        <div className="flex items-center justify-between mb-2 px-2">
-          <span className="text-xs font-semibold text-[#999fac] uppercase tracking-wider">
-            Select Keys for Custom Actuation (Selected: {selectedKeys.length})
-          </span>
-          {selectedKeys.length > 0 && (
-            <button
-              onClick={() => setSelectedKeys([])}
-              className="text-xs text-[#f28b50] hover:underline"
-            >
-              Clear Selection
-            </button>
-          )}
-        </div>
-        <KeyboardVisualizer
-          selectedKeys={selectedKeys}
-          onKeySelect={setSelectedKeys}
-          keySubtitles={keySubtitles}
-        />
-      </div>
-
+      <details className="draft-disclosure"><summary>Local draft settings & presets</summary>
+      <div className="flex justify-end my-4"><button className="ui-button" onClick={() => updateActuation({actuationPoint: ACTUATION_LIMITS.defaultActuation, resetPoint: ACTUATION_LIMITS.defaultReset, perKeyOverrides: []})}><RotateCcw size={13} />Reset local draft</button></div>
       {/* Controls Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* Global Settings */}
@@ -141,7 +89,7 @@ export const ActuationPage: React.FC = () => {
               }
               className="w-full accent-[#f28b50]"
             />
-            <div className="flex justify-between text-[11px] text-[#6b6b85] font-mono">
+            <div className="flex justify-between text-[11px] text-[#95a1b4] font-mono">
               <span>{ACTUATION_LIMITS.min}mm (Ultra Hair-Trigger)</span>
               <span>{ACTUATION_LIMITS.max}mm (Deep Press)</span>
             </div>
@@ -167,7 +115,7 @@ export const ActuationPage: React.FC = () => {
               }
               className="w-full accent-[#f28b50]"
             />
-            <p className="text-[11px] text-[#70708c]">
+            <p className="text-[11px] text-[#9ba7b8]">
               The upward travel point where key deactivation registers when Rapid Trigger is not active.
             </p>
           </div>
@@ -193,7 +141,7 @@ export const ActuationPage: React.FC = () => {
             </div>
           ) : (
             <div className="space-y-4">
-              <div className="p-3 bg-[#1e1e32] rounded-lg border border-[#30304c]">
+              <div className="p-3 bg-[#202833] rounded-lg border border-[#414d5e]">
                 <span className="text-xs text-[#999fac] block mb-1">
                   Target Keys:
                 </span>
@@ -201,7 +149,7 @@ export const ActuationPage: React.FC = () => {
                   {selectedKeys.map((k) => (
                     <span
                       key={k}
-                      className="px-2 py-0.5 rounded text-xs font-mono bg-[#2b2b48] text-white border border-[#656c79]"
+                      className="px-2 py-0.5 rounded text-xs font-mono bg-[#323d4d] text-white border border-[#656c79]"
                     >
                       {k.toUpperCase()}
                     </span>
@@ -216,19 +164,19 @@ export const ActuationPage: React.FC = () => {
                 <div className="grid grid-cols-3 gap-2">
                   <button
                     onClick={() => applyToSelectedKeys(0.4)}
-                    className="p-2 text-xs font-semibold rounded bg-[#202035] hover:bg-[#282845] border border-[#343455] text-white"
+                    className="p-2 text-xs font-semibold rounded bg-[#29323d] hover:bg-[#354152] border border-[#4b586b] text-white"
                   >
                     0.4mm (Fast)
                   </button>
                   <button
                     onClick={() => applyToSelectedKeys(1.5)}
-                    className="p-2 text-xs font-semibold rounded bg-[#202035] hover:bg-[#282845] border border-[#343455] text-white"
+                    className="p-2 text-xs font-semibold rounded bg-[#29323d] hover:bg-[#354152] border border-[#4b586b] text-white"
                   >
                     1.5mm (Balanced)
                   </button>
                   <button
                     onClick={() => applyToSelectedKeys(2.8)}
-                    className="p-2 text-xs font-semibold rounded bg-[#202035] hover:bg-[#282845] border border-[#343455] text-white"
+                    className="p-2 text-xs font-semibold rounded bg-[#29323d] hover:bg-[#354152] border border-[#4b586b] text-white"
                   >
                     2.8mm (Precise)
                   </button>
@@ -238,6 +186,7 @@ export const ActuationPage: React.FC = () => {
           )}
         </div>
       </div>
+      </details>
     </div>
   );
 };

@@ -13,7 +13,7 @@ npm run dev -- --host 127.0.0.1
 
 Open the local URL printed by Vite. Use Chrome/Edge with WebHID for device discovery; mock mode is clearly labelled. Production files are generated in `dist/` and need HTTPS when hosted.
 
-**Current release:** captured native RGB Apply plus host-driven per-key custom effects, with backups, acknowledgements and readback. Native Static/Wave/Ripple and update4 timed Snake have user-reported physical success. Update5 extends timed playback to17 spatial effects; USB readback/restore tests passed, while their new browser appearance remains to be assessed. Generic output/feature writes and other hardware configuration remain locked. Display Studio supports local images and manual stat cards; OLED upload and live system telemetry are not yet supported.
+**Current release:** a redesigned nine-page browser workspace with the82-key APEX200 layout, local Base/FN assignment drafts, editable profile names, OLED designer and device readback. Captured native/custom RGB and device actuation have dedicated backup/readback/restore workflows; actuation was physically tested on W through the app engine. RT, SOCD, keymap and OLED hardware writes remain unavailable. Their editors are labelled as local drafts. Generic HID/feature writes, calibration and flashing remain locked.
 
 Read [HANDOFF.md](HANDOFF.md), [PROGRESS.md](PROGRESS.md) and [docs/HID_PROTOCOL.md](docs/HID_PROTOCOL.md) for evidence, checks and blockers. No manufacturer binaries or private device identifiers are included.
 

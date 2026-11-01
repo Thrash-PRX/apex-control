@@ -296,7 +296,7 @@ export function DisplayPage() {
   const transformStyle = getTransformStyle(draft.imageSettings);
 
   return (
-    <section className="p-6 space-y-6 max-w-7xl mx-auto" style={{ backgroundColor: '#17181c', minHeight: '100vh' }}>
+    <section className="page-stack oled-studio">
       {/* Toast */}
       {notice && (
         <div
@@ -316,14 +316,14 @@ export function DisplayPage() {
       )}
 
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+      <div className="page-heading">
         <div>
           <h1 className="text-2xl font-bold tracking-tight text-white flex items-center gap-2">
             <Image className="w-6 h-6 text-[#f28b50]" />
-            Display Studio
+            OLED Studio
           </h1>
           <p className="text-sm text-[#999fac] mt-1">
-            Local image preview & stat card designer. Hardware display support unverified.
+            Create a screen design with images, text and layouts. Save it in your browser; keyboard upload is not available yet.
           </p>
         </div>
         <div className="flex items-center gap-2 flex-wrap">
@@ -349,7 +349,7 @@ export function DisplayPage() {
           </label>
           <button
             onClick={handleSave}
-            className="flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-semibold rounded-md bg-[#f28b50] text-white hover:bg-[#0080db] shadow-md shadow-[#f28b50]/20 transition-all"
+            className="flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-semibold rounded-md bg-[#f28b50] text-white hover:bg-[#f6b17f] shadow-md shadow-[#f28b50]/20 transition-all"
             title="Save draft (Ctrl+S)"
           >
             <Save className="w-3.5 h-3.5" />
@@ -382,7 +382,7 @@ export function DisplayPage() {
                 <label key={key} className="block">
                   <span className="block text-xs font-medium text-[#999fac] mb-1 capitalize">{key}</span>
                   <input
-                    className="block w-full rounded bg-[#1e1e32] p-3 border border-[#393d46] text-white placeholder-[#555] focus:border-[#f28b50] focus:outline-none focus:ring-1 focus:ring-[#f28b50]"
+                    className="block w-full rounded bg-[#202833] p-3 border border-[#393d46] text-white placeholder-[#555] focus:border-[#f28b50] focus:outline-none focus:ring-1 focus:ring-[#f28b50]"
                     maxLength={64}
                     value={draft[key]}
                     onChange={(e) => updateText(key, e.target.value)}
@@ -404,7 +404,7 @@ export function DisplayPage() {
                     className={`flex-1 px-3 py-2 rounded text-xs font-medium transition-all ${
                       draft.textAlign === align
                         ? 'bg-[#f28b50] text-white shadow-sm'
-                        : 'bg-[#1e1e32] text-[#999fac] hover:text-white hover:bg-[#282845]'
+                        : 'bg-[#202833] text-[#999fac] hover:text-white hover:bg-[#354152]'
                     } border border-[#393d46}`}
                     role="radio"
                     aria-checked={draft.textAlign === align}
@@ -439,8 +439,8 @@ export function DisplayPage() {
                 disabled={!!draft.image}
                 className={`w-full py-3 rounded-lg border-2 border-dashed transition-colors ${
                   draft.image
-                    ? 'border-[#393d46] bg-[#1e1e32] text-[#555] cursor-not-allowed'
-                    : 'border-[#393d46] bg-[#1e1e32] text-[#999fac] hover:border-[#f28b50]/50 hover:bg-[#25282f] hover:text-white'
+                    ? 'border-[#393d46] bg-[#202833] text-[#555] cursor-not-allowed'
+                    : 'border-[#393d46] bg-[#202833] text-[#999fac] hover:border-[#f28b50]/50 hover:bg-[#25282f] hover:text-white'
                 }`}
               >
                 {draft.image ? (
@@ -515,7 +515,7 @@ export function DisplayPage() {
                   </div>
                   <button
                     onClick={rotateImage}
-                    className="w-full px-3 py-2 rounded bg-[#1e1e32] hover:bg-[#282845] border border-[#393d46] text-white text-sm font-medium flex items-center justify-center gap-2"
+                    className="w-full px-3 py-2 rounded bg-[#202833] hover:bg-[#354152] border border-[#393d46] text-white text-sm font-medium flex items-center justify-center gap-2"
                     aria-label={`Rotate image (current: ${draft.imageSettings.rotation}°)`}
                   >
                     <RotateCcw className="w-4 h-4" />
@@ -530,7 +530,7 @@ export function DisplayPage() {
 
                 <button
                   onClick={removeImage}
-                  className="w-full px-3 py-1.5 rounded text-xs font-medium bg-[#25282f] hover:bg-[#303050] text-white border border-[#393d46] transition-colors"
+                  className="w-full px-3 py-1.5 rounded text-xs font-medium bg-[#25282f] hover:bg-[#394758] text-white border border-[#393d46] transition-colors"
                 >
                   <Trash2 className="w-3.5 h-3.5 inline mr-1" />
                   Remove Image
@@ -553,7 +553,7 @@ export function DisplayPage() {
                   className={`p-3 rounded-lg border text-center transition-all ${
                     draft.backgroundPreset === preset
                       ? 'border-[#f28b50] bg-[#f28b50]/10 text-white shadow-sm'
-                      : 'border-[#2b2b45] bg-[#1d1d30] text-[#a0a0b8] hover:border-[#3d3d60] hover:text-white'
+                      : 'border-[#485568] bg-[#252e3a] text-[#b2bfd0] hover:border-[#66768c] hover:text-white'
                   }`}
                   role="radio"
                   aria-checked={draft.backgroundPreset === preset}
@@ -579,13 +579,13 @@ export function DisplayPage() {
                   className={`p-3 rounded-lg border text-left transition-all ${
                     draft.layoutPreset === preset
                       ? 'border-[#f28b50] bg-[#f28b50]/10 text-white'
-                      : 'border-[#2b2b45] bg-[#1d1d30] text-[#a0a0b8] hover:border-[#3d3d60] hover:text-white'
+                      : 'border-[#485568] bg-[#252e3a] text-[#b2bfd0] hover:border-[#66768c] hover:text-white'
                   }`}
                   role="radio"
                   aria-checked={draft.layoutPreset === preset}
                 >
                   <span className="text-xs font-bold block">{LAYOUT_PRESETS[preset].name}</span>
-                  <span className="text-[10px] text-[#70708c]">{LAYOUT_PRESETS[preset].description}</span>
+                  <span className="text-[10px] text-[#9ba7b8]">{LAYOUT_PRESETS[preset].description}</span>
                 </button>
               ))}
             </div>
@@ -605,23 +605,23 @@ export function DisplayPage() {
             <div className="rounded-xl border border-[#393d46] bg-[#1c1e22] p-5 space-y-3 animate-slide-in">
               <h3 className="text-xs font-semibold uppercase tracking-wider text-[#999fac]">Image Transform Values</h3>
               <div className="grid grid-cols-2 gap-2 text-xs">
-                <div className="bg-[#1e1e32] p-2 rounded">
+                <div className="bg-[#202833] p-2 rounded">
                   <span className="text-[#666] block">Scale</span>
                   <span className="font-mono text-[#f28b50]">{draft.imageSettings.scale.toFixed(2)}</span>
                 </div>
-                <div className="bg-[#1e1e32] p-2 rounded">
+                <div className="bg-[#202833] p-2 rounded">
                   <span className="text-[#666] block">Offset X</span>
                   <span className="font-mono text-[#f28b50]">{draft.imageSettings.offsetX.toFixed(1)}%</span>
                 </div>
-                <div className="bg-[#1e1e32] p-2 rounded">
+                <div className="bg-[#202833] p-2 rounded">
                   <span className="text-[#666] block">Offset Y</span>
                   <span className="font-mono text-[#f28b50]">{draft.imageSettings.offsetY.toFixed(1)}%</span>
                 </div>
-                <div className="bg-[#1e1e32] p-2 rounded">
+                <div className="bg-[#202833] p-2 rounded">
                   <span className="text-[#666] block">Rotation</span>
                   <span className="font-mono text-[#f28b50]">{draft.imageSettings.rotation}°</span>
                 </div>
-                <div className="bg-[#1e1e32] p-2 rounded col-span-2">
+                <div className="bg-[#202833] p-2 rounded col-span-2">
                   <span className="text-[#666] block">Opacity</span>
                   <span className="font-mono text-[#f28b50]">{Math.round(draft.imageSettings.opacity * 100)}%</span>
                 </div>

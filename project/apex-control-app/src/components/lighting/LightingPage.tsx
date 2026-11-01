@@ -6,12 +6,13 @@ import {
   Sliders,
   Sun,
   Flame,
-  AlertTriangle,
+
   RotateCcw,
 } from 'lucide-react';
 import { useAppStore } from '../../stores/app-store';
 import { LIGHTING_EFFECTS, LightingEffect, type RgbColor } from '../../types';
 import { KeyboardVisualizer } from '../keyboard';
+import { PageHeader } from '../layout/PageHeader';
 
 import { previewLighting } from '../../lib/lighting-preview';
 import { APEX_200S_LAYOUT } from '../../lib/keyboard-layout';
@@ -69,26 +70,8 @@ export const LightingPage: React.FC = () => {
     for(const [id,c] of top){const base=keyColorsMap.get(id)!;keyColorsMap.set(id,{r:Math.max(base.r,c.r),g:Math.max(base.g,c.g),b:Math.max(base.b,c.b)});}
   }
   return (
-    <div className="space-y-6 max-w-6xl mx-auto pb-12">
-      {/* Page Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <div className="flex items-center gap-3">
-            <h1 className="text-2xl font-bold tracking-tight text-white flex items-center gap-2">
-              <Palette className="w-6 h-6 text-[#f28b50]" />
-              Lighting Studio
-            </h1>
-            <span className="flex items-center gap-1 text-[11px] font-semibold tracking-wider uppercase px-2.5 py-0.5 rounded-full bg-amber-500/10 text-amber-400 border border-amber-500/30">
-              <AlertTriangle className="w-3 h-3" />
-              Native + custom RGB
-            </span>
-          </div>
-          <p className="text-sm text-[#999fac] mt-1">
-            Preview RGB effects locally. Native APEX modes can be applied after pairing. Reactive and ripple use selected keys as demonstration origins.
-          </p>
-        </div>
-
-        <button
+    <div className="page-stack">
+<PageHeader title="Lighting" description="Choose an effect, set your colors and make your setup glow." badge={<span className="available-tag">DEVICE CONTROLS</span>} actions={<button
           onClick={() =>
             updateLighting({
               effect: LightingEffect.Static,
@@ -102,10 +85,8 @@ export const LightingPage: React.FC = () => {
         >
           <RotateCcw className="w-3.5 h-3.5" />
           Reset Defaults
-        </button>
-      </div>
-
-      <div className="rounded-xl border border-[#393d46] p-4 space-y-2">
+        </button>} />
+      <div className="editor-panel lighting-controls">
         <p className="text-sm">{hardwareReady?'APEX hardware connected — native Apply is available.':'No hardware connection — the keyboard image is a local preview only.'}</p>
         {!hardwareReady&&<button disabled={applying} className="px-4 py-2 rounded border border-[#f28b50]" onClick={async()=>{setApplying(true);setApplyStatus('Opening APEX pairing…');try{const state=useAppStore.getState();if(state.useMock)state.toggleMockMode();const device=await useAppStore.getState().pairDevice();if(device)await useAppStore.getState().connectDevice(device.path);const c=useAppStore.getState().connection;setApplyStatus(c.state==='connected'?'APEX connected. Choose a native effect, then Apply.':c.error??'No APEX connection. Close MKeyboard and select APEX in the browser picker.');}catch(e){setApplyStatus(String(e));}finally{setApplying(false);}}}>Connect APEX keyboard</button>}
         <button disabled={applying || !hardwareReady || nativeRgbMode(lightingConfig)===null || overlay!=='none'} className="px-4 py-2 rounded bg-[#f28b50] disabled:opacity-50" onClick={async()=>{setApplying(true);setApplyStatus('Backing up RGB settings and applying…');try{await applyRgb();setApplyStatus('RGB settings acknowledged and read back from APEX.');}catch(e){setApplyStatus(e instanceof AggregateError?e.message+": "+e.errors.map(x=>x instanceof Error?x.message:String(x)).join(" | "):e instanceof Error?e.message:String(e));}finally{setApplying(false);}}}>{applying?'Applying…':'Apply RGB to Keyboard'}</button>
@@ -115,8 +96,8 @@ export const LightingPage: React.FC = () => {
 
 <button disabled={applying} className="px-3 py-2 border rounded disabled:opacity-50" onClick={async()=>{setApplying(true);try{await playRgb(new AbortController().signal,true);setApplyStatus("Saved RGB settings restored and readback confirmed.");}catch(e){setApplyStatus(e instanceof Error?e.message:String(e));}finally{setApplying(false);}}}>Restore saved RGB settings</button><button className="px-3 py-2 border rounded" onClick={()=>playController.current?.abort()}>Stop animation and restore colors</button>
         </div>
-<button className="text-sm underline" onClick={()=>{const raw=JSON.stringify({palettes:JSON.parse(localStorage.getItem('apex-custom-rgb-history-v1')??'[]'),nativeColorCycle:JSON.parse(localStorage.getItem('apex-native-color-cycle-backup-v1')??'null')});if(!localStorage.getItem('apex-custom-rgb-history-v1')&&!localStorage.getItem('apex-native-color-cycle-backup-v1')){setApplyStatus("No animation palette backup yet.");return;}const url=URL.createObjectURL(new Blob([raw],{type:"application/json"}));const a=document.createElement("a");a.href=url;a.download="apex-animation-palettes.json";a.click();URL.revokeObjectURL(url);}}>Export animation palette backups</button><p className="text-xs text-[#999fac]">Playback update 7: full-board color fields for Wheel, Windmill, Storm and Neon Stream, with measured faster per-key pacing. custom effects use individual key timers and acknowledged key-color updates. While playing, the keyboard image mirrors verified colors instead of a faster demo. Keep the page open; Stop restores saved colors. Native effects run in firmware. Custom effects are original interpretations; exact WK68/Wooting behavior and smoothness are not claimed. Shadow and Heatmap react only to keys typed while this page has focus.</p>
-        <details><summary className="text-sm cursor-pointer">Legacy slow diagnostic</summary>          <button className="px-3 py-2 rounded bg-purple-700 disabled:opacity-50" disabled={applying || !hardwareReady || lightingConfig.effect==='native_layer' || overlay!=='none'} onClick={async()=>{const controller=new AbortController();playController.current=controller;setApplying(true);setApplyStatus('Backing up palette; running bounded hardware animation…');try{await playRgb(controller.signal);setApplyStatus('Animation test ended; palette restore readback confirmed. Custom mode remains selected.');}catch(e){setApplyStatus(e instanceof AggregateError?e.message+": "+e.errors.map(x=>x instanceof Error?x.message:String(x)).join(" | "):e instanceof Error?e.message:String(e));}finally{playController.current=null;setApplying(false);}}}>Slow diagnostic (2 fps)</button></details><p role="status" className="text-sm">{applyStatus}</p>
+<details className="draft-disclosure"><summary>Backups & playback diagnostics</summary><button className="text-sm underline" onClick={()=>{const raw=JSON.stringify({palettes:JSON.parse(localStorage.getItem('apex-custom-rgb-history-v1')??'[]'),nativeColorCycle:JSON.parse(localStorage.getItem('apex-native-color-cycle-backup-v1')??'null')});if(!localStorage.getItem('apex-custom-rgb-history-v1')&&!localStorage.getItem('apex-native-color-cycle-backup-v1')){setApplyStatus("No animation palette backup yet.");return;}const url=URL.createObjectURL(new Blob([raw],{type:"application/json"}));const a=document.createElement("a");a.href=url;a.download="apex-animation-palettes.json";a.click();URL.revokeObjectURL(url);}}>Export animation palette backups</button><p className="text-xs text-[#999fac]">Custom effects run while this page stays open. Stop restores saved colors. The keyboard image mirrors verified colors during playback. Native effects run on the keyboard; custom effects are authored interpretations. Shadow and Heatmap react only to typing in this page.</p>
+        <details><summary className="text-sm cursor-pointer">Legacy slow diagnostic</summary>          <button className="px-3 py-2 rounded bg-purple-700 disabled:opacity-50" disabled={applying || !hardwareReady || lightingConfig.effect==='native_layer' || overlay!=='none'} onClick={async()=>{const controller=new AbortController();playController.current=controller;setApplying(true);setApplyStatus('Backing up palette; running bounded hardware animation…');try{await playRgb(controller.signal);setApplyStatus('Animation test ended; palette restore readback confirmed. Custom mode remains selected.');}catch(e){setApplyStatus(e instanceof AggregateError?e.message+": "+e.errors.map(x=>x instanceof Error?x.message:String(x)).join(" | "):e instanceof Error?e.message:String(e));}finally{playController.current=null;setApplying(false);}}}>Slow diagnostic (2 fps)</button></details></details><p role="status" className="text-sm">{applyStatus}</p>
       </div>
       <div className="flex flex-wrap gap-4 text-sm">
         <label>Wave direction <select className="bg-[#25282f] p-2 ml-2 rounded" value={lightingConfig.direction??'left-to-right'} onChange={e=>updateLighting({direction:e.target.value as 'left-to-right'|'right-to-left'|'top-to-bottom'|'bottom-to-top'})}>
@@ -176,7 +157,7 @@ export const LightingPage: React.FC = () => {
                   className={`flex flex-col items-start p-3 rounded-lg border text-left transition-all ${
                     isSelected
                       ? 'border-[#f28b50] bg-[#f28b50]/10 text-white shadow-md shadow-[#f28b50]/10'
-                      : 'border-[#2b2b45] bg-[#1c1c30] text-[#a0a0b8] hover:border-[#3d3d60] hover:text-white'
+                      : 'border-[#485568] bg-[#1c1c30] text-[#b2bfd0] hover:border-[#66768c] hover:text-white'
                   } focus:outline-none focus:ring-2 focus:ring-[#f28b50] focus:ring-offset-2 focus:ring-offset-[#17181c]`}
                 >
                   <span className="text-xs font-bold leading-tight flex items-center justify-between w-full">
@@ -185,7 +166,7 @@ export const LightingPage: React.FC = () => {
                       <span className="w-2 h-2 rounded-full bg-[#f28b50]" aria-hidden="true" />
                     )}
                   </span>
-                  <span className="text-[11px] text-[#70708c] mt-1 line-clamp-2">
+                  <span className="text-[11px] text-[#9ba7b8] mt-1 line-clamp-2">
                     {eff.description}
                   </span>
                   <span className="mt-1 text-[10px] text-[#f28b50]">{nativeRgbMode({effect:eff.effect})!==null?'Native · Apply':eff.effect==='custom'?'Painting · preview only':eff.effect==='color_cycle'?'Custom · optimized color cycle':'Custom · host playback'}</span>

@@ -1,4 +1,6 @@
 import { nativeRgbMode } from '../lib/native-rgb-mode';
+import {pageFromHash,type AppPage} from '../lib/app-navigation';
+export type {AppPage} from '../lib/app-navigation';
 import type { DeviceSnapshot } from '../lib/read-device-state';
 import type { TriggerTable } from '../lib/device-actuation';
 /**
@@ -30,16 +32,6 @@ import {
 
 // ─── Navigation ─────────────────────────────────────────────────────────────
 
-export type AppPage =
-  | 'dashboard'
-  | 'display'
-  | 'lighting'
-  | 'actuation'
-  | 'rapid-trigger'
-  | 'socd'
-  | 'key-mapping'
-  | 'profiles'
-  | 'settings';
 
 // ─── Store State ────────────────────────────────────────────────────────────
 
@@ -158,8 +150,12 @@ const defaultSocd: SocdConfig = {
 
 export const useAppStore = create<AppState>((set, get) => ({
   // Navigation
-  activePage: 'dashboard',
-  setActivePage: (page) => set({ activePage: page }),
+  activePage: typeof window==='undefined'?'dashboard':pageFromHash(window.location?.hash??''),
+  setActivePage: (page) => {
+    if(get().activePage===page)return;
+    if(typeof window!=='undefined'&&window.history?.pushState&&window.location?.hash!==`#/${page}`)window.history.pushState(null,'',`#/${page}`);
+    set({activePage:page});
+  },
 
   // Device
   connection: {
@@ -173,7 +169,7 @@ export const useAppStore = create<AppState>((set, get) => ({
   discoveredDevices: [],
 
   // Transport
-  useMock: true,
+  useMock: false,
   toggleMockMode: () => {
     const { useMock, connection } = get();
     if (connection.state === ConnectionState.Connected) {

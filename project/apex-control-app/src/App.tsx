@@ -1,4 +1,6 @@
 import { DisplayPage } from './components/display/DisplayPage';
+import {useEffect} from 'react';
+import {pageFromHash} from './lib/app-navigation';
 import { useAppStore } from './stores/app-store';
 import { AppLayout } from './components/layout';
 import { DashboardPage } from './components/dashboard';
@@ -12,6 +14,11 @@ import { SettingsPage } from './components/settings';
 
 export function App() {
   const activePage = useAppStore((s) => s.activePage);
+  useEffect(()=>{
+    const navigate=()=>useAppStore.getState().setActivePage(pageFromHash(window.location.hash));
+    window.addEventListener('hashchange',navigate);
+    return()=>window.removeEventListener('hashchange',navigate);
+  },[]);
 
   const renderPage = () => {
     switch (activePage) {

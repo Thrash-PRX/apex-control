@@ -143,6 +143,7 @@ export const ProfilesPage: React.FC = () => {
   };
 
   const createNewProfile = () => {
+    if (profiles.length >= 100) { showToast('You can keep up to 100 profile drafts', 'error'); return; }
     const newProfile: ProfileItem = {
       id: `p${Date.now()}`,
       name: `Profile ${profiles.length + 1}`,
@@ -212,7 +213,7 @@ export const ProfilesPage: React.FC = () => {
   };
 
   return (
-    <div className="space-y-6 max-w-5xl mx-auto pb-12">
+    <div className="page-stack profile-studio">
       {/* Toast notification */}
       {toast && (
         <div
@@ -231,11 +232,11 @@ export const ProfilesPage: React.FC = () => {
         </div>
       )}
 
-      <div className="flex items-center justify-between">
+      <div className="page-heading">
         <div>
           <h1 className="text-2xl font-bold tracking-tight text-white flex items-center gap-2">
             <FolderOpen className="w-6 h-6 text-[#f28b50]" />
-            Configuration Profiles
+            Profile drafts
           </h1>
           <p className="text-sm text-[#999fac] mt-1">
             Manage local profile summaries. Selecting a profile does not configure the keyboard.
@@ -264,7 +265,7 @@ export const ProfilesPage: React.FC = () => {
           </button>
           <button
             onClick={createNewProfile}
-            className="flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-semibold rounded-md bg-[#f28b50] text-white hover:bg-[#0080db] shadow-md shadow-[#f28b50]/20 transition-all"
+            className="flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-semibold rounded-md bg-[#f28b50] text-white hover:bg-[#f6b17f] shadow-md shadow-[#f28b50]/20 transition-all"
             aria-label="Create new profile"
           >
             <Plus className="w-3.5 h-3.5" />
@@ -290,13 +291,11 @@ export const ProfilesPage: React.FC = () => {
                 </span>
                 {prof.active && (
                   <span className="flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded bg-[#f28b50] text-white">
-                    <Check className="w-3 h-3" /> ACTIVE
+                    <Check className="w-3 h-3" /> SELECTED
                   </span>
                 )}
               </div>
-              <h3 className="text-base font-bold text-white mb-2">
-                {prof.name}
-              </h3>
+              <input className="profile-name" aria-label={`Profile name ${prof.id}`} value={prof.name} maxLength={64} placeholder="Untitled draft" onChange={e => setProfiles(previous => previous.map(item => item.id === prof.id ? {...item,name:e.target.value} : item))} onBlur={() => setProfiles(previous => previous.map(item => item.id === prof.id ? {...item,name:item.name.trim()||'Untitled draft'} : item))} />
               <div className="text-xs text-[#999fac] space-y-1.5 mb-4">
                 <div className="flex justify-between">
                   <span>Actuation:</span>
@@ -315,9 +314,9 @@ export const ProfilesPage: React.FC = () => {
               {!prof.active ? (
                 <button
                   onClick={() => activateProfile(prof.id)}
-                  className="px-3 py-1.5 rounded text-xs font-semibold bg-[#25282f] hover:bg-[#303050] text-white"
+                  className="px-3 py-1.5 rounded text-xs font-semibold bg-[#25282f] hover:bg-[#394758] text-white"
                 >
-                  Activate
+                  Select draft
                 </button>
               ) : (
                 <span className="text-xs text-[#00c853] font-semibold">

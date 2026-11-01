@@ -52,12 +52,13 @@ export const KeyboardVisualizer: React.FC<KeyboardVisualizerProps> = ({
   };
 
   return (
-    <div className="flex flex-col items-center select-none overflow-x-auto p-4 w-full">
+    <div className="select-none overflow-x-auto p-4 w-full keyboard-visualizer">
       <div
         className="relative shrink-0 rounded-2xl border shadow-2xl transition-all"
         style={{
           width: `${totalWidth}px`,
           height: `${totalHeight}px`,
+          marginInline: 'auto',
           backgroundColor: '#101216',
           borderColor: '#484e59',
           boxShadow: '0 10px 30px rgba(0,0,0,0.6)',
@@ -154,7 +155,7 @@ export const KeyboardVisualizer: React.FC<KeyboardVisualizerProps> = ({
                 {key.label}
               </span>
               {subtitle && (
-                <span className="text-[8px] font-mono mt-0.5 text-[#f28b50] font-bold">
+                <span title={subtitle} className="text-[8px] font-mono mt-0.5 text-[#f28b50] font-bold max-w-full truncate">
                   {subtitle}
                 </span>
               )}
@@ -163,7 +164,7 @@ export const KeyboardVisualizer: React.FC<KeyboardVisualizerProps> = ({
         })}
       </div>
 
-      <div className="flex items-center justify-between w-full max-w-4xl mt-3 text-xs text-[#999fac]">
+      <div className="flex flex-wrap gap-2 items-center justify-between w-full max-w-4xl mx-auto mt-3 text-xs text-[#999fac]">
         <div className="flex items-center gap-3">
           <span className="flex items-center gap-1.5">
             <span className="w-3 h-3 rounded bg-[#30353e] border border-[#555d6a] inline-block" />

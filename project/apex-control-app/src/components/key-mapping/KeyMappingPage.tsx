@@ -1,103 +1,23 @@
-import React, { useState } from 'react';
-import {
-  Keyboard,
-  AlertTriangle,
-  Sparkles,
-} from 'lucide-react';
-import { useAppStore } from '../../stores/app-store';
-import { KeyboardVisualizer } from '../keyboard';
-
-export const KeyMappingPage: React.FC = () => {
-  const selectedKeys = useAppStore((s) => s.selectedKeys);
-  const setSelectedKeys = useAppStore((s) => s.setSelectedKeys);
-  const [activeLayer, setActiveLayer] = useState<'base' | 'fn'>('base');
-
-  return (
-    <div className="space-y-6 max-w-6xl mx-auto pb-12">
-      <div className="flex items-center justify-between">
-        <div>
-          <div className="flex items-center gap-3">
-            <h1 className="text-2xl font-bold tracking-tight text-white flex items-center gap-2">
-              <Keyboard className="w-6 h-6 text-[#f28b50]" />
-              Key Remapping & Layers
-            </h1>
-            <span className="flex items-center gap-1 text-[11px] font-semibold tracking-wider uppercase px-2.5 py-0.5 rounded-full bg-amber-500/10 text-amber-400 border border-amber-500/30">
-              <AlertTriangle className="w-3 h-3" />
-              EEPROM Protocol Unverified
-            </span>
-          </div>
-          <p className="text-sm text-[#999fac] mt-1">
-            Remap physical keys, set up FN layer combos, and assign multimedia functions.
-          </p>
-        </div>
-
-        <div className="flex items-center gap-2 bg-[#1c1e22] p-1 rounded-lg border border-[#393d46]">
-          <button
-            onClick={() => setActiveLayer('base')}
-            className={`px-3 py-1 rounded text-xs font-semibold transition-all ${
-              activeLayer === 'base'
-                ? 'bg-[#f28b50] text-white shadow-sm'
-                : 'text-[#999fac] hover:text-white'
-            }`}
-          >
-            Base Layer (Default)
-          </button>
-          <button
-            onClick={() => setActiveLayer('fn')}
-            className={`px-3 py-1 rounded text-xs font-semibold transition-all ${
-              activeLayer === 'fn'
-                ? 'bg-[#f28b50] text-white shadow-sm'
-                : 'text-[#999fac] hover:text-white'
-            }`}
-          >
-            FN Layer
-          </button>
-        </div>
-      </div>
-
-      <div className="rounded-xl border border-[#393d46] bg-[#1c1e22] p-4 shadow-lg">
-        <KeyboardVisualizer
-          selectedKeys={selectedKeys}
-          onKeySelect={setSelectedKeys}
-        />
-      </div>
-
-      <div className="rounded-xl border border-[#393d46] bg-[#1c1e22] p-5">
-        <h2 className="text-sm font-semibold uppercase tracking-wider text-[#999fac] mb-3 flex items-center gap-2">
-          <Sparkles className="w-4 h-4 text-[#f28b50]" />
-          Key Assignment Matrix
-        </h2>
-        {selectedKeys.length === 0 ? (
-          <p className="text-xs text-[#999fac]">
-            Select a key on the visual layout above to rebind its function or assign advanced macros.
-          </p>
-        ) : (
-          <div className="text-xs text-[#c0c0d8] space-y-3">
-            <p>
-              Selected key: <strong className="text-white font-mono text-sm">{selectedKeys[0].toUpperCase()}</strong> on{' '}
-              <span className="text-[#f28b50] font-semibold">{activeLayer.toUpperCase()} Layer</span>
-            </p>
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 pt-2">
-              <button className="p-2.5 rounded bg-[#202035] hover:bg-[#282845] border border-[#343455] text-left">
-                <span className="block font-bold text-white">Standard Keycode</span>
-                <span className="text-[10px] text-[#70708c]">A-Z, 0-9, Modifiers</span>
-              </button>
-              <button className="p-2.5 rounded bg-[#202035] hover:bg-[#282845] border border-[#343455] text-left">
-                <span className="block font-bold text-white">Media Function</span>
-                <span className="text-[10px] text-[#70708c]">Play, Pause, Mute</span>
-              </button>
-              <button className="p-2.5 rounded bg-[#202035] hover:bg-[#282845] border border-[#343455] text-left">
-                <span className="block font-bold text-white">DKS / Mod-Tap</span>
-                <span className="text-[10px] text-[#70708c]">Dual Action by Depth</span>
-              </button>
-              <button className="p-2.5 rounded bg-[#202035] hover:bg-[#282845] border border-[#343455] text-left">
-                <span className="block font-bold text-white">Disable Key</span>
-                <span className="text-[10px] text-[#70708c]">Send No Event</span>
-              </button>
-            </div>
-          </div>
-        )}
-      </div>
-    </div>
-  );
-};
+import {useState} from 'react';
+import {ArrowRight,Keyboard,Search,Undo2} from 'lucide-react';
+import {useAppStore} from '../../stores/app-store';
+import {PageHeader,LocalBadge} from '../layout/PageHeader';
+import {KeyWorkspace} from '../keyboard/KeyWorkspace';
+import {KEYMAP_DRAFT_KEY,KEYMAP_TARGETS,MEDIA_TARGETS,emptyKeymapDraft,parseKeymapDraft,assignmentLabel,type DraftAssignment,type KeymapDraft} from '../../lib/keymap-draft';
+function load(){try{return parseKeymapDraft(localStorage.getItem(KEYMAP_DRAFT_KEY)??'');}catch{return emptyKeymapDraft();}}
+export function KeyMappingPage(){
+ const selected=useAppStore(s=>s.selectedKeys);
+ const [layer,setLayer]=useState<'base'|'fn'>('base'),[kind,setKind]=useState<DraftAssignment['kind']>('standard'),[target,setTarget]=useState('esc'),[search,setSearch]=useState(''),[draft,setDraft]=useState(load),[status,setStatus]=useState('');
+ const usable=selected.filter(id=>KEYMAP_TARGETS.some(k=>k.id===id));
+ const subtitles=new Map(Object.entries(draft[layer]).map(([id,a])=>[id,assignmentLabel(a)]));
+ const options=(kind==='media'?MEDIA_TARGETS:KEYMAP_TARGETS).filter(k=>`${k.id} ${k.label}`.toLowerCase().includes(search.toLowerCase()));
+ function save(next:KeymapDraft){setDraft(next);try{localStorage.setItem(KEYMAP_DRAFT_KEY,JSON.stringify(next));setStatus('Draft saved in this browser. Keyboard settings have not changed.');}catch{setStatus('Updated in this page, but browser storage is unavailable. Keyboard settings have not changed.');}}
+ function assign(){if(!usable.length)return;const next={...draft,[layer]:{...draft[layer]}};for(const id of usable)next[layer][id]={kind,target:kind==='disabled'?'':target};save(next);}
+ function undo(){const next={...draft,[layer]:{...draft[layer]}};for(const id of usable)delete next[layer][id];save(next);}
+ return <div className="page-stack"><PageHeader title="Key mapping" description="Select a key, choose an assignment and build your layout." badge={<LocalBadge/>} actions={<div className="editor-segment" aria-label="Keyboard layer"><button aria-pressed={layer==='base'} onClick={()=>setLayer('base')}>Base layer</button><button aria-pressed={layer==='fn'} onClick={()=>setLayer('fn')}>FN layer</button></div>}/>
+  <KeyWorkspace subtitles={subtitles}/>
+  <div className="editor-grid"><section className="editor-panel"><div className="editor-panel-title"><h2>Choose an assignment</h2><span className="subtle-tag">{layer.toUpperCase()} LAYER</span></div><div className="editor-segment" aria-label="Assignment type">{([{id:'standard',label:'Keyboard'},{id:'media',label:'Media'},{id:'disabled',label:'Unassigned'}] as const).map(item=><button key={item.id} aria-pressed={kind===item.id} onClick={()=>{setKind(item.id);setTarget(item.id==='media'?'play-pause':'esc');setSearch('');}}>{item.label}</button>)}</div>
+   {kind!=='disabled'?<><label className="assignment-search"><Search size={14}/><input aria-label="Search key assignments" placeholder="Search assignments…" value={search} onChange={e=>setSearch(e.target.value)}/></label><div className="assignment-grid">{options.map(option=><button className="assignment-option" key={option.id} aria-pressed={target===option.id} onClick={()=>setTarget(option.id)}>{option.label}</button>)}</div>{!options.length&&<p className="editor-help mt-4">No matching assignments.</p>}</>:<div className="assignment-empty"><div><Keyboard size={26} className="mx-auto mb-3"/>Mark selected keys as unassigned in this draft.</div></div>}
+  </section><section className="editor-panel"><div className="editor-panel-title"><h2>Your selection</h2><span className="subtle-tag">{usable.length} KEYS</span></div>{usable.length?<><div className="selection-chips">{usable.map(id=><span key={id}>{KEYMAP_TARGETS.find(k=>k.id===id)?.label}</span>)}</div><div className="assignment-preview"><span>{usable.length===1?KEYMAP_TARGETS.find(k=>k.id===usable[0])?.label:`${usable.length} keys`}</span><ArrowRight size={16}/><strong>{assignmentLabel({kind,target:kind==='disabled'?'':target})}</strong></div><button className="ui-button primary w-full" onClick={assign}>Assign in draft</button><button className="ui-button w-full mt-2" onClick={undo}><Undo2 size={13}/>Clear selected assignments</button></>:<div className="assignment-empty">Select a physical key above to start.</div>}<p className="editor-help mt-4">Assignments stay in this browser. Hardware remapping and advanced actions are not available yet.</p><p role="status" aria-live="polite" className="editor-help mt-3">{status}</p></section></div>
+ </div>;
+}
