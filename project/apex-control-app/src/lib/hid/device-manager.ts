@@ -279,6 +279,10 @@ export class DeviceManager {
     return data;
   }
 
+  async readDeviceState() {
+    if (!(this._transport instanceof WebHidTransport)) throw new Error('Connect a real APEX using WebHID first');
+    return this._transport.readDeviceState();
+  }
   async playRgb(config: LightingConfig, signal: AbortSignal, restoreOnly=false,fast=false,loop=false): Promise<void> {
     if(!(this._transport instanceof WebHidTransport))throw new Error('Connect real APEX first');
     await this._transport.playRgb(config,signal,restoreOnly,fast,loop);

@@ -8,6 +8,7 @@ import {
   ShieldCheck,
 } from 'lucide-react';
 import { useAppStore } from '../../stores/app-store';
+import { DeviceReadback } from './DeviceReadback';
 
 export const SettingsPage: React.FC = () => {
   const useMock = useAppStore((s) => s.useMock);
@@ -101,6 +102,7 @@ export const SettingsPage: React.FC = () => {
         </div>
       </div>
 
+      <DeviceReadback />
       {/* Real-time Diagnostics Log */}
       <div className="rounded-xl border border-[#393d46] bg-[#1c1e22] p-5 space-y-3">
         <div className="flex items-center justify-between">

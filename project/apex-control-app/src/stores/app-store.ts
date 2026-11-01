@@ -1,4 +1,5 @@
 import { nativeRgbMode } from '../lib/native-rgb-mode';
+import type { DeviceSnapshot } from '../lib/read-device-state';
 /**
  * Main application store using Zustand.
  *
@@ -64,6 +65,7 @@ interface AppState {
   // Lighting
   playRgb: (signal: AbortSignal, restoreOnly?:boolean, fast?:boolean,loop?:boolean) => Promise<void>;
   applyRgb: () => Promise<void>;
+  readDeviceState: () => Promise<DeviceSnapshot>;
   lightingConfig: LightingConfig;
   updateLighting: (config: Partial<LightingConfig>) => void;
   selectedKeys: string[];
@@ -295,6 +297,10 @@ export const useAppStore = create<AppState>((set, get) => ({
   },
 
   // Lighting
+  readDeviceState: async () => {
+    if (get().useMock) throw new Error('Turn Demo off and connect your APEX first');
+    return getOrCreateDeviceManager(false).readDeviceState();
+  },
   playRgb: async (signal,restoreOnly=false,fast=false,loop=false) => {if(get().useMock)throw new Error('Pair real APEX first');await getOrCreateDeviceManager(false).playRgb(get().lightingConfig,signal,restoreOnly,fast,loop);},
   applyRgb: async () => {
     const s=get(),c=s.lightingConfig;if(s.useMock)throw new Error('Switch to hardware mode and connect APEX first');

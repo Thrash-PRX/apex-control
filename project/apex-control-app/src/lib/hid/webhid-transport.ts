@@ -1,6 +1,7 @@
 import { playCustomRgb } from '../play-custom-rgb.ts';
 import type { LightingConfig } from '../../types/lighting.ts';
 import { applyDeviceRgb } from '../apply-device-rgb.ts';
+import { readDeviceState, type DeviceSnapshot } from '../read-device-state.ts';
 /**
  * WebHID Transport implementation.
  *
@@ -190,6 +191,13 @@ export class WebHidTransport implements HidTransport {
   }
 
   private _rgbBusy = false;
+  async readDeviceState(): Promise<DeviceSnapshot> {
+    this._assertOpen();
+    if (reportLengths(this._device!.collections, 'outputReports').get(0) !== 64) throw new Error('Expected APEX 64-byte output report 0');
+    if (this._rgbBusy) throw new Error('A device operation is already in progress. Stop playback before reading.');
+    this._rgbBusy = true;
+    try { return await readDeviceState(this._device!); } finally { this._rgbBusy = false; }
+  }
   async playRgb(config: LightingConfig, signal: AbortSignal, restoreOnly=false,fast=false,loop=false): Promise<void> {
     this._assertOpen();if(this._rgbBusy)throw new Error('RGB operation already in progress');
     if(reportLengths(this._device!.collections,'outputReports').get(0)!==64)throw new Error('Expected 64-byte APEX output');
