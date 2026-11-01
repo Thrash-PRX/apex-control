@@ -1,3 +1,4 @@
+import {KeyEffectTimeline,TIMED_EFFECTS} from './effect-timeline.ts';
 import {SnakeTimeline} from './key-timeline.ts';
 import {exchangeRgb} from './rgb-exchange.ts';
 import { planPaletteDelta } from './rgb-delta.ts';
@@ -5,18 +6,25 @@ import {playNativeColorCycle,restoreNativeColorCycle} from './native-color-cycle
 import layout from './device-rgb-layout.json' with { type: 'json' };
 import { sampleEffect, EFFECTS } from './reference-effects.mjs';
 import type { LightingConfig } from '../types/lighting.ts';
-/** Bounded host playback using captured 10/16/19 commands; no firmware operations. */
+/** Captured RGB playback with backups, readback and recovery; no firmware operations. */
 export async function playCustomRgb(device:HIDDevice,config:LightingConfig,signal:AbortSignal,restoreOnly=false,fast=false,loop=false):Promise<void>{
  const aliases:Record<string,string>={breathing:'breathe',rainbow:'wave',color_cycle:'spectrum',star:'twinkle',cross:'ripple'};
  const effect=aliases[config.effect]??config.effect;
  if(!restoreOnly&&(!EFFECTS.includes(effect)||[config.speed,config.brightness].some(v=>!Number.isFinite(v)||v<0||v>100)))throw Error('Unsupported animation settings');
+ if(!restoreOnly&&[config.primaryColor,...(config.secondaryColor?[config.secondaryColor]:[])].some(c=>[c.r,c.g,c.b].some(v=>!Number.isInteger(v)||v<0||v>255)))throw Error('Invalid RGB color');
  if(signal.aborted)throw new DOMException('Playback cancelled','AbortError');
  if(device.vendorId!==0x314b||device.productId!==0x1026)throw Error('APEX required');
  const nativeRecovered=await restoreNativeColorCycle(device);if(restoreOnly&&nativeRecovered)return;
  if(!restoreOnly&&fast&&effect==='spectrum')return playNativeColorCycle(device,config,signal,loop);
  const exchange=(p:Uint8Array)=>exchangeRgb(device,p);
  const packet=(cmd:number,payload:number[],frame=1,total=1)=>{const p=new Uint8Array(64);if(payload.length>58)throw Error('RGB payload overflow');p.set([250,cmd,frame,total,0,payload.length,...payload]);return p;};
- const read=async()=>{const records=new Map<number,number[]>();let total=1;for(let page=1;page<=total;page++){const r=await exchange(packet(22,[],page,total));if(page===1){total=r[3];if(total<1||total>16)throw Error('Invalid palette page count');}if(r[3]!==total||r[5]<5||(r[5]-1)%4!==0||r[6]+(r[5]-1)/4>256)throw Error('Invalid palette readback');for(let i=0;i<(r[5]-1)/4;i++){const index=r[6]+i;if(records.has(index))throw Error('Duplicate palette index');records.set(index,[...r.slice(7+i*4,11+i*4)]);}}return records;};
+ const pageRanges=new Map<number,{first:number;count:number;total:number}>();
+ const read=async()=>{const records=new Map<number,number[]>();let total=1;for(let page=1;page<=total;page++){const r=await exchange(packet(22,[],page,total));if(page===1){total=r[3];if(total<1||total>16)throw Error('Invalid palette page count');}if(r[3]!==total||r[5]<5||(r[5]-1)%4!==0||r[6]+(r[5]-1)/4>256)throw Error('Invalid palette readback');pageRanges.set(page,{first:r[6],count:(r[5]-1)/4,total});for(let i=0;i<(r[5]-1)/4;i++){const index=r[6]+i;if(records.has(index))throw Error('Duplicate palette index');records.set(index,[...r.slice(7+i*4,11+i*4)]);}}return records;};
+ const verifyTouched=async(changed:readonly number[],target:Map<number,number[]>)=>{
+  const pages=[...pageRanges].filter(([,range])=>changed.some(i=>i>=range.first&&i<range.first+range.count));
+  if(changed.some(i=>!pages.some(([,range])=>i>=range.first&&i<range.first+range.count)))throw Error('Changed RGB key lacks readback coverage');
+  for(const [page,range] of pages){const r=await exchange(packet(22,[],page,range.total));if(r[3]!==range.total||r[5]!==1+range.count*4||r[6]!==range.first)throw Error('RGB readback page layout changed');for(let n=0;n<range.count;n++){const i=range.first+n;if(JSON.stringify([...r.slice(7+n*4,11+n*4)])!==JSON.stringify(target.get(i)))throw Error('Per-key readback differs at index '+i);}}
+ };
  const live=await read();
  const saved=restoreOnly?JSON.parse(localStorage.getItem('apex-custom-rgb-history-v1')??'[]')[0]:null;
  if(restoreOnly&&(!saved||!Array.isArray(saved.records)))throw Error('Original animation palette backup missing');
@@ -37,18 +45,19 @@ export async function playCustomRgb(device:HIDDevice,config:LightingConfig,signa
   const effect=aliases[config.effect]??config.effect;
   const hex='#'+[config.primaryColor.r,config.primaryColor.g,config.primaryColor.b].map(v=>v.toString(16).padStart(2,'0')).join('');
   const profile={effect,speed:config.speed,brightness:config.brightness,keys:Object.fromEntries(layout.map(k=>[String(k.index),{color:hex}]))};
-  if(fast&&effect==='snake'){
-   const indices=layout.map(k=>k.index),timeline=new SnakeTimeline(config.speed,config.brightness);
-   let confirmed=previous;const target=new Map([...previous].map(([i,r])=>[i,[...r]]));for(const i of indices)target.set(i,[100,0,0,0]);
-   const started=performance.now();let frames=0,packets=0;
+  if(fast&&TIMED_EFFECTS.has(config.effect)){
+   const indices=layout.map(k=>k.index),timeline=config.effect==='snake'?new SnakeTimeline(config.speed,config.brightness):new KeyEffectTimeline(config);
+   let confirmed=previous;const target=new Map([...previous].map(([i,r])=>[i,[...r]]));for(const i of indices)target.set(i,timeline instanceof KeyEffectTimeline?[...timeline.background]:[100,0,0,0]);
+   const started=performance.now();let frames=0,packets=0,lastAudit=started;
    while(!signal.aborted&&(loop||performance.now()-started<5000)){
-    for(const [i,r] of timeline.advance(performance.now()-started))target.set(i,r);
+    for(const [i,r] of (timeline instanceof KeyEffectTimeline?timeline.advance(performance.now()-started,hits):timeline.advance(performance.now()-started)))target.set(i,r);
     const plan=planPaletteDelta(confirmed,target,indices,'grouped');
-    for(const update of plan){const delay=Math.max(0,80-(performance.now()-lastWrite));if(delay)await new Promise(resolve=>setTimeout(resolve,delay));if(update.command===16)await write(update.payload[0],update.payload.slice(1,4),update.indices);else{await device.sendReport(0,packet(17,update.payload));lastWrite=performance.now();}packets++;}
-    if(plan.length){await new Promise(resolve=>setTimeout(resolve,100));const actual=await read();if(indices.some(i=>JSON.stringify(actual.get(i))!==JSON.stringify(target.get(i))))throw Error('Per-key timeline readback differs; playback stopped');confirmed=new Map([...target].map(([i,r])=>[i,[...r]]));frames++;window.dispatchEvent?.(new CustomEvent('apex-rgb-progress',{detail:{frames,fps:frames/((performance.now()-started)/1000),packets,transfer:'per-key-timeline'}}));}
+    for(const update of plan){const delay=Math.max(0,80-(performance.now()-lastWrite));if(delay)await new Promise(resolve=>setTimeout(resolve,delay));if(update.command!==16)throw Error('Per-key playback refuses bulk palette frames');await write(update.payload[0],update.payload.slice(1,4),update.indices);packets++;}
+    if(plan.length){await new Promise(resolve=>setTimeout(resolve,65));await verifyTouched(plan.flatMap(p=>p.indices),target);if(performance.now()-lastAudit>=5000){const actual=await read();if(indices.some(i=>JSON.stringify(actual.get(i))!==JSON.stringify(target.get(i))))throw Error('Full palette audit differs');lastAudit=performance.now();}confirmed=new Map([...target].map(([i,r])=>[i,[...r]]));frames++;window.dispatchEvent?.(new CustomEvent('apex-rgb-palette',{detail:{records:[...confirmed]}}));window.dispatchEvent?.(new CustomEvent('apex-rgb-progress',{detail:{frames,fps:frames/((performance.now()-started)/1000),packets,transfer:'per-key-timeline'}}));}
+    timeline.acknowledge(performance.now()-started);
     const delay=Math.max(0,timeline.nextDue-(performance.now()-started));if(delay)await new Promise(resolve=>setTimeout(resolve,delay));
    }
-   localStorage.setItem('apex-last-playback-metrics-v1',JSON.stringify({frames,packets,fps:frames/((performance.now()-started)/1000),transfer:'per-key-timeline'}));
+   localStorage.setItem('apex-last-playback-metrics-v1',JSON.stringify({frames,packets,fps:frames/((performance.now()-started)/1000),transfer:'per-key-timeline',effect:config.effect}));
   }else if(fast){
    if(Array.from({length:84},(_,i)=>i).some(i=>!previous.has(i)))throw Error('Bulk transfer needs the complete 84-record palette');
    const indices=layout.map(k=>k.index).sort((a,b)=>a-b),chunks:number[][]=[];
@@ -95,5 +104,6 @@ export async function playCustomRgb(device:HIDDevice,config:LightingConfig,signa
  }
  if(changed){try{const groups=new Map<string,number[]>();for(const k of layout){const raw=previous.get(k.index)!.join(',');groups.set(raw,[...(groups.get(raw)??[]),k.index]);}for(const [raw,indices] of groups){const old=raw.split(',').map(Number);await write(old[0],old.slice(1),indices);}await new Promise(resolve=>setTimeout(resolve,75));const after=await read();if(layout.some(k=>JSON.stringify(after.get(k.index))!==JSON.stringify(previous.get(k.index))))throw Error('Palette restore readback differs; keep the exported backup');}catch(error){failure=failure?new AggregateError([failure,error],'Animation and restore failed; keep the browser backup'):error;}
  }
+ window.dispatchEvent?.(new CustomEvent('apex-rgb-palette',{detail:null}));
  if(failure)throw failure;
 }

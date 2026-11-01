@@ -1,3 +1,4 @@
+import {TIMED_EFFECTS,timedEffectAt} from './effect-timeline.ts';
 import {snakeAt} from './key-timeline.ts';
 import { sampleEffect } from './reference-effects.mjs';
 /** Authored browser previews, not recovered WK68 firmware algorithms. No device I/O. */
@@ -11,7 +12,7 @@ function spectrum(h: number): RgbColor {
 }
 export function previewLighting(config: LightingConfig, keys: readonly KeyDefinition[], seconds: number, selected: readonly string[]=[]): Map<string,RgbColor> {
  const result=new Map<string,RgbColor>();
- const timedSnake=config.effect==='snake'?snakeAt(seconds*1000,config.speed,config.brightness):null;
+ const timedSnake=config.effect==='snake'?snakeAt(seconds*1000,config.speed,config.brightness):TIMED_EFFECTS.has(config.effect)&&!['shadow','heatmap'].includes(config.effect)?timedEffectAt(config,seconds*1000):null;
  const time=seconds*(0.15+config.speed/100*1.85), brightness=Math.max(0,Math.min(1,config.brightness/100));
  for(const key of keys){
   if(key.isSpecial) continue;

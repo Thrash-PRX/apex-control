@@ -1,0 +1,184 @@
+{
+  "date": "2026-11-01",
+  "device": "314B:1026",
+  "engine": "Playback update 5",
+  "transport": "Native USB adapter executing application playback code; not browser visual confirmation",
+  "boundedRuns": [
+    {
+      "effect": "snake",
+      "frames": 32,
+      "packets": 49,
+      "fps": 6.341980141000848,
+      "transfer": "per-key-timeline",
+      "restorationConfirmedByApp": true
+    },
+    {
+      "effect": "rainbow",
+      "frames": 29,
+      "packets": 30,
+      "fps": 5.726358457599426,
+      "transfer": "per-key-timeline",
+      "restorationConfirmedByApp": true
+    },
+    {
+      "effect": "gradient",
+      "frames": 29,
+      "packets": 31,
+      "fps": 5.631844718311346,
+      "transfer": "per-key-timeline",
+      "restorationConfirmedByApp": true
+    },
+    {
+      "effect": "flash-away",
+      "frames": 28,
+      "packets": 55,
+      "fps": 5.5576152915879256,
+      "transfer": "per-key-timeline",
+      "restorationConfirmedByApp": true
+    },
+    {
+      "effect": "rain",
+      "frames": 29,
+      "packets": 56,
+      "fps": 5.588407038448355,
+      "transfer": "per-key-timeline",
+      "restorationConfirmedByApp": true
+    },
+    {
+      "effect": "wheel",
+      "frames": 30,
+      "packets": 52,
+      "fps": 5.951024378589575,
+      "transfer": "per-key-timeline",
+      "restorationConfirmedByApp": true
+    },
+    {
+      "effect": "twinkle",
+      "frames": 32,
+      "packets": 51,
+      "fps": 6.274311732511974,
+      "transfer": "per-key-timeline",
+      "restorationConfirmedByApp": true
+    },
+    {
+      "effect": "shadow",
+      "frames": 22,
+      "packets": 24,
+      "fps": 4.397309550124849,
+      "transfer": "per-key-timeline",
+      "restorationConfirmedByApp": true
+    },
+    {
+      "effect": "neon-stream",
+      "frames": 29,
+      "packets": 57,
+      "fps": 5.618910384773299,
+      "transfer": "per-key-timeline",
+      "restorationConfirmedByApp": true
+    },
+    {
+      "effect": "sine-wave",
+      "frames": 29,
+      "packets": 56,
+      "fps": 5.724118000758225,
+      "transfer": "per-key-timeline",
+      "restorationConfirmedByApp": true
+    },
+    {
+      "effect": "scanner",
+      "frames": 29,
+      "packets": 51,
+      "fps": 5.701616665880571,
+      "transfer": "per-key-timeline",
+      "restorationConfirmedByApp": true
+    },
+    {
+      "effect": "windmill",
+      "frames": 29,
+      "packets": 57,
+      "fps": 5.620990561969184,
+      "transfer": "per-key-timeline",
+      "restorationConfirmedByApp": true
+    },
+    {
+      "effect": "waterfall",
+      "frames": 29,
+      "packets": 54,
+      "fps": 5.745820589169308,
+      "transfer": "per-key-timeline",
+      "restorationConfirmedByApp": true
+    },
+    {
+      "effect": "blossom",
+      "frames": 28,
+      "packets": 55,
+      "fps": 5.574122470876294,
+      "transfer": "per-key-timeline",
+      "restorationConfirmedByApp": true
+    },
+    {
+      "effect": "storm",
+      "frames": 28,
+      "packets": 55,
+      "fps": 5.544346515003969,
+      "transfer": "per-key-timeline",
+      "restorationConfirmedByApp": true
+    },
+    {
+      "effect": "fireworks",
+      "frames": 29,
+      "packets": 53,
+      "fps": 5.630846882089406,
+      "transfer": "per-key-timeline",
+      "restorationConfirmedByApp": true
+    },
+    {
+      "effect": "heatmap",
+      "frames": 14,
+      "packets": 14,
+      "fps": 2.7217548817881587,
+      "transfer": "per-key-timeline",
+      "restorationConfirmedByApp": true
+    },
+    {
+      "effect": "color_cycle",
+      "frames": 63,
+      "fps": 12.574094598825615,
+      "packets": 63,
+      "transfer": "native-static13",
+      "restorationConfirmedByApp": true
+    }
+  ],
+  "twentySecondStopTests": [
+    {
+      "effect": "snake",
+      "frames": 115,
+      "packets": 215,
+      "fps": 5.741309408654666,
+      "transfer": "per-key-timeline",
+      "restorationConfirmedByApp": true
+    },
+    {
+      "effect": "wheel",
+      "frames": 118,
+      "packets": 222,
+      "fps": 5.860942707104569,
+      "transfer": "per-key-timeline",
+      "restorationConfirmedByApp": true
+    }
+  ],
+  "validation": [
+    "Acknowledged selected-index command0x10 only for all17 spatial effects; no0x11 bulk palette frames.",
+    "Readback of each changed page and its unchanged neighbors after updates.",
+    "Full palette audit at five-second intervals during changed playback.",
+    "Full original active palette readback comparison during restoration.",
+    "Native Color Cycle uses backed-up0x13 Static settings and verifies restoration."
+  ],
+  "limits": [
+    "fps field means verified key-update batches/s for per-key-timeline, not whole-keyboard rendered frames/s.",
+    "Shadow/Heatmap received synthetic page-local key events; no OS input was injected.",
+    "Timings depend on effect and transport; no60fps or exact WK68/Wooting equivalence claimed.",
+    "Physical key naming remains vendor-data-derived except separately captured W34.",
+    "New visual appearance in browser needs user assessment; prior update4 Snake video remains the human-visible checkpoint."
+  ]
+}

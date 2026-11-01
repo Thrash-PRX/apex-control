@@ -1,4 +1,8 @@
-## Current continuation status (2026-10-31)
+## Current RGB checkpoint (2026-11-01)
+
+Native RGB Apply and timed custom playback supersede the earlier RGB-only write lock. See HANDOFF and research/evidence/timed-custom-rgb-results.json. Hardware controls unrelated to RGB remain disabled.
+
+## Historical continuation status (2026-10-31)
 
 - Discovery: observed identity `314B:1026 / FF02:0002`; descriptor sizing and disconnect behavior software-tested with fake HID devices. No new physical pairing verification in this continuation.
 - Offline codecs: static-evidence RGB report encoder / raw trigger decoder, software-tested; hardware writes remain locked.
@@ -10,10 +14,10 @@
 
 | Feature | Status | Evidence / Notes |
 |---|---|---|
-| **USB HID Discovery** | `software-tested` | Implemented `DeviceManager` and `HidTransport` abstraction with WebHID and Mock support. Uses observed VID `314B` PID `1026` (USB-CAPS-002). Unit tested in `tests/hid-transport.test.js` + `tests/reliability.test.js`. Hardware pairing pending physical device. |
-| **Interactive Keyboard Visualizer** | `software-tested` | 84-key physical 75% layout modeled with rotary encoder. Multi-select and RGB previews verified in `tests/layout.test.js`. |
-| **RGB Lighting Studio** | `implemented` | 10 effect selectors, RGB color picker with sliders/swatches, speed/brightness, live keyboard preview. Offline codec for opcodes 0x10/0x11/0x16 complete in `src/lib/protocol/apex.ts`. Hardware opcodes `investigating` (pending USB capture). Hardware writes locked. |
-| **Per-key RGB** | `investigating` | UI selection matrix implemented. Hardware storage vs host-streaming capability unverified. |
+| **USB HID Discovery** | `software-tested` | Implemented `DeviceManager` and `HidTransport` abstraction with WebHID and Mock support. Uses observed VID `314B` PID `1026` (USB-CAPS-002). Unit tested in `tests/hid-transport.test.js` + `tests/reliability.test.js`. Hardware pairing confirmed by the user during native RGB and timed Snake tests. |
+| **Interactive Keyboard Visualizer** | `software-tested` | User-confirmed APEX20082-key geometry with rotary encoder and screen; full key-index mapping remains partially verified. Multi-select and RGB previews verified in `tests/layout.test.js`. |
+| **RGB Lighting Studio** | `implemented` | Captured native modes0–11 with backup/apply/readback; Static, Wave and Ripple user-verified.17 authored spatial effects now use acknowledged per-key timers; Color Cycle uses captured native Static RGB. New visual appearance is pending user assessment; transfer/readback/recovery tested. |
+| **Per-key RGB** | `investigating` | Timed Snake user video verified on update4. Update5 uses selected-index10 writes only with changed-page readback, full audits and restoration. Other timed effects USB-tested; no smoothness equivalence or full82-key naming verification claimed. Manual color painting remains disabled. |
 | **Hall-Effect Actuation (Global)** | `implemented` | Global slider (0.1mm–3.6mm, 0.1 step) and reset point controls in UI and store. Offline codec for opcode 0x26/0x28 complete. Sensor ADC scaling unverified. |
 | **Hall-Effect Actuation (Per-Key)** | `implemented` | Multi-key selection with individual actuation overrides and presets in UI. Offline codec for opcode 0x26 complete. Firmware memory map unverified. |
 | **Rapid Trigger** | `implemented` | Dynamic press/release sensitivity controls (0.1mm–3.6mm) in UI. Offline codec for opcode 0x27 complete. Firmware execution logic unverified. |

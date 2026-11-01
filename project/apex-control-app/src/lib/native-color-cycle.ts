@@ -1,3 +1,4 @@
+import {SNAKE_ROUTE} from './key-timeline.ts';
 import {exchangeRgb} from './rgb-exchange.ts';
 import {sampleEffect} from './reference-effects.mjs';
 import type {LightingConfig} from '../types/lighting.ts';
@@ -35,11 +36,13 @@ export async function playNativeColorCycle(device:HIDDevice,config:LightingConfi
    const target=[...record];target[1]=Math.round(config.brightness);target.splice(5,3,...sampled.color.match(/[\d.]+/g)!.map(Number));
    await io.ack(19,target);await pause(65);
    if(JSON.stringify(await io.read())!==JSON.stringify(target))throw Error('Color cycle readback mismatch');
+   window.dispatchEvent?.(new CustomEvent('apex-rgb-palette',{detail:{records:SNAKE_ROUTE.map(i=>[i,[100,...target.slice(5).map(v=>Math.round(v*target[1]/100))]])}}));
    if(frames===0||frames%10===0)window.dispatchEvent?.(new CustomEvent('apex-rgb-progress',{detail:{frames:frames+1,fps:(frames+1)/((performance.now()-start)/1000),transfer:'native-static13'}}));
   }
   localStorage.setItem('apex-last-playback-metrics-v1',JSON.stringify({frames,fps:frames/((performance.now()-start)/1000),packets:frames,transfer:'native-static13'}));
  }catch(e){failure=e;}finally{
   try{await io.restore(record);localStorage.setItem(BACKUP,JSON.stringify({...backup,pending:false}));}catch(e){failure=failure?new AggregateError([failure,e],'Color cycle and restore failed; keep the native color-cycle backup'):e;}
  }
+ window.dispatchEvent?.(new CustomEvent('apex-rgb-palette',{detail:null}));
  if(failure)throw failure;
 }

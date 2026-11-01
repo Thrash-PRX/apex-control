@@ -24,6 +24,8 @@ export class SnakeTimeline{
   return changes;
  }
  get nextDue():number{return Math.min(this.nextOn,...this.lit.values());}
+ /** Pause effect time while USB is busy, keeping the trail from expiring in gaps. */
+ acknowledge(now:number):void{const late=Math.max(0,now-this.nextOn);if(late){this.nextOn+=late;for(const [key,at] of this.lit)this.lit.set(key,at+late);}}
 }
 /** Same route, key colors and six-step hold used by the on-screen preview. */
 export function snakeAt(timeMs:number,speed:number,brightness:number):Map<number,number[]>{
