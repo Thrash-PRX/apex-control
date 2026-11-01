@@ -54,7 +54,7 @@ export const SocdPage: React.FC = () => {
         <div>
           <div className="flex items-center gap-3">
             <h1 className="text-2xl font-bold tracking-tight text-white flex items-center gap-2">
-              <ArrowLeftRight className="w-6 h-6 text-[#0096ff]" />
+              <ArrowLeftRight className="w-6 h-6 text-[#f28b50]" />
               SOCD Resolution (Simultaneous Opposing Cardinal Directions)
             </h1>
             <span className="flex items-center gap-1 text-[11px] font-semibold tracking-wider uppercase px-2.5 py-0.5 rounded-full bg-amber-500/10 text-amber-400 border border-amber-500/30">
@@ -62,7 +62,7 @@ export const SocdPage: React.FC = () => {
               Firmware Execution Unverified
             </span>
           </div>
-          <p className="text-sm text-[#8888a0] mt-1">
+          <p className="text-sm text-[#999fac] mt-1">
             Resolve opposing directional inputs (A+D horizontal strafe, W+S vertical axis).
           </p>
         </div>
@@ -74,7 +74,7 @@ export const SocdPage: React.FC = () => {
               vertical: SocdMode.Neutral,
             })
           }
-          className="flex items-center gap-2 px-3 py-1.5 text-xs font-medium rounded-md border border-[#333355] text-[#8888a0] hover:text-white hover:bg-[#252540] transition-colors"
+          className="flex items-center gap-2 px-3 py-1.5 text-xs font-medium rounded-md border border-[#393d46] text-[#999fac] hover:text-white hover:bg-[#25282f] transition-colors"
         >
           <RotateCcw className="w-3.5 h-3.5" />
           Reset Neutral
@@ -95,12 +95,12 @@ export const SocdPage: React.FC = () => {
       </div>
 
       {/* Horizontal Axis (A / D) */}
-      <div className="rounded-xl border border-[#333355] bg-[#16162a] p-5 space-y-4">
+      <div className="rounded-xl border border-[#393d46] bg-[#1c1e22] p-5 space-y-4">
         <div className="flex items-center justify-between">
-          <h2 className="text-sm font-semibold uppercase tracking-wider text-[#8888a0]">
+          <h2 className="text-sm font-semibold uppercase tracking-wider text-[#999fac]">
             Horizontal Strafe Axis (A ⟷ D)
           </h2>
-          <span className="text-xs font-mono text-[#0096ff] font-semibold">
+          <span className="text-xs font-mono text-[#f28b50] font-semibold">
             Active: {socdConfig.horizontal.toUpperCase()}
           </span>
         </div>
@@ -114,7 +114,7 @@ export const SocdPage: React.FC = () => {
                 onClick={() => updateSocd({ horizontal: opt.mode })}
                 className={`p-4 rounded-lg border text-left transition-all ${
                   isSelected
-                    ? 'border-[#0096ff] bg-[#0096ff]/10 text-white'
+                    ? 'border-[#f28b50] bg-[#f28b50]/10 text-white'
                     : 'border-[#2b2b45] bg-[#1d1d30] text-[#a0a0b8] hover:border-[#3d3d60]'
                 }`}
               >
@@ -123,11 +123,11 @@ export const SocdPage: React.FC = () => {
                     {opt.title}
                   </span>
                   {isSelected && (
-                    <CheckCircle className="w-4 h-4 text-[#0096ff]" />
+                    <CheckCircle className="w-4 h-4 text-[#f28b50]" />
                   )}
                 </div>
                 <p className="text-[11px] text-[#70708c] mb-2">{opt.desc}</p>
-                <div className="p-1.5 rounded bg-[#141424] font-mono text-[10px] text-[#0096ff]">
+                <div className="p-1.5 rounded bg-[#17181c] font-mono text-[10px] text-[#f28b50]">
                   {opt.diagram}
                 </div>
               </button>
@@ -137,12 +137,12 @@ export const SocdPage: React.FC = () => {
       </div>
 
       {/* Vertical Axis (W / S) */}
-      <div className="rounded-xl border border-[#333355] bg-[#16162a] p-5 space-y-4">
+      <div className="rounded-xl border border-[#393d46] bg-[#1c1e22] p-5 space-y-4">
         <div className="flex items-center justify-between">
-          <h2 className="text-sm font-semibold uppercase tracking-wider text-[#8888a0]">
+          <h2 className="text-sm font-semibold uppercase tracking-wider text-[#999fac]">
             Vertical Axis (W ⟷ S)
           </h2>
-          <span className="text-xs font-mono text-[#0096ff] font-semibold">
+          <span className="text-xs font-mono text-[#f28b50] font-semibold">
             Active: {socdConfig.vertical.toUpperCase()}
           </span>
         </div>
@@ -156,7 +156,7 @@ export const SocdPage: React.FC = () => {
                 onClick={() => updateSocd({ vertical: opt.mode })}
                 className={`p-4 rounded-lg border text-left transition-all ${
                   isSelected
-                    ? 'border-[#0096ff] bg-[#0096ff]/10 text-white'
+                    ? 'border-[#f28b50] bg-[#f28b50]/10 text-white'
                     : 'border-[#2b2b45] bg-[#1d1d30] text-[#a0a0b8] hover:border-[#3d3d60]'
                 }`}
               >
@@ -165,11 +165,11 @@ export const SocdPage: React.FC = () => {
                     {opt.title}
                   </span>
                   {isSelected && (
-                    <CheckCircle className="w-4 h-4 text-[#0096ff]" />
+                    <CheckCircle className="w-4 h-4 text-[#f28b50]" />
                   )}
                 </div>
                 <p className="text-[11px] text-[#70708c] mb-2">{opt.desc}</p>
-                <div className="p-1.5 rounded bg-[#141424] font-mono text-[10px] text-[#0096ff]">
+                <div className="p-1.5 rounded bg-[#17181c] font-mono text-[10px] text-[#f28b50]">
                   {opt.diagram}
                 </div>
               </button>

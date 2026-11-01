@@ -1,28 +1,19 @@
-import React, { type ReactNode } from 'react';
+import type { ReactNode } from 'react';
 import { Sidebar } from './Sidebar';
 import { Header } from './Header';
+import { useAppStore } from '../../stores/app-store';
 
-interface AppLayoutProps {
-  children: ReactNode;
-}
-
-export const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
-  return (
-    <div
-      className="flex h-screen w-screen overflow-hidden text-neutral-100 font-sans"
-      style={{ backgroundColor: '#1a1a2e' }}
-    >
-      <Sidebar />
-      <div className="flex flex-col flex-1 min-w-0 overflow-hidden">
-        <Header />
-        <div role="status" className="px-6 py-2 text-xs bg-amber-500/10 text-amber-300 border-b border-amber-500/20">RGB Apply supports APEX native effects on paired devices; reference animations and overlays are previews. Rapid Trigger, SOCD and display edits remain local previews.</div>
-        <main
-          className="flex-1 overflow-y-auto p-6"
-          style={{ backgroundColor: '#1a1a2e' }}
-        >
-          {children}
-        </main>
-      </div>
+export function AppLayout({ children }: { children: ReactNode }) {
+  const page = useAppStore(s => s.activePage);
+  const draft = ['actuation','rapid-trigger','socd','key-mapping','display'].includes(page);
+  return <div className="app-shell">
+    <a className="skip-link" href="#workspace">Skip to workspace</a>
+    <Sidebar />
+    <div className="app-content">
+      <Header />
+      {draft && <div className="workspace-notice" role="status"><span className="notice-tag">LOCAL EDITOR</span>{page === 'display' ? 'Design and save your screen locally. Upload to the keyboard is not available yet.' : 'Changes here are saved in the editor. Applying these settings to the keyboard is not available yet.'}</div>}
+      <main id="workspace" tabIndex={-1} className="workspace"><div className="workspace-inner">{children}</div></main>
+      <footer className="workspace-footer"><span>APEX 200 <span className="footer-dot">·</span> 82 keys</span><span>{draft ? 'Local editing' : 'Browser workspace'}</span></footer>
     </div>
-  );
-};
+  </div>;
+}

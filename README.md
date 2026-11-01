@@ -16,3 +16,8 @@ Open the local URL printed by Vite. Use Chrome/Edge with WebHID for device disco
 **Current release:** captured native RGB Apply plus host-driven per-key custom effects, with backups, acknowledgements and readback. Native Static/Wave/Ripple and update4 timed Snake have user-reported physical success. Update5 extends timed playback to17 spatial effects; USB readback/restore tests passed, while their new browser appearance remains to be assessed. Generic output/feature writes and other hardware configuration remain locked. Display Studio supports local images and manual stat cards; OLED upload and live system telemetry are not yet supported.
 
 Read [HANDOFF.md](HANDOFF.md), [PROGRESS.md](PROGRESS.md) and [docs/HID_PROTOCOL.md](docs/HID_PROTOCOL.md) for evidence, checks and blockers. No manufacturer binaries or private device identifiers are included.
+
+## Browser redesign (2026-11-02)
+The web workspace now uses a charcoal/orange interface with grouped navigation, connection/demo state and the82-key APEX200 overview. It runs as a static React browser application; no desktop app or native helper is required for WebHID pairing. For hosted use, serve dist over HTTPS in a WebHID-capable Chromium browser. Device pairing always requires the user's browser permission.
+
+The redesign preserves existing behavior; it does not port MKeyboard's native backend. Actuation, Rapid Trigger, SOCD and keymap changes remain local editor settings. OLED uploads are unavailable. RGB behavior is unchanged.186 automated tests, lint and production build pass. Browser visual review is pending because automated access to the preview origin was denied.

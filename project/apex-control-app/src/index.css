@@ -2,13 +2,12 @@
 
 @layer base {
   body {
-    background-color: #1a1a2e;
-    color: #e4e4ef;
+    background-color: #17181c;
+    color: #e9e9ee;
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
     margin: 0;
     padding: 0;
     overflow: hidden;
-    user-select: none;
     -webkit-font-smoothing: antialiased;
   }
 
@@ -18,16 +17,82 @@
     height: 6px;
   }
   ::-webkit-scrollbar-track {
-    background: #141424;
+    background: #17181c;
   }
   ::-webkit-scrollbar-thumb {
-    background: #2f2f4a;
+    background: #454851;
     border-radius: 3px;
   }
   ::-webkit-scrollbar-thumb:hover {
-    background: #44446a;
+    background: #656a76;
   }
 }
+
+:root { color-scheme: dark; --surface: #202227; --border: #35383f; --accent: #f28b50; --muted: #959aa7; }
+button, input, select, textarea { font: inherit; }
+button:not(:disabled), select { cursor: pointer; }
+button:disabled { cursor: not-allowed; }
+button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible { outline: 2px solid #ffb88c; outline-offset: 3px; }
+input[type='range'] { accent-color: var(--accent); }
+input[type='checkbox'], input[type='radio'] { accent-color: var(--accent); }
+.app-shell { display: flex; height: 100dvh; min-height: 0; background: #17181c; }
+.app-sidebar { width: 230px; flex-shrink: 0; display: flex; flex-direction: column; border-right: 1px solid #303238; background: #1c1e22; }
+.app-brand { display: flex; align-items: center; gap: 11px; text-align: left; padding: 26px 22px 25px; font-size: 21px; font-weight: 750; letter-spacing: -.8px; }
+.brand-mark { display: grid; place-items: center; width: 34px; height: 36px; color: #f28b50; border: 1px solid #5b4033; border-radius: 10px; background: #302721; }
+.brand-secondary { color: #a0a4af; font-weight: 400; }
+.app-brand small { display: block; font-size: 8px; letter-spacing: 1.7px; font-weight: 500; color: #7d8390; margin-top: 3px; }
+.device-tile { display: flex; align-items: center; gap: 10px; margin: 0 15px 22px; padding: 15px 12px; border: 1px solid #444850; border-radius: 9px; text-align: left; background: #272a30; color: #afb5c2; }
+.device-tile:hover { border-color: #727986; }
+.device-tile > span { flex: 1; }
+.device-tile strong { display: block; font-size: 13px; letter-spacing: .4px; color: #ededf2; }
+.device-tile small { display: flex; align-items: center; gap: 6px; font-size: 10px; margin-top: 5px; color: #a1a6b2; }
+.device-dot { display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: #777d89; flex-shrink: 0; }
+.device-dot.connected { background: #7edbb2; box-shadow: 0 0 8px #7edbb222; }
+.app-navigation { overflow: auto; flex: 1; padding: 0 13px; }
+.nav-group + .nav-group { margin-top: 27px; }
+.nav-label { color: #777e8c; font-size: 9px; letter-spacing: 1.8px; font-weight: 650; padding: 0 12px; margin: 0 0 9px; }
+.nav-link { display: flex; width: 100%; align-items: center; gap: 12px; padding: 11px 12px; text-align: left; color: #adb2bd; font-size: 12px; font-weight: 500; border-radius: 6px; margin: 3px 0; border: 1px solid transparent; transition: background .12s, color .12s; }
+.nav-link:hover { background: #292c32; color: #fff; }
+.nav-link.active { background: #3c2e27; border-color: #664633; color: #ffad79; }
+.nav-active-dot { width: 5px; height: 5px; border-radius: 50%; background: #f28b50; margin-left: auto; }
+.mobile-settings { display: none; }
+[class~="bg-[#f28b50]"] { color: #17181c; }
+.sidebar-bottom { padding: 14px 13px 0; }
+.source-link { display: flex; justify-content: space-between; align-items: center; margin: 15px 0 0; padding: 17px 10px; border-top: 1px solid #34373e; font-size: 9px; letter-spacing: .8px; color: #757c89; }
+.source-link span { display: flex; align-items: center; gap: 4px; }
+.app-content { display: flex; flex: 1; min-width: 0; flex-direction: column; }
+.app-header { display: flex; align-items: center; justify-content: space-between; gap: 15px; min-height: 67px; padding: 12px 32px; border-bottom: 1px solid #303238; background: #1c1e22; }
+.app-breadcrumb { display: flex; gap: 13px; align-items: center; font-size: 12px; color: #767d8b; }
+.app-breadcrumb strong { color: #dce0e8; font-weight: 550; }
+.header-actions { display: flex; align-items: center; gap: 17px; font-size: 10px; }
+.web-label { display: flex; align-items: center; gap: 6px; color: #8d94a2; }
+.connection-pill { display: flex; align-items: center; gap: 7px; border: 1px solid #3c414a; border-radius: 20px; padding: 6px 10px; color: #c4c9d4; white-space: nowrap; }
+.mode-switch { display: flex; align-items: center; gap: 8px; color: #959caa; }
+.switch-track { width: 27px; height: 16px; background: #454b57; border-radius: 10px; padding: 3px; }
+.switch-track i { display: block; width: 10px; height: 10px; background: #dfe2e8; border-radius: 50%; transition: transform .15s; }
+.switch-track.on { background: #a65630; }
+.switch-track.on i { transform: translateX(11px); }
+.workspace { flex: 1; overflow: auto; padding: 34px 36px 48px; }
+.workspace-inner { max-width: 1280px; margin: 0 auto; }
+.workspace-notice { display: flex; align-items: center; gap: 12px; padding: 10px 32px; background: #28251f; border-bottom: 1px solid #494034; color: #ccc0a7; font-size: 11px; }
+.notice-tag { color: #efbf7b; font-size: 9px; font-weight: 650; letter-spacing: .9px; flex-shrink: 0; }
+.workspace-footer { display: flex; justify-content: space-between; font-size: 9px; letter-spacing: .3px; color: #818997; padding: 10px 32px; border-top: 1px solid #303238; background: #1c1e22; }
+.footer-dot { margin: 0 8px; color: #545a65; }
+.skip-link { position: fixed; left: 250px; top: -60px; z-index: 100; padding: 10px 16px; background: #f28b50; color: #17181c; border-radius: 6px; }
+.skip-link:focus { top: 10px; }
+.overview-hero { border: 1px solid #393d46; background: linear-gradient(135deg, #282b32, #202227 70%); border-radius: 14px; overflow: hidden; }
+.overview-hero-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 20px; padding: 25px 30px 0; }
+.overview-eyebrow { font-size: 9px; font-weight: 600; letter-spacing: 1.7px; color: #b1b7c4; text-transform: uppercase; }
+.overview-hero h2 { font-size: 30px; font-weight: 650; letter-spacing: -1px; margin: 4px 0 6px; }
+.overview-hero p { color: #989fad; font-size: 12px; }
+.overview-keyboard { padding: 22px 30px; overflow-x: auto; }
+.overview-hero-footer { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px; padding: 17px 30px; border-top: 1px solid #393d46; font-size: 11px; color: #9ba3b2; }
+.overview-hero-footer button { display: flex; align-items: center; gap: 8px; color: #ffb180; }
+.workspace h1 { letter-spacing: -.6px; }
+@media (max-width: 1100px) { .app-sidebar { width: 200px; } .app-brand { padding-left: 17px; font-size: 18px; } .workspace { padding: 25px 24px; } .web-label { display: none; } }
+@media (max-width: 700px) { .app-shell { flex-direction: column; } .app-sidebar { width: 100%; height: auto; flex-direction: row; border-right: 0; border-bottom: 1px solid #303238; align-items: center; } .app-brand { padding: 12px; } .app-brand > span:last-child, .device-tile, .nav-label, .sidebar-bottom { display: none; } .app-navigation { display: flex; overflow-x: auto; padding: 4px; } .nav-group { display: flex; gap: 2px; } .nav-group + .nav-group { margin: 0; } .nav-link { width: auto; white-space: nowrap; padding: 9px; font-size: 11px; gap: 6px; } .nav-active-dot { display: none; } .app-content { min-height: 0; } .app-header { padding: 10px 15px; min-height: 55px; } .header-actions { gap: 10px; } .app-breadcrumb > span, .app-breadcrumb > svg { display: none; } .workspace { padding: 20px 14px 35px; } .workspace-notice { padding: 10px 14px; } .workspace-footer { padding: 9px 15px; } .overview-hero-header { padding: 20px 20px 0; } .overview-keyboard { padding: 15px; } }
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; } }
+@media (max-width: 700px) { .mobile-settings { display: flex; } }
 
 @layer utilities {
   @keyframes slide-in {

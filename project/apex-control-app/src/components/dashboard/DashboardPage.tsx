@@ -27,6 +27,7 @@ import {
 } from 'lucide-react';
 import { useAppStore, type AppPage } from '../../stores/app-store';
 import { ConnectionState } from '../../types';
+import { KeyboardVisualizer } from '../keyboard';
 
 // ─── Connection state display helpers ───────────────────────────────────────
 
@@ -36,8 +37,8 @@ const CONNECTION_BADGE: Record<
 > = {
   [ConnectionState.Disconnected]: {
     label: 'Disconnected',
-    dotColor: 'bg-[#8888a0]',
-    textColor: 'text-[#8888a0]',
+    dotColor: 'bg-[#999fac]',
+    textColor: 'text-[#999fac]',
   },
   [ConnectionState.Scanning]: {
     label: 'Scanning…',
@@ -125,11 +126,11 @@ interface StatCardProps {
 
 function StatCard({ icon, label, value }: StatCardProps) {
   return (
-    <div className="flex items-center gap-3 rounded-lg bg-[#252540] border border-[#333355] px-4 py-3">
-      <div className="text-[#0096ff]">{icon}</div>
+    <div className="flex items-center gap-3 rounded-lg bg-[#25282f] border border-[#393d46] px-4 py-3">
+      <div className="text-[#f28b50]">{icon}</div>
       <div className="min-w-0">
-        <p className="text-xs text-[#8888a0] uppercase tracking-wider">{label}</p>
-        <p className="text-sm font-medium text-[#e4e4ef] truncate">{value}</p>
+        <p className="text-xs text-[#999fac] uppercase tracking-wider">{label}</p>
+        <p className="text-sm font-medium text-[#e9e9ee] truncate">{value}</p>
       </div>
     </div>
   );
@@ -202,6 +203,19 @@ export function DashboardPage() {
 
   return (
     <div className="space-y-6">
+      <div>
+        <p className="overview-eyebrow">YOUR WORKSPACE</p>
+        <h1 className="text-2xl font-semibold text-white mt-2">Make it feel like you.</h1>
+        <p className="text-sm text-[#999fac] mt-2">Your keyboard, profiles and settings. All in your browser.</p>
+      </div>
+      <section className="overview-hero" aria-label="APEX 200 keyboard overview">
+        <div className="overview-hero-header">
+          <div><p className="overview-eyebrow">MAGNETIC GAMING KEYBOARD</p><h2>APEX 200</h2><p>82 keys. A workspace of your own.</p></div>
+          <span className="connection-pill"><i className={isConnected && !useMock ? 'device-dot connected' : 'device-dot'} />{useMock ? 'Demo preview' : badge.label}</span>
+        </div>
+        <div className="overview-keyboard"><KeyboardVisualizer interactive={false} mode="display" /></div>
+        <div className="overview-hero-footer"><span>APEX 200 layout · OLED screen & rotary dial</span><button onClick={() => setActivePage('key-mapping')}>Open key mapping <Keyboard size={14} /></button></div>
+      </section>
       {/* Mock‐mode banner */}
       {useMock && (
         <div className="flex items-center gap-3 rounded-lg border border-[#ffab00]/30 bg-[#ffab00]/10 px-4 py-3">
@@ -214,9 +228,9 @@ export function DashboardPage() {
       )}
 
       {/* ── Device connection section ─────────────────────────────────────── */}
-      <section className="rounded-lg border border-[#333355] bg-[#252540]">
-        <div className="flex items-center justify-between border-b border-[#333355] px-5 py-3">
-          <h2 className="text-sm font-semibold uppercase tracking-wider text-[#e4e4ef]">
+      <section className="rounded-lg border border-[#393d46] bg-[#25282f]">
+        <div className="flex items-center justify-between border-b border-[#393d46] px-5 py-3">
+          <h2 className="text-sm font-semibold uppercase tracking-wider text-[#e9e9ee]">
             Device Connection
           </h2>
 
@@ -235,11 +249,11 @@ export function DashboardPage() {
 
         <div className="px-5 py-4 space-y-4">
           {/* Transport type */}
-          <div className="flex items-center gap-2 text-xs text-[#8888a0]">
+          <div className="flex items-center gap-2 text-xs text-[#999fac]">
             <Cpu size={14} />
             <span>
               Transport:{' '}
-              <span className="font-mono text-[#e4e4ef]">
+              <span className="font-mono text-[#e9e9ee]">
                 {useMock ? 'Mock' : 'WebHID'}
               </span>
             </span>
@@ -247,14 +261,14 @@ export function DashboardPage() {
 
           {/* Device identity (when connected) */}
           {isConnected && device && (
-            <div className="rounded-md border border-[#333355] bg-[#1a1a2e] px-4 py-3 space-y-1">
-              <div className="flex items-center gap-2 text-xs text-[#8888a0]">
+            <div className="rounded-md border border-[#393d46] bg-[#17181c] px-4 py-3 space-y-1">
+              <div className="flex items-center gap-2 text-xs text-[#999fac]">
                 <CheckCircle2 size={14} className="text-[#00c853]" />
-                <span className="text-[#e4e4ef] font-medium">
+                <span className="text-[#e9e9ee] font-medium">
                   {device.manufacturer} — {device.product}
                 </span>
               </div>
-              <p className="text-xs text-[#8888a0] font-mono pl-[22px]">
+              <p className="text-xs text-[#999fac] font-mono pl-[22px]">
                 VID:PID {formatVidPid(device.vendorId, device.productId)}
                 {device.serialNumber && ` · S/N ${device.serialNumber}`}
               </p>
@@ -270,16 +284,16 @@ export function DashboardPage() {
           )}
 
           {/* Action buttons */}
-          <div className="flex items-center gap-3">
+          <div className="flex flex-wrap items-center gap-3">
             {!isConnected ? (
               <button
                 onClick={handleConnect}
                 disabled={isBusy}
                 aria-busy={isBusy}
                 aria-label={isBusy ? 'Connection in progress' : useMock ? 'Connect mock device' : 'Pair and connect keyboard'}
-                className="inline-flex items-center gap-2 rounded-md bg-[#0096ff] px-4 py-2 text-sm font-medium text-white
-                           hover:bg-[#0077cc] disabled:opacity-50 disabled:cursor-not-allowed transition-colors
-                           focus:outline-none focus:ring-2 focus:ring-[#0096ff] focus:ring-offset-2 focus:ring-offset-[#1a1a2e]"
+                className="inline-flex items-center gap-2 rounded-md bg-[#f28b50] px-4 py-2 text-sm font-medium text-white
+                           hover:bg-[#cd6d36] disabled:opacity-50 disabled:cursor-not-allowed transition-colors
+                           focus:outline-none focus:ring-2 focus:ring-[#f28b50] focus:ring-offset-2 focus:ring-offset-[#17181c]"
               >
                 {isBusy ? (
                   <Loader2 size={16} className="animate-spin" aria-hidden="true" />
@@ -292,9 +306,9 @@ export function DashboardPage() {
               <button
                 onClick={disconnectDevice}
                 aria-label="Disconnect from keyboard"
-                className="inline-flex items-center gap-2 rounded-md border border-[#333355] bg-[#1a1a2e] px-4 py-2 text-sm font-medium text-[#e4e4ef]
-                           hover:bg-[#2d2d4a] transition-colors
-                           focus:outline-none focus:ring-2 focus:ring-[#0096ff] focus:ring-offset-2 focus:ring-offset-[#1a1a2e]"
+                className="inline-flex items-center gap-2 rounded-md border border-[#393d46] bg-[#17181c] px-4 py-2 text-sm font-medium text-[#e9e9ee]
+                           hover:bg-[#30343d] transition-colors
+                           focus:outline-none focus:ring-2 focus:ring-[#f28b50] focus:ring-offset-2 focus:ring-offset-[#17181c]"
               >
                 <Unplug size={16} aria-hidden="true" />
                 Disconnect
@@ -336,8 +350,8 @@ export function DashboardPage() {
 
       {/* ── Quick navigation ─────────────────────────────────────────────── */}
       <section>
-        <h2 className="mb-3 text-sm font-semibold uppercase tracking-wider text-[#8888a0]">
-          Quick Navigation
+        <h2 className="mb-3 text-sm font-semibold uppercase tracking-wider text-[#999fac]">
+          Customize your keyboard
         </h2>
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
           {NAV_SHORTCUTS.map((nav) => (
@@ -346,20 +360,20 @@ export function DashboardPage() {
               onClick={() => setActivePage(nav.page)}
               onKeyDown={(e) => handleNavKeyDown(e, nav.page)}
               tabIndex={0}
-              role="menuitem"
               aria-label={`Navigate to ${nav.label}: ${nav.description}`}
-              className="group flex items-start gap-3 rounded-lg border border-[#333355] bg-[#252540] px-4 py-3
-                         hover:border-[#0096ff]/50 hover:bg-[#2d2d4a] transition-colors text-left
-                         focus:outline-none focus:ring-2 focus:ring-[#0096ff] focus:ring-offset-2 focus:ring-offset-[#1a1a2e]"
+              className="group flex items-start gap-3 rounded-lg border border-[#393d46] bg-[#25282f] px-4 py-3
+                         hover:border-[#f28b50]/50 hover:bg-[#30343d] transition-colors text-left
+                         focus:outline-none focus:ring-2 focus:ring-[#f28b50] focus:ring-offset-2 focus:ring-offset-[#17181c]"
             >
-              <div className="mt-0.5 text-[#8888a0] group-hover:text-[#0096ff] transition-colors" aria-hidden="true">
+              <div className="mt-0.5 text-[#999fac] group-hover:text-[#f28b50] transition-colors" aria-hidden="true">
                 {nav.icon}
               </div>
               <div className="min-w-0">
-                <p className="text-sm font-medium text-[#e4e4ef]">{nav.label}</p>
-                <p className="text-xs text-[#8888a0] leading-snug">
+                <p className="text-sm font-medium text-[#e9e9ee]">{nav.label}</p>
+                <p className="text-xs text-[#999fac] leading-snug">
                   {nav.description}
                 </p>
+                {['actuation','rapid-trigger','socd','key-mapping'].includes(nav.page) && <span className="text-[10px] text-[#d8b88e] mt-1 inline-block">Local editor</span>}
               </div>
             </button>
           ))}

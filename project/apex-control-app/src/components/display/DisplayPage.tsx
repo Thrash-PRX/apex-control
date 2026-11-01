@@ -296,14 +296,14 @@ export function DisplayPage() {
   const transformStyle = getTransformStyle(draft.imageSettings);
 
   return (
-    <section className="p-6 space-y-6 max-w-7xl mx-auto" style={{ backgroundColor: '#1a1a2e', minHeight: '100vh' }}>
+    <section className="p-6 space-y-6 max-w-7xl mx-auto" style={{ backgroundColor: '#17181c', minHeight: '100vh' }}>
       {/* Toast */}
       {notice && (
         <div
           className={`fixed bottom-6 right-6 z-50 px-4 py-3 rounded-lg border shadow-lg animate-slide-in flex items-center gap-2 ${
             notice.type === 'success' ? 'border-[#00c853] bg-[#00c853]/10 text-[#00c853]' :
             notice.type === 'error' ? 'border-red-500 bg-red-500/10 text-red-400' :
-            'border-[#0096ff] bg-[#0096ff]/10 text-[#0096ff]'
+            'border-[#f28b50] bg-[#f28b50]/10 text-[#f28b50]'
           }`}
           role="alert"
           aria-live="polite"
@@ -319,23 +319,23 @@ export function DisplayPage() {
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold tracking-tight text-white flex items-center gap-2">
-            <Image className="w-6 h-6 text-[#0096ff]" />
+            <Image className="w-6 h-6 text-[#f28b50]" />
             Display Studio
           </h1>
-          <p className="text-sm text-[#8888a0] mt-1">
+          <p className="text-sm text-[#999fac] mt-1">
             Local image preview & stat card designer. Hardware display support unverified.
           </p>
         </div>
         <div className="flex items-center gap-2 flex-wrap">
           <button
             onClick={handleExport}
-            className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-md border border-[#333355] text-[#8888a0] hover:text-white hover:bg-[#252540] transition-colors"
+            className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-md border border-[#393d46] text-[#999fac] hover:text-white hover:bg-[#25282f] transition-colors"
             title="Export draft (Ctrl+E)"
           >
             <Download className="w-3.5 h-3.5" />
             Export
           </button>
-          <label className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-md border border-[#333355] text-[#8888a0] hover:text-white hover:bg-[#252540] transition-colors cursor-pointer">
+          <label className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-md border border-[#393d46] text-[#999fac] hover:text-white hover:bg-[#25282f] transition-colors cursor-pointer">
             <Upload className="w-3.5 h-3.5" />
             Import
             <input
@@ -349,7 +349,7 @@ export function DisplayPage() {
           </label>
           <button
             onClick={handleSave}
-            className="flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-semibold rounded-md bg-[#0096ff] text-white hover:bg-[#0080db] shadow-md shadow-[#0096ff]/20 transition-all"
+            className="flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-semibold rounded-md bg-[#f28b50] text-white hover:bg-[#0080db] shadow-md shadow-[#f28b50]/20 transition-all"
             title="Save draft (Ctrl+S)"
           >
             <Save className="w-3.5 h-3.5" />
@@ -372,17 +372,17 @@ export function DisplayPage() {
         {/* Editor Panel */}
         <div className="lg:col-span-1 space-y-5">
           {/* Text Fields */}
-          <div className="rounded-xl border border-[#333355] bg-[#16162a] p-5 space-y-4">
-            <h2 className="text-sm font-semibold uppercase tracking-wider text-[#8888a0] flex items-center gap-2">
-              <Settings className="w-4 h-4 text-[#0096ff]" />
+          <div className="rounded-xl border border-[#393d46] bg-[#1c1e22] p-5 space-y-4">
+            <h2 className="text-sm font-semibold uppercase tracking-wider text-[#999fac] flex items-center gap-2">
+              <Settings className="w-4 h-4 text-[#f28b50]" />
               Text Content
             </h2>
             <div className="space-y-4">
               {(['title', 'label', 'value'] as const).map((key) => (
                 <label key={key} className="block">
-                  <span className="block text-xs font-medium text-[#8888a0] mb-1 capitalize">{key}</span>
+                  <span className="block text-xs font-medium text-[#999fac] mb-1 capitalize">{key}</span>
                   <input
-                    className="block w-full rounded bg-[#1e1e32] p-3 border border-[#333355] text-white placeholder-[#555] focus:border-[#0096ff] focus:outline-none focus:ring-1 focus:ring-[#0096ff]"
+                    className="block w-full rounded bg-[#1e1e32] p-3 border border-[#393d46] text-white placeholder-[#555] focus:border-[#f28b50] focus:outline-none focus:ring-1 focus:ring-[#f28b50]"
                     maxLength={64}
                     value={draft[key]}
                     onChange={(e) => updateText(key, e.target.value)}
@@ -394,8 +394,8 @@ export function DisplayPage() {
             </div>
             
             {/* Text Alignment */}
-            <div className="space-y-2 pt-2 border-t border-[#252540]">
-              <span className="text-xs font-medium text-[#8888a0] block">Text Alignment</span>
+            <div className="space-y-2 pt-2 border-t border-[#25282f]">
+              <span className="text-xs font-medium text-[#999fac] block">Text Alignment</span>
               <div className="flex gap-1" role="radiogroup" aria-label="Text alignment">
                 {(['left', 'center', 'right'] as TextAlign[]).map((align) => (
                   <button
@@ -403,9 +403,9 @@ export function DisplayPage() {
                     onClick={() => updateTextAlign(align)}
                     className={`flex-1 px-3 py-2 rounded text-xs font-medium transition-all ${
                       draft.textAlign === align
-                        ? 'bg-[#0096ff] text-white shadow-sm'
-                        : 'bg-[#1e1e32] text-[#8888a0] hover:text-white hover:bg-[#282845]'
-                    } border border-[#333355}`}
+                        ? 'bg-[#f28b50] text-white shadow-sm'
+                        : 'bg-[#1e1e32] text-[#999fac] hover:text-white hover:bg-[#282845]'
+                    } border border-[#393d46}`}
                     role="radio"
                     aria-checked={draft.textAlign === align}
                   >
@@ -419,9 +419,9 @@ export function DisplayPage() {
           </div>
 
           {/* Image Settings */}
-          <div className="rounded-xl border border-[#333355] bg-[#16162a] p-5 space-y-4">
-            <h2 className="text-sm font-semibold uppercase tracking-wider text-[#8888a0] flex items-center gap-2">
-              <Image className="w-4 h-4 text-[#0096ff]" />
+          <div className="rounded-xl border border-[#393d46] bg-[#1c1e22] p-5 space-y-4">
+            <h2 className="text-sm font-semibold uppercase tracking-wider text-[#999fac] flex items-center gap-2">
+              <Image className="w-4 h-4 text-[#f28b50]" />
               Background Image
             </h2>
             
@@ -439,8 +439,8 @@ export function DisplayPage() {
                 disabled={!!draft.image}
                 className={`w-full py-3 rounded-lg border-2 border-dashed transition-colors ${
                   draft.image
-                    ? 'border-[#333355] bg-[#1e1e32] text-[#555] cursor-not-allowed'
-                    : 'border-[#333355] bg-[#1e1e32] text-[#8888a0] hover:border-[#0096ff]/50 hover:bg-[#252540] hover:text-white'
+                    ? 'border-[#393d46] bg-[#1e1e32] text-[#555] cursor-not-allowed'
+                    : 'border-[#393d46] bg-[#1e1e32] text-[#999fac] hover:border-[#f28b50]/50 hover:bg-[#25282f] hover:text-white'
                 }`}
               >
                 {draft.image ? (
@@ -456,12 +456,12 @@ export function DisplayPage() {
             </label>
 
             {draft.image && (
-              <div className="space-y-3 pt-2 border-t border-[#252540]">
+              <div className="space-y-3 pt-2 border-t border-[#25282f]">
                 <div className="flex items-center justify-between">
-                  <span className="text-xs font-medium text-[#8888a0]">Image Controls</span>
+                  <span className="text-xs font-medium text-[#999fac]">Image Controls</span>
                   <button
                     onClick={resetImageSettings}
-                    className="px-2 py-1 text-xs text-[#8888a0] hover:text-white hover:bg-[#252540] rounded transition-colors"
+                    className="px-2 py-1 text-xs text-[#999fac] hover:text-white hover:bg-[#25282f] rounded transition-colors"
                     title="Reset image settings"
                   >
                     <RotateCcw className="w-3 h-3 inline" />
@@ -471,11 +471,11 @@ export function DisplayPage() {
 
                 {/* Scale */}
                 <div className="space-y-1">
-                  <div className="flex justify-between text-xs text-[#8888a0]">
+                  <div className="flex justify-between text-xs text-[#999fac]">
                     <span className="flex items-center gap-1.5">
                       <ZoomIn className="w-3.5 h-3.5" /> Scale
                     </span>
-                    <span className="font-mono text-[#0096ff]">{Math.round(draft.imageSettings.scale * 100)}%</span>
+                    <span className="font-mono text-[#f28b50]">{Math.round(draft.imageSettings.scale * 100)}%</span>
                   </div>
                   <input
                     type="range"
@@ -484,16 +484,16 @@ export function DisplayPage() {
                     step="5"
                     value={Math.round(draft.imageSettings.scale * 100)}
                     onChange={(e) => updateImageSettings({ scale: parseInt(e.target.value) / 100 })}
-                    className="w-full accent-[#0096ff]"
+                    className="w-full accent-[#f28b50]"
                     aria-label="Image scale (10%-300%)"
                   />
                 </div>
 
                 {/* Opacity */}
                 <div className="space-y-1">
-                  <div className="flex justify-between text-xs text-[#8888a0]">
+                  <div className="flex justify-between text-xs text-[#999fac]">
                     <span>Opacity</span>
-                    <span className="font-mono text-[#0096ff]">{Math.round(draft.imageSettings.opacity * 100)}%</span>
+                    <span className="font-mono text-[#f28b50]">{Math.round(draft.imageSettings.opacity * 100)}%</span>
                   </div>
                   <input
                     type="range"
@@ -502,20 +502,20 @@ export function DisplayPage() {
                     step="5"
                     value={Math.round(draft.imageSettings.opacity * 100)}
                     onChange={(e) => updateImageSettings({ opacity: parseInt(e.target.value) / 100 })}
-                    className="w-full accent-[#0096ff]"
+                    className="w-full accent-[#f28b50]"
                     aria-label="Image opacity (0%-100%)"
                   />
                 </div>
 
                 {/* Rotation */}
                 <div className="space-y-1">
-                  <div className="flex justify-between text-xs text-[#8888a0]">
+                  <div className="flex justify-between text-xs text-[#999fac]">
                     <span>Rotation</span>
-                    <span className="font-mono text-[#0096ff]">{draft.imageSettings.rotation}°</span>
+                    <span className="font-mono text-[#f28b50]">{draft.imageSettings.rotation}°</span>
                   </div>
                   <button
                     onClick={rotateImage}
-                    className="w-full px-3 py-2 rounded bg-[#1e1e32] hover:bg-[#282845] border border-[#333355] text-white text-sm font-medium flex items-center justify-center gap-2"
+                    className="w-full px-3 py-2 rounded bg-[#1e1e32] hover:bg-[#282845] border border-[#393d46] text-white text-sm font-medium flex items-center justify-center gap-2"
                     aria-label={`Rotate image (current: ${draft.imageSettings.rotation}°)`}
                   >
                     <RotateCcw className="w-4 h-4" />
@@ -530,7 +530,7 @@ export function DisplayPage() {
 
                 <button
                   onClick={removeImage}
-                  className="w-full px-3 py-1.5 rounded text-xs font-medium bg-[#252540] hover:bg-[#303050] text-white border border-[#333355] transition-colors"
+                  className="w-full px-3 py-1.5 rounded text-xs font-medium bg-[#25282f] hover:bg-[#303050] text-white border border-[#393d46] transition-colors"
                 >
                   <Trash2 className="w-3.5 h-3.5 inline mr-1" />
                   Remove Image
@@ -540,9 +540,9 @@ export function DisplayPage() {
           </div>
 
           {/* Background Preset */}
-          <div className="rounded-xl border border-[#333355] bg-[#16162a] p-5 space-y-3">
-            <h2 className="text-sm font-semibold uppercase tracking-wider text-[#8888a0] flex items-center gap-2">
-              <Grid className="w-4 h-4 text-[#0096ff]" />
+          <div className="rounded-xl border border-[#393d46] bg-[#1c1e22] p-5 space-y-3">
+            <h2 className="text-sm font-semibold uppercase tracking-wider text-[#999fac] flex items-center gap-2">
+              <Grid className="w-4 h-4 text-[#f28b50]" />
               Preview Background
             </h2>
             <div className="grid grid-cols-3 gap-2">
@@ -552,7 +552,7 @@ export function DisplayPage() {
                   onClick={() => updateBackgroundPreset(preset)}
                   className={`p-3 rounded-lg border text-center transition-all ${
                     draft.backgroundPreset === preset
-                      ? 'border-[#0096ff] bg-[#0096ff]/10 text-white shadow-sm'
+                      ? 'border-[#f28b50] bg-[#f28b50]/10 text-white shadow-sm'
                       : 'border-[#2b2b45] bg-[#1d1d30] text-[#a0a0b8] hover:border-[#3d3d60] hover:text-white'
                   }`}
                   role="radio"
@@ -566,9 +566,9 @@ export function DisplayPage() {
           </div>
 
           {/* Layout Preset */}
-          <div className="rounded-xl border border-[#333355] bg-[#16162a] p-5 space-y-3">
-            <h2 className="text-sm font-semibold uppercase tracking-wider text-[#8888a0] flex items-center gap-2">
-              <Sliders className="w-4 h-4 text-[#0096ff]" />
+          <div className="rounded-xl border border-[#393d46] bg-[#1c1e22] p-5 space-y-3">
+            <h2 className="text-sm font-semibold uppercase tracking-wider text-[#999fac] flex items-center gap-2">
+              <Sliders className="w-4 h-4 text-[#f28b50]" />
               Layout Preset
             </h2>
             <div className="grid grid-cols-2 gap-2">
@@ -578,7 +578,7 @@ export function DisplayPage() {
                   onClick={() => updateLayoutPreset(preset)}
                   className={`p-3 rounded-lg border text-left transition-all ${
                     draft.layoutPreset === preset
-                      ? 'border-[#0096ff] bg-[#0096ff]/10 text-white'
+                      ? 'border-[#f28b50] bg-[#f28b50]/10 text-white'
                       : 'border-[#2b2b45] bg-[#1d1d30] text-[#a0a0b8] hover:border-[#3d3d60] hover:text-white'
                   }`}
                   role="radio"
@@ -594,7 +594,7 @@ export function DisplayPage() {
           {/* Advanced Toggle */}
           <button
             onClick={() => setShowAdvanced(!showAdvanced)}
-            className="w-full px-3 py-2 rounded-lg border border-[#333355] bg-[#16162a] text-xs text-[#8888a0] hover:text-white hover:border-[#0096ff]/50 transition-colors flex items-center justify-center gap-2"
+            className="w-full px-3 py-2 rounded-lg border border-[#393d46] bg-[#1c1e22] text-xs text-[#999fac] hover:text-white hover:border-[#f28b50]/50 transition-colors flex items-center justify-center gap-2"
           >
             <Settings className={`w-4 h-4 transition-transform ${showAdvanced ? 'rotate-180' : ''}`} />
             {showAdvanced ? 'Hide Advanced' : 'Show Advanced'}
@@ -602,28 +602,28 @@ export function DisplayPage() {
 
           {/* Advanced Settings */}
           {showAdvanced && (
-            <div className="rounded-xl border border-[#333355] bg-[#16162a] p-5 space-y-3 animate-slide-in">
-              <h3 className="text-xs font-semibold uppercase tracking-wider text-[#8888a0]">Image Transform Values</h3>
+            <div className="rounded-xl border border-[#393d46] bg-[#1c1e22] p-5 space-y-3 animate-slide-in">
+              <h3 className="text-xs font-semibold uppercase tracking-wider text-[#999fac]">Image Transform Values</h3>
               <div className="grid grid-cols-2 gap-2 text-xs">
                 <div className="bg-[#1e1e32] p-2 rounded">
                   <span className="text-[#666] block">Scale</span>
-                  <span className="font-mono text-[#0096ff]">{draft.imageSettings.scale.toFixed(2)}</span>
+                  <span className="font-mono text-[#f28b50]">{draft.imageSettings.scale.toFixed(2)}</span>
                 </div>
                 <div className="bg-[#1e1e32] p-2 rounded">
                   <span className="text-[#666] block">Offset X</span>
-                  <span className="font-mono text-[#0096ff]">{draft.imageSettings.offsetX.toFixed(1)}%</span>
+                  <span className="font-mono text-[#f28b50]">{draft.imageSettings.offsetX.toFixed(1)}%</span>
                 </div>
                 <div className="bg-[#1e1e32] p-2 rounded">
                   <span className="text-[#666] block">Offset Y</span>
-                  <span className="font-mono text-[#0096ff]">{draft.imageSettings.offsetY.toFixed(1)}%</span>
+                  <span className="font-mono text-[#f28b50]">{draft.imageSettings.offsetY.toFixed(1)}%</span>
                 </div>
                 <div className="bg-[#1e1e32] p-2 rounded">
                   <span className="text-[#666] block">Rotation</span>
-                  <span className="font-mono text-[#0096ff]">{draft.imageSettings.rotation}°</span>
+                  <span className="font-mono text-[#f28b50]">{draft.imageSettings.rotation}°</span>
                 </div>
                 <div className="bg-[#1e1e32] p-2 rounded col-span-2">
                   <span className="text-[#666] block">Opacity</span>
-                  <span className="font-mono text-[#0096ff]">{Math.round(draft.imageSettings.opacity * 100)}%</span>
+                  <span className="font-mono text-[#f28b50]">{Math.round(draft.imageSettings.opacity * 100)}%</span>
                 </div>
               </div>
             </div>
@@ -632,13 +632,13 @@ export function DisplayPage() {
 
         {/* Preview Panel */}
         <div className="lg:col-span-2 space-y-4">
-          <div className="rounded-xl border border-[#333355] bg-[#16162a] p-4">
+          <div className="rounded-xl border border-[#393d46] bg-[#1c1e22] p-4">
             <div className="flex items-center justify-between mb-3">
-              <span className="text-xs font-semibold text-[#8888a0] uppercase tracking-wider">
+              <span className="text-xs font-semibold text-[#999fac] uppercase tracking-wider">
                 Live Preview (Layout: {LAYOUT_PRESETS[draft.layoutPreset].name})
               </span>
               {draft.image && (
-                <span className="text-xs text-[#0096ff] font-mono">
+                <span className="text-xs text-[#f28b50] font-mono">
                   {draft.imageSettings.rotation}° · {Math.round(draft.imageSettings.scale * 100)}% · {Math.round(draft.imageSettings.opacity * 100)}%
                 </span>
               )}
@@ -704,15 +704,15 @@ export function DisplayPage() {
           </div>
 
           {/* Keyboard Shortcuts Hint */}
-          <details className="rounded-lg border border-[#252540] bg-[#1a1a2e] p-3">
-            <summary className="text-xs text-[#8888a0] cursor-pointer select-none flex items-center gap-2">
+          <details className="rounded-lg border border-[#25282f] bg-[#17181c] p-3">
+            <summary className="text-xs text-[#999fac] cursor-pointer select-none flex items-center gap-2">
               <Settings className="w-4 h-4" />
               Keyboard Shortcuts
             </summary>
             <ul className="text-xs text-[#666] mt-2 space-y-1 pl-4 list-disc">
-              <li><kbd className="px-1.5 py-0.5 bg-[#252540] rounded text-white font-mono">Ctrl+S</kbd> Save draft</li>
-              <li><kbd className="px-1.5 py-0.5 bg-[#252540] rounded text-white font-mono">Ctrl+E</kbd> Export draft</li>
-              <li><kbd className="px-1.5 py-0.5 bg-[#252540] rounded text-white font-mono">Delete</kbd> Remove image</li>
+              <li><kbd className="px-1.5 py-0.5 bg-[#25282f] rounded text-white font-mono">Ctrl+S</kbd> Save draft</li>
+              <li><kbd className="px-1.5 py-0.5 bg-[#25282f] rounded text-white font-mono">Ctrl+E</kbd> Export draft</li>
+              <li><kbd className="px-1.5 py-0.5 bg-[#25282f] rounded text-white font-mono">Delete</kbd> Remove image</li>
               <li>Drag image in preview to reposition</li>
             </ul>
           </details>
