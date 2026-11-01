@@ -373,7 +373,8 @@ export function DashboardPage() {
                 <p className="text-xs text-[#999fac] leading-snug">
                   {nav.description}
                 </p>
-                {['actuation','rapid-trigger','socd','key-mapping'].includes(nav.page) && <span className="text-[10px] text-[#d8b88e] mt-1 inline-block">Local editor</span>}
+                {['rapid-trigger','socd','key-mapping'].includes(nav.page) && <span className="text-[10px] text-[#d8b88e] mt-1 inline-block">Local editor</span>}
+                {nav.page === 'actuation' && <span className="text-[10px] text-emerald-300 mt-1 inline-block">Device read / apply / restore</span>}
               </div>
             </button>
           ))}

@@ -5,7 +5,7 @@ import { useAppStore } from '../../stores/app-store';
 
 export function AppLayout({ children }: { children: ReactNode }) {
   const page = useAppStore(s => s.activePage);
-  const draft = ['actuation','rapid-trigger','socd','key-mapping','display'].includes(page);
+  const draft = ['rapid-trigger','socd','key-mapping','display'].includes(page);
   return <div className="app-shell">
     <a className="skip-link" href="#workspace">Skip to workspace</a>
     <Sidebar />

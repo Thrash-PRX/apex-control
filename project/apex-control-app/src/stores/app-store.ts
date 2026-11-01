@@ -1,5 +1,6 @@
 import { nativeRgbMode } from '../lib/native-rgb-mode';
 import type { DeviceSnapshot } from '../lib/read-device-state';
+import type { TriggerTable } from '../lib/device-actuation';
 /**
  * Main application store using Zustand.
  *
@@ -66,6 +67,8 @@ interface AppState {
   playRgb: (signal: AbortSignal, restoreOnly?:boolean, fast?:boolean,loop?:boolean) => Promise<void>;
   applyRgb: () => Promise<void>;
   readDeviceState: () => Promise<DeviceSnapshot>;
+  readActuation: () => Promise<TriggerTable>;
+  applyActuation: (raw: number, keys: number[], restoreOnly?: boolean) => Promise<void>;
   lightingConfig: LightingConfig;
   updateLighting: (config: Partial<LightingConfig>) => void;
   selectedKeys: string[];
@@ -300,6 +303,14 @@ export const useAppStore = create<AppState>((set, get) => ({
   readDeviceState: async () => {
     if (get().useMock) throw new Error('Turn Demo off and connect your APEX first');
     return getOrCreateDeviceManager(false).readDeviceState();
+  },
+  readActuation: async () => {
+    if (get().useMock) throw Error('Connect real APEX first');
+    return getOrCreateDeviceManager(false).readActuation();
+  },
+  applyActuation: async (raw, keys, restoreOnly = false) => {
+    if (get().useMock) throw Error('Connect real APEX first');
+    return getOrCreateDeviceManager(false).applyActuation(raw, keys, restoreOnly);
   },
   playRgb: async (signal,restoreOnly=false,fast=false,loop=false) => {if(get().useMock)throw new Error('Pair real APEX first');await getOrCreateDeviceManager(false).playRgb(get().lightingConfig,signal,restoreOnly,fast,loop);},
   applyRgb: async () => {

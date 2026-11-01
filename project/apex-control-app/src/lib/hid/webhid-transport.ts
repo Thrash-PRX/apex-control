@@ -2,6 +2,7 @@ import { playCustomRgb } from '../play-custom-rgb.ts';
 import type { LightingConfig } from '../../types/lighting.ts';
 import { applyDeviceRgb } from '../apply-device-rgb.ts';
 import { readDeviceState, type DeviceSnapshot } from '../read-device-state.ts';
+import { ACTUATION_WRITES_ENABLED, applyDeviceActuation, readTriggerTable, restoreDeviceActuation } from '../device-actuation.ts';
 /**
  * WebHID Transport implementation.
  *
@@ -191,6 +192,21 @@ export class WebHidTransport implements HidTransport {
   }
 
   private _rgbBusy = false;
+  async readActuation() {
+    this._assertOpen();
+    if (reportLengths(this._device!.collections, 'outputReports').get(0) !== 64) throw Error('Expected APEX 64-byte output report 0');
+    if (this._rgbBusy) throw Error('A device operation is already in progress');
+    this._rgbBusy = true;
+    try { return await readTriggerTable(this._device!); } finally { this._rgbBusy = false; }
+  }
+  async applyActuation(raw: number, keys: number[], restoreOnly = false) {
+    if (!ACTUATION_WRITES_ENABLED) throw Error('Actuation Apply is awaiting an authorized live validation');
+    this._assertOpen();
+    if (reportLengths(this._device!.collections, 'outputReports').get(0) !== 64) throw Error('Expected APEX 64-byte output report 0');
+    if (this._rgbBusy) throw Error('A device operation is already in progress');
+    this._rgbBusy = true;
+    try { if (restoreOnly) await restoreDeviceActuation(this._device!); else await applyDeviceActuation(this._device!, raw, keys); } finally { this._rgbBusy = false; }
+  }
   async readDeviceState(): Promise<DeviceSnapshot> {
     this._assertOpen();
     if (reportLengths(this._device!.collections, 'outputReports').get(0) !== 64) throw new Error('Expected APEX 64-byte output report 0');

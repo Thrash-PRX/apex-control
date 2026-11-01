@@ -9,6 +9,7 @@ import {
 import { useAppStore } from '../../stores/app-store';
 import { ACTUATION_LIMITS } from '../../types';
 import { KeyboardVisualizer } from '../keyboard';
+import { DeviceActuationPanel } from './DeviceActuationPanel';
 
 export const ActuationPage: React.FC = () => {
   const actuationConfig = useAppStore((s) => s.actuationConfig);
@@ -55,21 +56,22 @@ export const ActuationPage: React.FC = () => {
 
   return (
     <div className="space-y-6 max-w-6xl mx-auto pb-12">
+      <DeviceActuationPanel />
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
           <div className="flex items-center gap-3">
             <h1 className="text-2xl font-bold tracking-tight text-white flex items-center gap-2">
               <Gauge className="w-6 h-6 text-[#f28b50]" />
-              Hall-Effect Actuation Controls
+              Actuation workspace
             </h1>
             <span className="flex items-center gap-1 text-[11px] font-semibold tracking-wider uppercase px-2.5 py-0.5 rounded-full bg-amber-500/10 text-amber-400 border border-amber-500/30">
               <AlertTriangle className="w-3 h-3" />
-              Sensor Limits Unverified
+              Local draft controls below
             </span>
           </div>
           <p className="text-sm text-[#999fac] mt-1">
-            Adjust magnetic Hall-effect actuation depths between 0.1mm and 3.6mm.
+            Use Device actuation above for hardware read, Apply and restore. Draft controls below do not change the keyboard.
           </p>
         </div>
 
@@ -84,7 +86,7 @@ export const ActuationPage: React.FC = () => {
           className="flex items-center gap-2 px-3 py-1.5 text-xs font-medium rounded-md border border-[#393d46] text-[#999fac] hover:text-white hover:bg-[#25282f] transition-colors"
         >
           <RotateCcw className="w-3.5 h-3.5" />
-          Reset All to 2.0mm
+          Reset local draft
         </button>
       </div>
 
@@ -116,7 +118,7 @@ export const ActuationPage: React.FC = () => {
         <div className="rounded-xl border border-[#393d46] bg-[#1c1e22] p-5 space-y-5">
           <h2 className="text-sm font-semibold uppercase tracking-wider text-[#999fac] flex items-center gap-2">
             <Sliders className="w-4 h-4 text-[#f28b50]" />
-            Global Actuation (All Keys)
+            Local draft — global settings
           </h2>
 
           <div className="space-y-3">
@@ -176,7 +178,7 @@ export const ActuationPage: React.FC = () => {
           <h2 className="text-sm font-semibold uppercase tracking-wider text-[#999fac] flex items-center justify-between">
             <span className="flex items-center gap-2">
               <Check className="w-4 h-4 text-[#f28b50]" />
-              Per-Key Override Tool
+              Local draft — per-key presets
             </span>
             <span className="text-xs font-mono text-[#f28b50]">
               {selectedKeys.length} selected
