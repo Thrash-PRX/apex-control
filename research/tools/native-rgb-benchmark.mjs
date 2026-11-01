@@ -12,6 +12,9 @@ function read(){const records=new Map();let total=1;for(let page=1;page<=total;p
 const indices=layout.map(k=>k.index).sort((a,b)=>a-b),chunks=[];for(const i of indices){const last=chunks.at(-1);if(last&&last.length<14&&last.at(-1)===i-1)last.push(i);else chunks.push([i]);}
 const previous=read();if(indices.some(i=>!previous.has(i)))throw Error('Incomplete palette');
 let staticRecord;const white=process.argv[4]==='white';
+// Only use after a stock capture establishes mode1 is selected and its white record is saved.
+const restoreStatic=process.argv.includes('--restore-confirmed-static');
+if(restoreStatic&&!white){device.close();throw Error('Static restoration requires the white comparison');}
 if(white){let total=1;for(let page=1;page<=total;page++){const r=exchange(23,[255],page,total);if(page===1)total=r[3];if(total<1||total>16||r[5]%8)throw Error('Invalid effect table');for(let at=6;at<6+r[5];at+=8)if(r[at]===1)staticRecord=r.slice(at,at+8);}if(!staticRecord)throw Error('Static mode missing');}
 fs.writeFileSync(root+'-backup.json',JSON.stringify({version:1,device:'314B:1026',records:[...previous],staticRecord,completeDeviceBackup:false},null,2),{flag:'wx'});
 const results=[];let error;try{
@@ -28,7 +31,9 @@ const results=[];let error;try{
 }catch(e){error=e.message;}finally{
  try{if(staticRecord){const r=exchange(19,staticRecord);if(r[6]!==0)throw Error('Native Static restore not acknowledged');exchange(25,[255]);}const groups=new Map();for(const i of indices){const key=previous.get(i).join(',');groups.set(key,[...(groups.get(key)??[]),i]);}
  for(const [raw,ids] of groups)for(let at=0;at<ids.length;at+=54){const r=exchange(16,[...raw.split(',').map(Number),...ids.slice(at,at+54)]);if(r[5]!==1||r[6]!==0)throw Error('Restore not acknowledged');await sleep(60);}
- const actual=read();if(indices.some(i=>JSON.stringify(actual.get(i))!==JSON.stringify(previous.get(i))))throw Error('Restore readback mismatch');console.log('Original palette restored and readback verified');
+ const actual=read();if(indices.some(i=>JSON.stringify(actual.get(i))!==JSON.stringify(previous.get(i))))throw Error('Restore readback mismatch');
+ if(restoreStatic){const r=exchange(25,[1]);if(r[5]!==1||r[6]!==0)throw Error('Confirmed Static mode restoration failed');}
+ console.log('Original palette restored and readback verified'+(restoreStatic?'; captured native Static mode selected':''));
  }catch(e){error=(error?error+'; ':'')+'RESTORE: '+e.message;}finally{device.close();}
  fs.writeFileSync(root+'-result.json',JSON.stringify({results,error,restoreConfirmed:!error?.includes('RESTORE:')},null,2));if(error)throw Error(error);
 }

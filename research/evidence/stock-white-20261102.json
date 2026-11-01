@@ -1,0 +1,69 @@
+{
+  "device": "314B:1026",
+  "captureSha256": "699106b03867d47b52a75e2a4c633b58b6d293c851f81d27487d7a02b525c01c",
+  "truncated": false,
+  "rgbWrites": [
+    {
+      "elapsedMs": 1044,
+      "command": 25,
+      "payload": [
+        11
+      ]
+    },
+    {
+      "elapsedMs": 1068,
+      "command": 19,
+      "payload": [
+        11,
+        100,
+        17,
+        0,
+        7,
+        217,
+        26,
+        217
+      ]
+    },
+    {
+      "elapsedMs": 4069,
+      "command": 19,
+      "payload": [
+        11,
+        100,
+        100,
+        0,
+        7,
+        217,
+        26,
+        217
+      ]
+    },
+    {
+      "elapsedMs": 24675,
+      "command": 25,
+      "payload": [
+        1
+      ]
+    },
+    {
+      "elapsedMs": 32720,
+      "command": 19,
+      "payload": [
+        1,
+        100,
+        58,
+        0,
+        13,
+        255,
+        255,
+        255
+      ]
+    }
+  ],
+  "interpretation": "Captured final Static white [1,100,58,0,13,255,255,255]. Sequence does not isolate brightness 50→100: earlier record changes its third byte. Existing prior speed evidence is retained; no range change inferred.",
+  "comparison": {
+    "results": [],
+    "restoreConfirmed": true
+  },
+  "humanComparisonPending": true
+}
