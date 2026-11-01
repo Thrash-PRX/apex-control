@@ -2,6 +2,8 @@
 import {createRequire} from 'node:module';import fs from 'node:fs';import {setTimeout as sleep} from 'node:timers/promises';
 import layout from '../../project/apex-control-app/src/lib/device-rgb-layout.json' with {type:'json'};
 if(!process.argv.includes('--run-hardware-test'))throw Error('Explicit --run-hardware-test required; this changes RGB settings and writes a private backup');
+const phaseSeconds=Number(process.argv.find(v=>v.startsWith('--phase-seconds='))?.split('=')[1]??5);
+if(!Number.isInteger(phaseSeconds)||phaseSeconds<5||phaseSeconds>30)throw Error('White phase duration must be 5–30 seconds');
 const HID=createRequire(process.argv[2])('node-hid');
 const found=HID.devices().filter(d=>d.vendorId===0x314b&&d.productId===0x1026&&d.usagePage===0xff02&&d.usage===2);
 if(found.length!==1)throw Error('Expected one APEX vendor collection');
@@ -20,8 +22,8 @@ fs.writeFileSync(root+'-backup.json',JSON.stringify({version:1,device:'314B:1026
 const results=[];let error;try{
  const ack=exchange(25,[255]);if(ack[5]!==1||ack[6]!==0)throw Error('Custom mode not acknowledged');
  if(white){
-  const desired=[...staticRecord];desired[1]=100;desired.splice(5,3,255,255,255);let r=exchange(19,desired);if(r[6]!==0)throw Error('Static white not acknowledged');r=exchange(25,[1]);if(r[6]!==0)throw Error('Static selection failed');console.log('PHASE A: native Static white100 for5seconds');await sleep(5000);
-  r=exchange(25,[255]);if(r[6]!==0)throw Error('Custom selection failed');for(let at=0;at<indices.length;at+=54){r=exchange(16,[100,255,255,255,...indices.slice(at,at+54)]);if(r[6]!==0)throw Error('Custom white failed');await sleep(60);}const actual=read();if(indices.some(i=>JSON.stringify(actual.get(i))!=='[100,255,255,255]'))throw Error('White readback mismatch');console.log('PHASE B: custom white100 for5seconds; palette readback confirmed');await sleep(5000);
+  const desired=[...staticRecord];desired[1]=100;desired.splice(5,3,255,255,255);let r=exchange(19,desired);if(r[6]!==0)throw Error('Static white not acknowledged');r=exchange(25,[1]);if(r[6]!==0)throw Error('Static selection failed');console.log(`PHASE A: native Static white100 for ${phaseSeconds} seconds`);await sleep(phaseSeconds*1000);
+  r=exchange(25,[255]);if(r[6]!==0)throw Error('Custom selection failed');for(let at=0;at<indices.length;at+=54){r=exchange(16,[100,255,255,255,...indices.slice(at,at+54)]);if(r[6]!==0)throw Error('Custom white failed');await sleep(60);}const actual=read();if(indices.some(i=>JSON.stringify(actual.get(i))!=='[100,255,255,255]'))throw Error('White readback mismatch');console.log(`PHASE B: custom white100 for ${phaseSeconds} seconds; palette readback confirmed`);await sleep(phaseSeconds*1000);
  }else for(const gap of [4,12,30,60]){
   const phase=results.length+1,target=new Map([...previous].map(([i,r])=>[i,[...r]]));for(const i of indices)target.set(i,[100,(i*7+phase*35)%256,(i*11+phase*53)%256,(i*13+phase*97)%256]);
   const start=performance.now();for(let page=0;page<chunks.length;page++){const ids=chunks[page];if(device.write(packet(17,[ids[0],...ids.flatMap(i=>target.get(i))],page+1,chunks.length))!==65)throw Error('Short bulk write');if(page<chunks.length-1)await sleep(gap);}
