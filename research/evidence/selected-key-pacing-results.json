@@ -114,7 +114,9 @@
     ],
     "phaseSeconds": 5,
     "originalPaletteRestoredAndReadbackConfirmed": true,
-    "humanComparisonPending": true
+    "humanComparisonPending": false,
+    "userReport": "Both native Static white and Custom white looked dim.",
+    "stockSoftwareComparisonPending": true
   },
   "interpretation": [
     "50ms after acknowledged0x10 writes passed;25ms caused an acknowledgement timeout, followed by verified restoration.",
