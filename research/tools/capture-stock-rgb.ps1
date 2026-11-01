@@ -3,7 +3,8 @@
 # This is passive USB capture; it sends no HID settings or commands.
 [CmdletBinding()]
 param(
-    [ValidateRange(15, 120)][int]$Seconds = 60
+    [ValidateRange(15, 120)][int]$Seconds = 60,
+    [ValidateRange(1, 127)][int]$DeviceAddress = 3
 )
 $ErrorActionPreference = 'Stop'
 $identity = [Security.Principal.WindowsIdentity]::GetCurrent()
@@ -22,7 +23,7 @@ $output = Join-Path $privateDir ('stock-bright-' + [DateTime]::UtcNow.ToString('
 $worker = $null
 try {
     # Already elevated: worker inherits this token, allowing finally to stop it.
-    $worker = Start-Process -FilePath $captureExe -ArgumentList @('-d', '\\.\USBPcap2', '--devices', '3', '--inject-descriptors', '-o', ('"' + $output + '"')) -WindowStyle Hidden -PassThru
+    $worker = Start-Process -FilePath $captureExe -ArgumentList @('-d', '\\.\USBPcap2', '--devices', "$DeviceAddress", '--inject-descriptors', '-o', ('"' + $output + '"')) -WindowStyle Hidden -PassThru
     Start-Sleep -Seconds 2
     $worker.Refresh()
     if ($worker.HasExited) { throw ('Capture exited early: ' + $worker.ExitCode) }
