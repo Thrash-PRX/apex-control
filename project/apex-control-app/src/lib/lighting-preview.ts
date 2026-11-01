@@ -12,7 +12,7 @@ function spectrum(h: number): RgbColor {
 }
 export function previewLighting(config: LightingConfig, keys: readonly KeyDefinition[], seconds: number, selected: readonly string[]=[]): Map<string,RgbColor> {
  const result=new Map<string,RgbColor>();
- const timedSnake=config.effect==='snake'?snakeAt(seconds*1000,config.speed,config.brightness):TIMED_EFFECTS.has(config.effect)&&!['shadow','heatmap'].includes(config.effect)?timedEffectAt(config,seconds*1000):null;
+ const timedSnake=config.effect==='snake'?snakeAt(seconds*1000,config.speed,config.brightness,config.primaryColor,config.backgroundGlow):TIMED_EFFECTS.has(config.effect)&&!['shadow','heatmap'].includes(config.effect)?timedEffectAt(config,seconds*1000):null;
  const time=seconds*(0.15+config.speed/100*1.85), brightness=Math.max(0,Math.min(1,config.brightness/100));
  for(const key of keys){
   if(key.isSpecial) continue;

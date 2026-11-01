@@ -92,7 +92,8 @@ export const LightingPage: React.FC = () => {
             updateLighting({
               effect: LightingEffect.Static,
               primaryColor: { r: 0, g: 150, b: 255 },
-              brightness: 80,
+              brightness: 100,
+              backgroundGlow: 22,
               speed: 50,
             })
           }
@@ -109,11 +110,11 @@ export const LightingPage: React.FC = () => {
         <button disabled={applying || !hardwareReady || nativeRgbMode(lightingConfig)===null || overlay!=='none'} className="px-4 py-2 rounded bg-[#0096ff] disabled:opacity-50" onClick={async()=>{setApplying(true);setApplyStatus('Backing up RGB settings and applying…');try{await applyRgb();setApplyStatus('RGB settings acknowledged and read back from APEX.');}catch(e){setApplyStatus(e instanceof AggregateError?e.message+": "+e.errors.map(x=>x instanceof Error?x.message:String(x)).join(" | "):e instanceof Error?e.message:String(e));}finally{setApplying(false);}}}>{applying?'Applying…':'Apply RGB to Keyboard'}</button>
         <button className="ml-3 text-sm underline" onClick={()=>{const raw=localStorage.getItem("apex-rgb-device-backup-v1");if(!raw){setApplyStatus("No device RGB backup yet. Apply reads and saves it before changing settings.");return;}const url=URL.createObjectURL(new Blob([raw],{type:"application/json"}));const a=document.createElement("a");a.href=url;a.download="apex-rgb-backup.json";a.click();URL.revokeObjectURL(url);}}>Export RGB backup</button><p className="text-xs text-[#8888a0]">Use Apply for native effects or Play custom effect for host-driven animations. Overlays are preview-only. Close MKeyboard first and use Connect APEX keyboard above. Current RGB records are backed up in this browser before applying.</p>
         <div className="flex flex-wrap gap-3">
-          <button className="px-3 py-2 rounded bg-purple-600 disabled:opacity-50" disabled={applying || !hardwareReady || nativeRgbMode(lightingConfig)!==null || lightingConfig.effect==='custom' || overlay!=='none'} onClick={async()=>{const c=new AbortController();playController.current=c;setApplying(true);setApplyStatus('Backing up settings and starting optimized custom playback…');try{updateLighting({brightness:100});await playRgb(c.signal,false,true,true);const m=JSON.parse(localStorage.getItem('apex-last-playback-metrics-v1')??'{}');setApplyStatus('Playback ended; saved RGB settings restored and readback confirmed. '+(m.fps?.toFixed(1)??'?')+(m.transfer==='per-key-timeline'?' key updates/s.':' fps.'));}catch(e){setApplyStatus(e instanceof AggregateError?e.message+': '+e.errors.map(x=>String(x)).join(' | '):String(e));}finally{playController.current=null;setApplying(false);}}}>Play custom effect (loop)</button>
+          <button className="px-3 py-2 rounded bg-purple-600 disabled:opacity-50" disabled={applying || !hardwareReady || nativeRgbMode(lightingConfig)!==null || lightingConfig.effect==='custom' || overlay!=='none'} onClick={async()=>{const c=new AbortController();playController.current=c;setApplying(true);setApplyStatus('Backing up settings and starting optimized custom playback…');try{await playRgb(c.signal,false,true,true);const m=JSON.parse(localStorage.getItem('apex-last-playback-metrics-v1')??'{}');setApplyStatus('Playback ended; saved RGB settings restored and readback confirmed. '+(m.fps?.toFixed(1)??'?')+(m.transfer==='per-key-timeline'?' key updates/s.':' fps.'));}catch(e){setApplyStatus(e instanceof AggregateError?e.message+': '+e.errors.map(x=>String(x)).join(' | '):String(e));}finally{playController.current=null;setApplying(false);}}}>Play custom effect (loop)</button>
 
 <button disabled={applying} className="px-3 py-2 border rounded disabled:opacity-50" onClick={async()=>{setApplying(true);try{await playRgb(new AbortController().signal,true);setApplyStatus("Saved RGB settings restored and readback confirmed.");}catch(e){setApplyStatus(e instanceof Error?e.message:String(e));}finally{setApplying(false);}}}>Restore saved RGB settings</button><button className="px-3 py-2 border rounded" onClick={()=>playController.current?.abort()}>Stop animation and restore colors</button>
         </div>
-<button className="text-sm underline" onClick={()=>{const raw=JSON.stringify({palettes:JSON.parse(localStorage.getItem('apex-custom-rgb-history-v1')??'[]'),nativeColorCycle:JSON.parse(localStorage.getItem('apex-native-color-cycle-backup-v1')??'null')});if(!localStorage.getItem('apex-custom-rgb-history-v1')&&!localStorage.getItem('apex-native-color-cycle-backup-v1')){setApplyStatus("No animation palette backup yet.");return;}const url=URL.createObjectURL(new Blob([raw],{type:"application/json"}));const a=document.createElement("a");a.href=url;a.download="apex-animation-palettes.json";a.click();URL.revokeObjectURL(url);}}>Export animation palette backups</button><p className="text-xs text-[#8888a0]">Playback update 5: custom effects use individual key timers and acknowledged key-color updates. While playing, the keyboard image mirrors verified colors instead of a faster demo. Keep the page open; Stop restores saved colors. Native effects run in firmware. Custom effects are original interpretations; exact WK68/Wooting behavior and smoothness are not claimed. Shadow and Heatmap react only to keys typed while this page has focus.</p>
+<button className="text-sm underline" onClick={()=>{const raw=JSON.stringify({palettes:JSON.parse(localStorage.getItem('apex-custom-rgb-history-v1')??'[]'),nativeColorCycle:JSON.parse(localStorage.getItem('apex-native-color-cycle-backup-v1')??'null')});if(!localStorage.getItem('apex-custom-rgb-history-v1')&&!localStorage.getItem('apex-native-color-cycle-backup-v1')){setApplyStatus("No animation palette backup yet.");return;}const url=URL.createObjectURL(new Blob([raw],{type:"application/json"}));const a=document.createElement("a");a.href=url;a.download="apex-animation-palettes.json";a.click();URL.revokeObjectURL(url);}}>Export animation palette backups</button><p className="text-xs text-[#8888a0]">Playback update 6: richer colors, a background glow, fuller patterns and longer trails. custom effects use individual key timers and acknowledged key-color updates. While playing, the keyboard image mirrors verified colors instead of a faster demo. Keep the page open; Stop restores saved colors. Native effects run in firmware. Custom effects are original interpretations; exact WK68/Wooting behavior and smoothness are not claimed. Shadow and Heatmap react only to keys typed while this page has focus.</p>
         <details><summary className="text-sm cursor-pointer">Legacy slow diagnostic</summary>          <button className="px-3 py-2 rounded bg-purple-700 disabled:opacity-50" disabled={applying || !hardwareReady || lightingConfig.effect==='native_layer' || overlay!=='none'} onClick={async()=>{const controller=new AbortController();playController.current=controller;setApplying(true);setApplyStatus('Backing up palette; running bounded hardware animation…');try{await playRgb(controller.signal);setApplyStatus('Animation test ended; palette restore readback confirmed. Custom mode remains selected.');}catch(e){setApplyStatus(e instanceof AggregateError?e.message+": "+e.errors.map(x=>x instanceof Error?x.message:String(x)).join(" | "):e instanceof Error?e.message:String(e));}finally{playController.current=null;setApplying(false);}}}>Slow diagnostic (2 fps)</button></details><p role="status" className="text-sm">{applyStatus}</p>
       </div>
       <div className="flex flex-wrap gap-4 text-sm">
@@ -311,11 +312,19 @@ export const LightingPage: React.FC = () => {
                 type="range"
                 min="0"
                 max="100"
+                disabled={applying}
                 value={lightingConfig.brightness}
                 onChange={(e) => updateLighting({ brightness: parseInt(e.target.value) })}
                 className="w-full accent-[#0096ff]"
                 aria-label="Brightness (0-100%)"
               />
+            </div>
+
+            <div className="space-y-2 text-xs">
+              <button disabled={applying||nativeRgbMode(lightingConfig)!==null} className="px-3 py-2 rounded bg-purple-600 disabled:opacity-50" onClick={()=>updateLighting({brightness:100,backgroundGlow:28,primaryColor:{r:40,g:160,b:255},secondaryColor:{r:180,g:80,b:255},speed:50})}>Vivid preset</button>
+              <label htmlFor="background-glow" className="flex justify-between text-[#8888a0]"><span>Background glow</span><span>{lightingConfig.backgroundGlow??22}%</span></label>
+              <input id="background-glow" type="range" min="0" max="40" disabled={applying||nativeRgbMode(lightingConfig)!==null||['rainbow','gradient','shadow'].includes(lightingConfig.effect)} value={lightingConfig.backgroundGlow??22} onChange={e=>updateLighting({backgroundGlow:Number(e.target.value)})} className="w-full accent-[#0096ff]" aria-label="Custom effect background glow (0-40%)" />
+              <p className="text-[#8888a0]">Choose settings before Play. Glow applies to pulse effects; 0 gives a dark background.</p>
             </div>
 
             <div className="space-y-1 text-xs">
@@ -325,6 +334,7 @@ export const LightingPage: React.FC = () => {
               </label>
               <input
                 id="speed"
+                disabled={applying}
                 type="range"
                 min="0"
                 max="100"

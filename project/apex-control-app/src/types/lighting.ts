@@ -63,6 +63,7 @@ export interface LightingConfig {
   primaryColor: RgbColor;
   secondaryColor?: RgbColor;
   brightness: number; // 0–100
+  backgroundGlow?: number; // 0–40%; software RGB background for custom effects
   speed: number; // 0–100
   direction?: EffectDirection;
 }

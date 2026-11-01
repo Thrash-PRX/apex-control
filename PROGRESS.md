@@ -148,3 +148,12 @@ Real USB native-adapter checks ran all18 engines for about5seconds each: all com
 During playback the visualizer mirrors last verified colors, including Color Cycle, rather than a faster independent demo. Outside playback it uses shared authored timed patterns. Shadow/Heatmap accept page-focused key events only. Other modes and UI preserved; native Apply stays separate. README/feature matrix stale RGB write-lock/key-count claims corrected. Final validation:181 automated tests, clean lint, successful production build. Refresh update5 and assess new patterns on device; do not claim exact vendor parity or60fps.
 
 User confirms update5 running/Stop restoration, but rejects dim/sparse appearance. Preserve this functional checkpoint while tuning colors and coverage.
+
+## Playback update6 — brighter/fuller software styling, 2026-11-01
+After user confirmed update5 functional playback and Stop restoration, they reported dim, unappealing effects. Preserve the working protocol path; raw custom leading parameter stays100 and RGB bytes remain0–255. No unverified brightness range or new device command was introduced. The per-key capture's raw value80 was rechecked; no inferred scale above100 is used.
+
+Added a22% default ambient RGB glow (adjustable0–40% for pulse effects), lifted low foreground color channels with an18% white component, widened beams/rings and increased pulse coverage/hold durations. Snake now holds12 accent keys over the background rather than6 over black. Rainbow/Gradient start filled with four coordinated color zones before their per-key evolution, avoiding the slow monochrome startup. Local preview and hardware share these colors/holds; live mirror remains readback-driven.
+
+Added Vivid preset (brightness100/glow28/blue-violet colors), stopped silently overriding brightness on Play, and made default brightness100. Glow affects software RGB values only. Recovery ignores invalid optional editor glow so backups remain restorable. Tests cover valid limits/zero brightness, black/zero-glow behavior, full background coverage,12-key continuity, filled startup, shared preview parity and recovery. This is RGB styling, not a measured physical luminance fix; user visual assessment remains necessary. No agent-triggered hardware writes were performed during this styling change while the user's browser may be connected. Update5 USB results remain the underlying transport checkpoint.
+
+Update6 verification:185 tests passed; lint clean; production build passed. Package refreshed; live aesthetic assessment pending.

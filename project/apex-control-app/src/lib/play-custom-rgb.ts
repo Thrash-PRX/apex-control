@@ -12,6 +12,7 @@ export async function playCustomRgb(device:HIDDevice,config:LightingConfig,signa
  const effect=aliases[config.effect]??config.effect;
  if(!restoreOnly&&(!EFFECTS.includes(effect)||[config.speed,config.brightness].some(v=>!Number.isFinite(v)||v<0||v>100)))throw Error('Unsupported animation settings');
  if(!restoreOnly&&[config.primaryColor,...(config.secondaryColor?[config.secondaryColor]:[])].some(c=>[c.r,c.g,c.b].some(v=>!Number.isInteger(v)||v<0||v>255)))throw Error('Invalid RGB color');
+ if(!restoreOnly&&config.backgroundGlow!==undefined&&(!Number.isFinite(config.backgroundGlow)||config.backgroundGlow<0||config.backgroundGlow>40))throw Error('Invalid background glow');
  if(signal.aborted)throw new DOMException('Playback cancelled','AbortError');
  if(device.vendorId!==0x314b||device.productId!==0x1026)throw Error('APEX required');
  const nativeRecovered=await restoreNativeColorCycle(device);if(restoreOnly&&nativeRecovered)return;
@@ -46,8 +47,8 @@ export async function playCustomRgb(device:HIDDevice,config:LightingConfig,signa
   const hex='#'+[config.primaryColor.r,config.primaryColor.g,config.primaryColor.b].map(v=>v.toString(16).padStart(2,'0')).join('');
   const profile={effect,speed:config.speed,brightness:config.brightness,keys:Object.fromEntries(layout.map(k=>[String(k.index),{color:hex}]))};
   if(fast&&TIMED_EFFECTS.has(config.effect)){
-   const indices=layout.map(k=>k.index),timeline=config.effect==='snake'?new SnakeTimeline(config.speed,config.brightness):new KeyEffectTimeline(config);
-   let confirmed=previous;const target=new Map([...previous].map(([i,r])=>[i,[...r]]));for(const i of indices)target.set(i,timeline instanceof KeyEffectTimeline?[...timeline.background]:[100,0,0,0]);
+   const indices=layout.map(k=>k.index),timeline=config.effect==='snake'?new SnakeTimeline(config.speed,config.brightness,config.primaryColor,config.backgroundGlow):new KeyEffectTimeline(config);
+   let confirmed=previous;const target=new Map([...previous].map(([i,r])=>[i,[...r]]));for(const i of indices)target.set(i,timeline instanceof KeyEffectTimeline?[...timeline.initialColors.get(i)!]:[...timeline.background]);
    const started=performance.now();let frames=0,packets=0,lastAudit=started;
    while(!signal.aborted&&(loop||performance.now()-started<5000)){
     for(const [i,r] of (timeline instanceof KeyEffectTimeline?timeline.advance(performance.now()-started,hits):timeline.advance(performance.now()-started)))target.set(i,r);

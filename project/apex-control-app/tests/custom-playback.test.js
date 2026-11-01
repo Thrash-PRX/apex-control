@@ -14,7 +14,7 @@ test('Custom playback storage failure blocks all palette writes',async()=>{
 test('Restore-only recovers the original snapshot without changing backup history',async()=>{
  const rows=Array.from({length:84},(_,i)=>[i,[80,1,2,3]]);
  environment({getItem(){return JSON.stringify([{records:rows}])},setItem(){throw Error('Restore must not overwrite original backup')}});
- const d=fake();await playCustomRgb(d,{...config,effect:'native_layer'},new AbortController().signal,true);
+ const d=fake();await playCustomRgb(d,{...config,effect:'native_layer',backgroundGlow:NaN},new AbortController().signal,true);
  for(const k of layout)assert.deepEqual(d.colors[k.index],[80,1,2,3]);
  assert.equal(d.writes,2);delete globalThis.window;delete globalThis.localStorage;
 });

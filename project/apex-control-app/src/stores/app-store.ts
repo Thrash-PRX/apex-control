@@ -126,7 +126,8 @@ function replaceDeviceManager(useMock: boolean): DeviceManager {
 const defaultLighting: LightingConfig = {
   effect: LightingEffect.Static,
   primaryColor: { r: 0, g: 150, b: 255 }, // Electric blue accent
-  brightness: 80,
+  brightness: 100,
+  backgroundGlow: 22,
   speed: 50,
 };
 
