@@ -220,7 +220,7 @@ export const ProfilesPage: React.FC = () => {
           className={`fixed bottom-6 right-6 z-50 px-4 py-3 rounded-lg border shadow-lg animate-slide-in flex items-center gap-2 ${
             toast.type === 'success' ? 'border-[#00c853] bg-[#00c853]/10 text-[#00c853]' :
             toast.type === 'error' ? 'border-red-500 bg-red-500/10 text-red-400' :
-            'border-[#f28b50] bg-[#f28b50]/10 text-[#f28b50]'
+            'border-[#f4f4f4] bg-[#f4f4f4]/10 text-[#f4f4f4]'
           }`}
           role="alert"
           aria-live="polite"
@@ -235,16 +235,16 @@ export const ProfilesPage: React.FC = () => {
       <div className="page-heading">
         <div>
           <h1 className="text-2xl font-bold tracking-tight text-white flex items-center gap-2">
-            <FolderOpen className="w-6 h-6 text-[#f28b50]" />
+            <FolderOpen className="w-6 h-6 text-[#f4f4f4]" />
             Profile drafts
           </h1>
-          <p className="text-sm text-[#999fac] mt-1">
+          <p className="text-sm text-[#8e8e8e] mt-1">
             Manage local profile summaries. Selecting a profile does not configure the keyboard.
           </p>
         </div>
 
         <div className="flex items-center gap-2">
-          <label className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-md border border-[#393d46] text-[#999fac] hover:text-white hover:bg-[#25282f] transition-colors cursor-pointer">
+          <label className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-md border border-[#292929] text-[#8e8e8e] hover:text-white hover:bg-[#171717] transition-colors cursor-pointer">
             <Upload className="w-3.5 h-3.5" />
             Import JSON
             <input
@@ -257,7 +257,7 @@ export const ProfilesPage: React.FC = () => {
           </label>
           <button
             onClick={exportProfiles}
-            className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-md border border-[#393d46] text-[#999fac] hover:text-white hover:bg-[#25282f] transition-colors"
+            className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-md border border-[#292929] text-[#8e8e8e] hover:text-white hover:bg-[#171717] transition-colors"
             aria-label="Export profiles to JSON file"
           >
             <Download className="w-3.5 h-3.5" />
@@ -265,7 +265,7 @@ export const ProfilesPage: React.FC = () => {
           </button>
           <button
             onClick={createNewProfile}
-            className="flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-semibold rounded-md bg-[#f28b50] text-white hover:bg-[#f6b17f] shadow-md shadow-[#f28b50]/20 transition-all"
+            className="flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-semibold rounded-md bg-[#f4f4f4] text-white hover:bg-[#ffffff] shadow-md shadow-[#f4f4f4]/20 transition-all"
             aria-label="Create new profile"
           >
             <Plus className="w-3.5 h-3.5" />
@@ -280,23 +280,23 @@ export const ProfilesPage: React.FC = () => {
             key={prof.id}
             className={`p-5 rounded-xl border flex flex-col justify-between transition-all ${
               prof.active
-                ? 'border-[#f28b50] bg-[#f28b50]/10 shadow-lg shadow-[#f28b50]/5'
-                : 'border-[#393d46] bg-[#1c1e22]'
+                ? 'border-[#f4f4f4] bg-[#f4f4f4]/10 shadow-lg shadow-[#f4f4f4]/5'
+                : 'border-[#292929] bg-[#101010]'
             }`}
           >
             <div>
               <div className="flex items-center justify-between mb-2">
-                <span className="text-[11px] font-mono uppercase tracking-wider text-[#f28b50] font-bold">
+                <span className="text-[11px] font-mono uppercase tracking-wider text-[#f4f4f4] font-bold">
                   {prof.game}
                 </span>
                 {prof.active && (
-                  <span className="flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded bg-[#f28b50] text-white">
+                  <span className="flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded bg-[#f4f4f4] text-white">
                     <Check className="w-3 h-3" /> SELECTED
                   </span>
                 )}
               </div>
               <input className="profile-name" aria-label={`Profile name ${prof.id}`} value={prof.name} maxLength={64} placeholder="Untitled draft" onChange={e => setProfiles(previous => previous.map(item => item.id === prof.id ? {...item,name:e.target.value} : item))} onBlur={() => setProfiles(previous => previous.map(item => item.id === prof.id ? {...item,name:item.name.trim()||'Untitled draft'} : item))} />
-              <div className="text-xs text-[#999fac] space-y-1.5 mb-4">
+              <div className="text-xs text-[#8e8e8e] space-y-1.5 mb-4">
                 <div className="flex justify-between">
                   <span>Actuation:</span>
                   <span className="font-mono text-neutral-300">{prof.actuation}</span>
@@ -310,11 +310,11 @@ export const ProfilesPage: React.FC = () => {
               </div>
             </div>
 
-            <div className="pt-3 border-t border-[#25282f] flex items-center justify-between">
+            <div className="pt-3 border-t border-[#171717] flex items-center justify-between">
               {!prof.active ? (
                 <button
                   onClick={() => activateProfile(prof.id)}
-                  className="px-3 py-1.5 rounded text-xs font-semibold bg-[#25282f] hover:bg-[#394758] text-white"
+                  className="px-3 py-1.5 rounded text-xs font-semibold bg-[#171717] hover:bg-[#242424] text-white"
                 >
                   Select draft
                 </button>

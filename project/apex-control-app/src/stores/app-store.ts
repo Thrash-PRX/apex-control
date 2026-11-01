@@ -43,6 +43,7 @@ interface AppState {
   // Device connection
   connection: ConnectionInfo;
   capabilities: DeviceCapabilities;
+  deviceSnapshot: DeviceSnapshot | null;
   discoveredDevices: HidDeviceInfo[];
 
   // Transport mode
@@ -166,6 +167,7 @@ export const useAppStore = create<AppState>((set, get) => ({
     error: null,
   },
   capabilities: createUnknownCapabilities(),
+  deviceSnapshot: null,
   discoveredDevices: [],
 
   // Transport
@@ -181,7 +183,7 @@ export const useAppStore = create<AppState>((set, get) => ({
     // Recreate device manager with new transport
     replaceDeviceManager(newUseMock);
 
-    set({ useMock: newUseMock });
+    set({ useMock: newUseMock, deviceSnapshot: null });
     get().addLog('info', `Switched to ${newUseMock ? 'Mock' : 'WebHID'} transport`);
   },
 
@@ -266,7 +268,7 @@ export const useAppStore = create<AppState>((set, get) => ({
     try {
       await dm.connect(path);
       const conn = dm.connection;
-      set({ connection: conn });
+      set({ connection: conn, deviceSnapshot: null });
       get().addLog('info', `Connected via ${dm.transportName}${dm.isMock ? ' (MOCK)' : ''}`);
     } catch (err) {
       const msg = err instanceof Error ? err.message : String(err);
@@ -287,7 +289,7 @@ export const useAppStore = create<AppState>((set, get) => ({
 
     try {
       await dm.disconnect();
-      set({ connection: dm.connection });
+      set({ connection: dm.connection, deviceSnapshot: null });
       get().addLog('info', 'Disconnected');
     } catch (err) {
       const msg = err instanceof Error ? err.message : String(err);
@@ -298,7 +300,12 @@ export const useAppStore = create<AppState>((set, get) => ({
   // Lighting
   readDeviceState: async () => {
     if (get().useMock) throw new Error('Turn Demo off and connect your APEX first');
-    return getOrCreateDeviceManager(false).readDeviceState();
+    const connectedDevice=get().connection.device;
+    set({deviceSnapshot:null});
+    const snapshot=await getOrCreateDeviceManager(false).readDeviceState();
+    if(get().useMock||get().connection.state!==ConnectionState.Connected||get().connection.device!==connectedDevice)throw Error('Connection changed during readback');
+    set({deviceSnapshot:snapshot});
+    return snapshot;
   },
   readActuation: async () => {
     if (get().useMock) throw Error('Connect real APEX first');

@@ -71,51 +71,16 @@ export const LightingPage: React.FC = () => {
   }
   return (
     <div className="page-stack">
-<PageHeader title="Lighting" description="Choose an effect, set your colors and make your setup glow." badge={<span className="available-tag">DEVICE CONTROLS</span>} actions={<button
-          onClick={() =>
-            updateLighting({
-              effect: LightingEffect.Static,
-              primaryColor: { r: 0, g: 150, b: 255 },
-              brightness: 100,
-              backgroundGlow: 22,
-              speed: 50,
-            })
-          }
-          className="flex items-center gap-2 px-3 py-1.5 text-xs font-medium rounded-md border border-[#393d46] text-[#999fac] hover:text-white hover:bg-[#25282f] transition-colors"
-        >
-          <RotateCcw className="w-3.5 h-3.5" />
-          Reset Defaults
-        </button>} />
-      <div className="editor-panel lighting-controls">
-        <p className="text-sm">{hardwareReady?'APEX hardware connected — native Apply is available.':'No hardware connection — the keyboard image is a local preview only.'}</p>
-        {!hardwareReady&&<button disabled={applying} className="px-4 py-2 rounded border border-[#f28b50]" onClick={async()=>{setApplying(true);setApplyStatus('Opening APEX pairing…');try{const state=useAppStore.getState();if(state.useMock)state.toggleMockMode();const device=await useAppStore.getState().pairDevice();if(device)await useAppStore.getState().connectDevice(device.path);const c=useAppStore.getState().connection;setApplyStatus(c.state==='connected'?'APEX connected. Choose a native effect, then Apply.':c.error??'No APEX connection. Close MKeyboard and select APEX in the browser picker.');}catch(e){setApplyStatus(String(e));}finally{setApplying(false);}}}>Connect APEX keyboard</button>}
-        <button disabled={applying || !hardwareReady || nativeRgbMode(lightingConfig)===null || overlay!=='none'} className="px-4 py-2 rounded bg-[#f28b50] disabled:opacity-50" onClick={async()=>{setApplying(true);setApplyStatus('Backing up RGB settings and applying…');try{await applyRgb();setApplyStatus('RGB settings acknowledged and read back from APEX.');}catch(e){setApplyStatus(e instanceof AggregateError?e.message+": "+e.errors.map(x=>x instanceof Error?x.message:String(x)).join(" | "):e instanceof Error?e.message:String(e));}finally{setApplying(false);}}}>{applying?'Applying…':'Apply RGB to Keyboard'}</button>
-        <button className="ml-3 text-sm underline" onClick={()=>{const raw=localStorage.getItem("apex-rgb-device-backup-v1");if(!raw){setApplyStatus("No device RGB backup yet. Apply reads and saves it before changing settings.");return;}const url=URL.createObjectURL(new Blob([raw],{type:"application/json"}));const a=document.createElement("a");a.href=url;a.download="apex-rgb-backup.json";a.click();URL.revokeObjectURL(url);}}>Export RGB backup</button><p className="text-xs text-[#999fac]">Use Apply for native effects or Play custom effect for host-driven animations. Overlays are preview-only. Close MKeyboard first and use Connect APEX keyboard above. Current RGB records are backed up in this browser before applying.</p>
-        <div className="flex flex-wrap gap-3">
-          <button className="px-3 py-2 rounded bg-purple-600 disabled:opacity-50" disabled={applying || !hardwareReady || nativeRgbMode(lightingConfig)!==null || lightingConfig.effect==='custom' || overlay!=='none'} onClick={async()=>{const c=new AbortController();playController.current=c;setApplying(true);setApplyStatus('Backing up settings and starting optimized custom playback…');try{await playRgb(c.signal,false,true,true);const m=JSON.parse(localStorage.getItem('apex-last-playback-metrics-v1')??'{}');setApplyStatus('Playback ended; saved RGB settings restored and readback confirmed. '+(m.fps?.toFixed(1)??'?')+(m.transfer==='per-key-timeline'?' key updates/s.':' fps.'));}catch(e){setApplyStatus(e instanceof AggregateError?e.message+': '+e.errors.map(x=>String(x)).join(' | '):String(e));}finally{playController.current=null;setApplying(false);}}}>Play custom effect (loop)</button>
-
-<button disabled={applying} className="px-3 py-2 border rounded disabled:opacity-50" onClick={async()=>{setApplying(true);try{await playRgb(new AbortController().signal,true);setApplyStatus("Saved RGB settings restored and readback confirmed.");}catch(e){setApplyStatus(e instanceof Error?e.message:String(e));}finally{setApplying(false);}}}>Restore saved RGB settings</button><button className="px-3 py-2 border rounded" onClick={()=>playController.current?.abort()}>Stop animation and restore colors</button>
-        </div>
-<details className="draft-disclosure"><summary>Backups & playback diagnostics</summary><button className="text-sm underline" onClick={()=>{const raw=JSON.stringify({palettes:JSON.parse(localStorage.getItem('apex-custom-rgb-history-v1')??'[]'),nativeColorCycle:JSON.parse(localStorage.getItem('apex-native-color-cycle-backup-v1')??'null')});if(!localStorage.getItem('apex-custom-rgb-history-v1')&&!localStorage.getItem('apex-native-color-cycle-backup-v1')){setApplyStatus("No animation palette backup yet.");return;}const url=URL.createObjectURL(new Blob([raw],{type:"application/json"}));const a=document.createElement("a");a.href=url;a.download="apex-animation-palettes.json";a.click();URL.revokeObjectURL(url);}}>Export animation palette backups</button><p className="text-xs text-[#999fac]">Custom effects run while this page stays open. Stop restores saved colors. The keyboard image mirrors verified colors during playback. Native effects run on the keyboard; custom effects are authored interpretations. Shadow and Heatmap react only to typing in this page.</p>
-        <details><summary className="text-sm cursor-pointer">Legacy slow diagnostic</summary>          <button className="px-3 py-2 rounded bg-purple-700 disabled:opacity-50" disabled={applying || !hardwareReady || lightingConfig.effect==='native_layer' || overlay!=='none'} onClick={async()=>{const controller=new AbortController();playController.current=controller;setApplying(true);setApplyStatus('Backing up palette; running bounded hardware animation…');try{await playRgb(controller.signal);setApplyStatus('Animation test ended; palette restore readback confirmed. Custom mode remains selected.');}catch(e){setApplyStatus(e instanceof AggregateError?e.message+": "+e.errors.map(x=>x instanceof Error?x.message:String(x)).join(" | "):e instanceof Error?e.message:String(e));}finally{playController.current=null;setApplying(false);}}}>Slow diagnostic (2 fps)</button></details></details><p role="status" className="text-sm">{applyStatus}</p>
-      </div>
-      <div className="flex flex-wrap gap-4 text-sm">
-        <label>Wave direction <select className="bg-[#25282f] p-2 ml-2 rounded" value={lightingConfig.direction??'left-to-right'} onChange={e=>updateLighting({direction:e.target.value as 'left-to-right'|'right-to-left'|'top-to-bottom'|'bottom-to-top'})}>
-          <option value="left-to-right">Left → right</option><option value="right-to-left">Right → left</option><option value="top-to-bottom">Top → bottom</option><option value="bottom-to-top">Bottom → top</option>
-        </select></label>
-        <label>Preview overlay <select disabled={applying} className="bg-[#25282f] p-2 ml-2 rounded" value={overlay} onChange={e=>setOverlay(e.target.value as typeof overlay)}><option value="none">None</option><option value="reactive">Reactive</option><option value="ripple">Ripple</option></select></label>
-        <p className="text-xs text-[#999fac]">Custom animations are original interpretations; Play keeps the app running as their controller. Overlays cannot be sent to APEX. Layer is a native firmware mode; its preview is blank. Per-key Custom is separate and is not enabled for hardware painting yet.</p>
-      </div>
       {/* Keyboard Visual Preview */}
-      <div className="rounded-xl border border-[#393d46] bg-[#1c1e22] p-4 shadow-lg">
+      <div className="lighting-keyboard-stage rounded-xl border border-[#292929] bg-[#101010] p-4 shadow-lg">
         <div className="flex items-center justify-between mb-2 px-2">
-          <span className="text-xs font-semibold text-[#999fac] uppercase tracking-wider">
+          <span className="text-xs font-semibold text-[#8e8e8e] uppercase tracking-wider">
             {hardwareColors?'Last verified keyboard colors':'Local preview'} (Selected Keys: {selectedKeys.length})
           </span>
           {selectedKeys.length > 0 && (
             <button
               onClick={() => setSelectedKeys([])}
-              className="text-xs text-[#f28b50] hover:underline"
+              className="text-xs text-[#f4f4f4] hover:underline"
             >
               Clear Key Selection
             </button>
@@ -128,15 +93,51 @@ export const LightingPage: React.FC = () => {
         />
       </div>
 
+
+<PageHeader title="Lighting" description="Choose an effect, set your colors and make your setup glow." badge={<span className="available-tag">DEVICE CONTROLS</span>} actions={<button
+          onClick={() =>
+            updateLighting({
+              effect: LightingEffect.Static,
+              primaryColor: { r: 0, g: 150, b: 255 },
+              brightness: 100,
+              backgroundGlow: 22,
+              speed: 50,
+            })
+          }
+          className="flex items-center gap-2 px-3 py-1.5 text-xs font-medium rounded-md border border-[#292929] text-[#8e8e8e] hover:text-white hover:bg-[#171717] transition-colors"
+        >
+          <RotateCcw className="w-3.5 h-3.5" />
+          Reset Defaults
+        </button>} />
+      <div className="editor-panel lighting-controls">
+        <p className="text-sm">{hardwareReady?'APEX hardware connected — native Apply is available.':'No hardware connection — the keyboard image is a local preview only.'}</p>
+        {!hardwareReady&&<button disabled={applying} className="px-4 py-2 rounded border border-[#f4f4f4]" onClick={async()=>{setApplying(true);setApplyStatus('Opening APEX pairing…');try{const state=useAppStore.getState();if(state.useMock)state.toggleMockMode();const device=await useAppStore.getState().pairDevice();if(device)await useAppStore.getState().connectDevice(device.path);const c=useAppStore.getState().connection;setApplyStatus(c.state==='connected'?'APEX connected. Choose a native effect, then Apply.':c.error??'No APEX connection. Close MKeyboard and select APEX in the browser picker.');}catch(e){setApplyStatus(String(e));}finally{setApplying(false);}}}>Connect APEX keyboard</button>}
+        <button disabled={applying || !hardwareReady || nativeRgbMode(lightingConfig)===null || overlay!=='none'} className="px-4 py-2 rounded bg-[#f4f4f4] disabled:opacity-50" onClick={async()=>{setApplying(true);setApplyStatus('Backing up RGB settings and applying…');try{await applyRgb();setApplyStatus('RGB settings acknowledged and read back from APEX.');}catch(e){setApplyStatus(e instanceof AggregateError?e.message+": "+e.errors.map(x=>x instanceof Error?x.message:String(x)).join(" | "):e instanceof Error?e.message:String(e));}finally{setApplying(false);}}}>{applying?'Applying…':'Apply RGB to Keyboard'}</button>
+        <button className="ml-3 text-sm underline" onClick={()=>{const raw=localStorage.getItem("apex-rgb-device-backup-v1");if(!raw){setApplyStatus("No device RGB backup yet. Apply reads and saves it before changing settings.");return;}const url=URL.createObjectURL(new Blob([raw],{type:"application/json"}));const a=document.createElement("a");a.href=url;a.download="apex-rgb-backup.json";a.click();URL.revokeObjectURL(url);}}>Export RGB backup</button><p className="text-xs text-[#8e8e8e]">Use Apply for native effects or Play custom effect for host-driven animations. Overlays are preview-only. Close MKeyboard first and use Connect APEX keyboard above. Current RGB records are backed up in this browser before applying.</p>
+        <div className="flex flex-wrap gap-3">
+          <button className="px-3 py-2 rounded bg-purple-600 disabled:opacity-50" disabled={applying || !hardwareReady || nativeRgbMode(lightingConfig)!==null || lightingConfig.effect==='custom' || overlay!=='none'} onClick={async()=>{const c=new AbortController();playController.current=c;setApplying(true);setApplyStatus('Backing up settings and starting optimized custom playback…');try{await playRgb(c.signal,false,true,true);const m=JSON.parse(localStorage.getItem('apex-last-playback-metrics-v1')??'{}');setApplyStatus('Playback ended; saved RGB settings restored and readback confirmed. '+(m.fps?.toFixed(1)??'?')+(m.transfer==='per-key-timeline'?' key updates/s.':' fps.'));}catch(e){setApplyStatus(e instanceof AggregateError?e.message+': '+e.errors.map(x=>String(x)).join(' | '):String(e));}finally{playController.current=null;setApplying(false);}}}>Play custom effect (loop)</button>
+
+<button disabled={applying} className="px-3 py-2 border rounded disabled:opacity-50" onClick={async()=>{setApplying(true);try{await playRgb(new AbortController().signal,true);setApplyStatus("Saved RGB settings restored and readback confirmed.");}catch(e){setApplyStatus(e instanceof Error?e.message:String(e));}finally{setApplying(false);}}}>Restore saved RGB settings</button><button className="px-3 py-2 border rounded" onClick={()=>playController.current?.abort()}>Stop animation and restore colors</button>
+        </div>
+<details className="draft-disclosure"><summary>Backups & playback diagnostics</summary><button className="text-sm underline" onClick={()=>{const raw=JSON.stringify({palettes:JSON.parse(localStorage.getItem('apex-custom-rgb-history-v1')??'[]'),nativeColorCycle:JSON.parse(localStorage.getItem('apex-native-color-cycle-backup-v1')??'null')});if(!localStorage.getItem('apex-custom-rgb-history-v1')&&!localStorage.getItem('apex-native-color-cycle-backup-v1')){setApplyStatus("No animation palette backup yet.");return;}const url=URL.createObjectURL(new Blob([raw],{type:"application/json"}));const a=document.createElement("a");a.href=url;a.download="apex-animation-palettes.json";a.click();URL.revokeObjectURL(url);}}>Export animation palette backups</button><p className="text-xs text-[#8e8e8e]">Custom effects run while this page stays open. Stop restores saved colors. The keyboard image mirrors verified colors during playback. Native effects run on the keyboard; custom effects are authored interpretations. Shadow and Heatmap react only to typing in this page.</p>
+        <details><summary className="text-sm cursor-pointer">Legacy slow diagnostic</summary>          <button className="px-3 py-2 rounded bg-purple-700 disabled:opacity-50" disabled={applying || !hardwareReady || lightingConfig.effect==='native_layer' || overlay!=='none'} onClick={async()=>{const controller=new AbortController();playController.current=controller;setApplying(true);setApplyStatus('Backing up palette; running bounded hardware animation…');try{await playRgb(controller.signal);setApplyStatus('Animation test ended; palette restore readback confirmed. Custom mode remains selected.');}catch(e){setApplyStatus(e instanceof AggregateError?e.message+": "+e.errors.map(x=>x instanceof Error?x.message:String(x)).join(" | "):e instanceof Error?e.message:String(e));}finally{playController.current=null;setApplying(false);}}}>Slow diagnostic (2 fps)</button></details></details><p role="status" className="text-sm">{applyStatus}</p>
+      </div>
+      <div className="flex flex-wrap gap-4 text-sm">
+        <label>Wave direction <select className="bg-[#171717] p-2 ml-2 rounded" value={lightingConfig.direction??'left-to-right'} onChange={e=>updateLighting({direction:e.target.value as 'left-to-right'|'right-to-left'|'top-to-bottom'|'bottom-to-top'})}>
+          <option value="left-to-right">Left → right</option><option value="right-to-left">Right → left</option><option value="top-to-bottom">Top → bottom</option><option value="bottom-to-top">Bottom → top</option>
+        </select></label>
+        <label>Preview overlay <select disabled={applying} className="bg-[#171717] p-2 ml-2 rounded" value={overlay} onChange={e=>setOverlay(e.target.value as typeof overlay)}><option value="none">None</option><option value="reactive">Reactive</option><option value="ripple">Ripple</option></select></label>
+        <p className="text-xs text-[#8e8e8e]">Custom animations are original interpretations; Play keeps the app running as their controller. Overlays cannot be sent to APEX. Layer is a native firmware mode; its preview is blank. Per-key Custom is separate and is not enabled for hardware painting yet.</p>
+      </div>
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Effect Selector (2 cols on lg) */}
-        <div className="lg:col-span-2 rounded-xl border border-[#393d46] bg-[#1c1e22] p-5">
-          <h2 className="text-sm font-semibold uppercase tracking-wider text-[#999fac] mb-4 flex items-center gap-2">
-            <Flame className="w-4 h-4 text-[#f28b50]" />
+        <div className="lg:col-span-2 rounded-xl border border-[#292929] bg-[#101010] p-5">
+          <h2 className="text-sm font-semibold uppercase tracking-wider text-[#8e8e8e] mb-4 flex items-center gap-2">
+            <Flame className="w-4 h-4 text-[#f4f4f4]" />
             APEX Effects
           </h2>
 
-<p className="text-xs text-[#999fac] mb-3">Native effects run in the keyboard. Custom effects run from this app using captured RGB controls; their speed depends on how many keys change. These are not exact WK68/Wooting firmware effects.</p><button className="text-xs underline mb-3" onClick={()=>setShowExperimental(v=>!v)}>{showExperimental?"Hide custom effects":"Show custom effects"}</button><div className="grid grid-cols-2 sm:grid-cols-3 gap-3" role="group" aria-label="Lighting effects">
+<p className="text-xs text-[#8e8e8e] mb-3">Native effects run in the keyboard. Custom effects run from this app using captured RGB controls; their speed depends on how many keys change. These are not exact WK68/Wooting firmware effects.</p><button className="text-xs underline mb-3" onClick={()=>setShowExperimental(v=>!v)}>{showExperimental?"Hide custom effects":"Show custom effects"}</button><div className="grid grid-cols-2 sm:grid-cols-3 gap-3" role="group" aria-label="Lighting effects">
             {LIGHTING_EFFECTS.filter(e=>showExperimental||nativeRgbMode({effect:e.effect})!==null).map((eff) => {
               const isSelected = lightingConfig.effect === eff.effect;
               return (
@@ -156,20 +157,20 @@ export const LightingPage: React.FC = () => {
                   aria-label={eff.label}
                   className={`flex flex-col items-start p-3 rounded-lg border text-left transition-all ${
                     isSelected
-                      ? 'border-[#f28b50] bg-[#f28b50]/10 text-white shadow-md shadow-[#f28b50]/10'
-                      : 'border-[#485568] bg-[#1c1c30] text-[#b2bfd0] hover:border-[#66768c] hover:text-white'
-                  } focus:outline-none focus:ring-2 focus:ring-[#f28b50] focus:ring-offset-2 focus:ring-offset-[#17181c]`}
+                      ? 'border-[#f4f4f4] bg-[#f4f4f4]/10 text-white shadow-md shadow-[#f4f4f4]/10'
+                      : 'border-[#333333] bg-[#1c1c30] text-[#aaaaaa] hover:border-[#444444] hover:text-white'
+                  } focus:outline-none focus:ring-2 focus:ring-[#f4f4f4] focus:ring-offset-2 focus:ring-offset-[#090909]`}
                 >
                   <span className="text-xs font-bold leading-tight flex items-center justify-between w-full">
                     {eff.label}
                     {isSelected && (
-                      <span className="w-2 h-2 rounded-full bg-[#f28b50]" aria-hidden="true" />
+                      <span className="w-2 h-2 rounded-full bg-[#f4f4f4]" aria-hidden="true" />
                     )}
                   </span>
-                  <span className="text-[11px] text-[#9ba7b8] mt-1 line-clamp-2">
+                  <span className="text-[11px] text-[#8e8e8e] mt-1 line-clamp-2">
                     {eff.description}
                   </span>
-                  <span className="mt-1 text-[10px] text-[#f28b50]">{nativeRgbMode({effect:eff.effect})!==null?'Native · Apply':eff.effect==='custom'?'Painting · preview only':eff.effect==='color_cycle'?'Custom · optimized color cycle':'Custom · host playback'}</span>
+                  <span className="mt-1 text-[10px] text-[#f4f4f4]">{nativeRgbMode({effect:eff.effect})!==null?'Native · Apply':eff.effect==='custom'?'Painting · preview only':eff.effect==='color_cycle'?'Custom · optimized color cycle':'Custom · host playback'}</span>
                 </button>
               );
             })}
@@ -179,9 +180,9 @@ export const LightingPage: React.FC = () => {
         {/* Adjustments & Color Controls */}
         <div className="space-y-6">
           {/* Color Picker Card */}
-          <div className="rounded-xl border border-[#393d46] bg-[#1c1e22] p-5">
-            <h2 className="text-sm font-semibold uppercase tracking-wider text-[#999fac] mb-4 flex items-center gap-2">
-              <Palette className="w-4 h-4 text-[#f28b50]" />
+          <div className="rounded-xl border border-[#292929] bg-[#101010] p-5">
+            <h2 className="text-sm font-semibold uppercase tracking-wider text-[#8e8e8e] mb-4 flex items-center gap-2">
+              <Palette className="w-4 h-4 text-[#f4f4f4]" />
               Color Accent
             </h2>
 
@@ -192,7 +193,7 @@ export const LightingPage: React.FC = () => {
                   backgroundColor: `rgb(${lightingConfig.primaryColor.r}, ${lightingConfig.primaryColor.g}, ${lightingConfig.primaryColor.b})`,
                 }}
               />
-              <div className="font-mono text-xs text-[#999fac] space-y-1">
+              <div className="font-mono text-xs text-[#8e8e8e] space-y-1">
                 <div>
                   RGB: ({lightingConfig.primaryColor.r}, {lightingConfig.primaryColor.g}, {lightingConfig.primaryColor.b})
                 </div>
@@ -210,8 +211,8 @@ export const LightingPage: React.FC = () => {
                 <button
                   key={idx}
                   onClick={() => updateLighting({ primaryColor: col })}
-                  className="h-7 rounded border border-[#393d46] transition-transform hover:scale-105 active:scale-95
-                             focus:outline-none focus:ring-2 focus:ring-[#f28b50] focus:ring-offset-2 focus:ring-offset-[#17181c]"
+                  className="h-7 rounded border border-[#292929] transition-transform hover:scale-105 active:scale-95
+                             focus:outline-none focus:ring-2 focus:ring-[#f4f4f4] focus:ring-offset-2 focus:ring-offset-[#090909]"
                   style={{
                     backgroundColor: `rgb(${col.r}, ${col.g}, ${col.b})`,
                   }}
@@ -223,7 +224,7 @@ export const LightingPage: React.FC = () => {
             {/* Sliders for R, G, B */}
             <div className="space-y-2.5 text-xs">
               <div className="space-y-1">
-                <label htmlFor="rgb-r" className="flex justify-between text-[#999fac]">
+                <label htmlFor="rgb-r" className="flex justify-between text-[#8e8e8e]">
                   <span>Red</span>
                   <span className="font-mono">{lightingConfig.primaryColor.r}</span>
                 </label>
@@ -240,7 +241,7 @@ export const LightingPage: React.FC = () => {
               </div>
 
               <div className="space-y-1">
-                <label htmlFor="rgb-g" className="flex justify-between text-[#999fac]">
+                <label htmlFor="rgb-g" className="flex justify-between text-[#8e8e8e]">
                   <span>Green</span>
                   <span className="font-mono">{lightingConfig.primaryColor.g}</span>
                 </label>
@@ -257,7 +258,7 @@ export const LightingPage: React.FC = () => {
               </div>
 
               <div className="space-y-1">
-                <label htmlFor="rgb-b" className="flex justify-between text-[#999fac]">
+                <label htmlFor="rgb-b" className="flex justify-between text-[#8e8e8e]">
                   <span>Blue</span>
                   <span className="font-mono">{lightingConfig.primaryColor.b}</span>
                 </label>
@@ -268,7 +269,7 @@ export const LightingPage: React.FC = () => {
                   max="255"
                   value={lightingConfig.primaryColor.b}
                   onChange={(e) => handleColorChange('b', parseInt(e.target.value))}
-                  className="w-full accent-[#f28b50]"
+                  className="w-full accent-[#f4f4f4]"
                   aria-label="Blue channel (0-255)"
                 />
               </div>
@@ -276,14 +277,14 @@ export const LightingPage: React.FC = () => {
           </div>
 
           {/* Brightness & Speed */}
-          <div className="rounded-xl border border-[#393d46] bg-[#1c1e22] p-5 space-y-4">
-            <h2 className="text-sm font-semibold uppercase tracking-wider text-[#999fac] flex items-center gap-2">
-              <Sliders className="w-4 h-4 text-[#f28b50]" />
+          <div className="rounded-xl border border-[#292929] bg-[#101010] p-5 space-y-4">
+            <h2 className="text-sm font-semibold uppercase tracking-wider text-[#8e8e8e] flex items-center gap-2">
+              <Sliders className="w-4 h-4 text-[#f4f4f4]" />
               Parameters
             </h2>
 
             <div className="space-y-1 text-xs">
-              <label htmlFor="brightness" className="flex justify-between text-[#999fac]">
+              <label htmlFor="brightness" className="flex justify-between text-[#8e8e8e]">
                 <span className="flex items-center gap-1.5">
                   <Sun className="w-3.5 h-3.5" aria-hidden="true" /> Brightness
                 </span>
@@ -297,20 +298,20 @@ export const LightingPage: React.FC = () => {
                 disabled={applying}
                 value={lightingConfig.brightness}
                 onChange={(e) => updateLighting({ brightness: parseInt(e.target.value) })}
-                className="w-full accent-[#f28b50]"
+                className="w-full accent-[#f4f4f4]"
                 aria-label="Brightness (0-100%)"
               />
             </div>
 
             <div className="space-y-2 text-xs">
               <button disabled={applying||nativeRgbMode(lightingConfig)!==null} className="px-3 py-2 rounded bg-purple-600 disabled:opacity-50" onClick={()=>updateLighting({brightness:100,backgroundGlow:28,primaryColor:{r:40,g:160,b:255},secondaryColor:{r:180,g:80,b:255},speed:85})}>Vivid preset</button>
-              <label htmlFor="background-glow" className="flex justify-between text-[#999fac]"><span>Background glow</span><span>{lightingConfig.backgroundGlow??22}%</span></label>
-              <input id="background-glow" type="range" min="0" max="40" disabled={applying||nativeRgbMode(lightingConfig)!==null||(FILLED_EFFECTS.has(lightingConfig.effect)||lightingConfig.effect==='shadow')} value={lightingConfig.backgroundGlow??22} onChange={e=>updateLighting({backgroundGlow:Number(e.target.value)})} className="w-full accent-[#f28b50]" aria-label="Custom effect background glow (0-40%)" />
-              <p className="text-[#999fac]">Choose settings before Play. Glow applies to pulse effects; 0 gives a dark background.</p>
+              <label htmlFor="background-glow" className="flex justify-between text-[#8e8e8e]"><span>Background glow</span><span>{lightingConfig.backgroundGlow??22}%</span></label>
+              <input id="background-glow" type="range" min="0" max="40" disabled={applying||nativeRgbMode(lightingConfig)!==null||(FILLED_EFFECTS.has(lightingConfig.effect)||lightingConfig.effect==='shadow')} value={lightingConfig.backgroundGlow??22} onChange={e=>updateLighting({backgroundGlow:Number(e.target.value)})} className="w-full accent-[#f4f4f4]" aria-label="Custom effect background glow (0-40%)" />
+              <p className="text-[#8e8e8e]">Choose settings before Play. Glow applies to pulse effects; 0 gives a dark background.</p>
             </div>
 
             <div className="space-y-1 text-xs">
-              <label htmlFor="speed" className="flex justify-between text-[#999fac]">
+              <label htmlFor="speed" className="flex justify-between text-[#8e8e8e]">
                 <span>Speed</span>
                 <span className="font-mono">{lightingConfig.speed}%</span>
               </label>
@@ -322,7 +323,7 @@ export const LightingPage: React.FC = () => {
                 max="100"
                 value={lightingConfig.speed}
                 onChange={(e) => updateLighting({ speed: parseInt(e.target.value) })}
-                className="w-full accent-[#f28b50]"
+                className="w-full accent-[#f4f4f4]"
                 aria-label="Effect speed (0-100%)"
               />
             </div>

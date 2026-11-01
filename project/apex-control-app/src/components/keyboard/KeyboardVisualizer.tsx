@@ -59,14 +59,14 @@ export const KeyboardVisualizer: React.FC<KeyboardVisualizerProps> = ({
           width: `${totalWidth}px`,
           height: `${totalHeight}px`,
           marginInline: 'auto',
-          backgroundColor: '#101216',
-          borderColor: '#484e59',
+          backgroundColor: '#131313',
+          borderColor: '#303030',
           boxShadow: '0 10px 30px rgba(0,0,0,0.6)',
         }}
       >
         {/* Status display placeholder top right */}
         <div
-          className="absolute flex items-center justify-center text-[9px] font-mono tracking-wider px-2 py-0.5 rounded border border-[#f28b50]/40 bg-[#1c1e22] text-[#f28b50]"
+          className="absolute flex items-center justify-center text-[9px] font-mono tracking-wider px-2 py-0.5 rounded border border-[#f4f4f4]/40 bg-[#101010] text-[#f4f4f4]"
           style={{
             top: `${padding + APEX_DISPLAY.y * unitSize}px`,
             left: `${padding + APEX_DISPLAY.x * unitSize}px`,
@@ -99,13 +99,13 @@ export const KeyboardVisualizer: React.FC<KeyboardVisualizerProps> = ({
                   top: `${top}px`,
                   width: `${width}px`,
                   height: `${height}px`,
-                  backgroundColor: '#30353e',
-                  borderColor: isSelected ? '#f28b50' : '#656d7b',
-                  boxShadow: isSelected ? '0 0 12px rgba(242,139,80,0.3)' : 'none',
+                  backgroundColor: '#151515',
+                  borderColor: isSelected ? '#f4f4f4' : '#454545',
+                  boxShadow: isSelected ? '0 0 12px rgba(255,255,255,0.3)' : 'none',
                 }}
                 onClick={(e) => handleKeyClick(key, e)}
               >
-                <div className="w-4 h-4 rounded-full border border-[#656d7b] bg-[#17181c] flex items-center justify-center text-[10px]">
+                <div className="w-4 h-4 rounded-full border border-[#454545] bg-[#090909] flex items-center justify-center text-[10px]">
                   ⚙
                 </div>
               </div>
@@ -116,14 +116,14 @@ export const KeyboardVisualizer: React.FC<KeyboardVisualizerProps> = ({
           const keyBg = customColor
             ? `rgb(${customColor.r}, ${customColor.g}, ${customColor.b})`
             : isSelected
-            ? '#594031'
-            : '#30353e';
+            ? '#262626'
+            : '#151515';
 
           const textColor = customColor
             ? (customColor.r * 0.299 + customColor.g * 0.587 + customColor.b * 0.114 > 150 ? '#111' : '#fff')
             : isSelected
             ? '#ffffff'
-            : '#d5dae3';
+            : '#a0a0a0';
 
           return (
             <button
@@ -138,10 +138,10 @@ export const KeyboardVisualizer: React.FC<KeyboardVisualizerProps> = ({
                 width: `${width}px`,
                 height: `${height}px`,
                 backgroundColor: keyBg,
-                borderColor: isSelected ? '#f28b50' : '#555d6a',
+                borderColor: isSelected ? '#f4f4f4' : '#292929',
                 color: textColor,
                 boxShadow: isSelected
-                  ? '0 0 10px rgba(242, 139, 80, 0.4), inset 0 1px 0 rgba(255,255,255,0.15)'
+                  ? '0 0 10px rgba(255, 255, 255, 0.4), inset 0 1px 0 rgba(255,255,255,0.15)'
                   : 'inset 0 1px 0 rgba(255,255,255,0.06), 0 2px 4px rgba(0,0,0,0.4)',
                 transform: isSelected ? 'translateY(-1px)' : 'none',
               }}
@@ -155,7 +155,7 @@ export const KeyboardVisualizer: React.FC<KeyboardVisualizerProps> = ({
                 {key.label}
               </span>
               {subtitle && (
-                <span title={subtitle} className="text-[8px] font-mono mt-0.5 text-[#f28b50] font-bold max-w-full truncate">
+                <span title={subtitle} className="text-[8px] font-mono mt-0.5 text-[#f4f4f4] font-bold max-w-full truncate">
                   {subtitle}
                 </span>
               )}
@@ -164,14 +164,14 @@ export const KeyboardVisualizer: React.FC<KeyboardVisualizerProps> = ({
         })}
       </div>
 
-      <div className="flex flex-wrap gap-2 items-center justify-between w-full max-w-4xl mx-auto mt-3 text-xs text-[#999fac]">
+      <div className="flex flex-wrap gap-2 items-center justify-between w-full max-w-4xl mx-auto mt-3 text-xs text-[#8e8e8e]">
         <div className="flex items-center gap-3">
           <span className="flex items-center gap-1.5">
-            <span className="w-3 h-3 rounded bg-[#30353e] border border-[#555d6a] inline-block" />
+            <span className="w-3 h-3 rounded bg-[#151515] border border-[#292929] inline-block" />
             Normal Key
           </span>
           <span className="flex items-center gap-1.5">
-            <span className="w-3 h-3 rounded bg-[#594031] border border-[#f28b50] inline-block" />
+            <span className="w-3 h-3 rounded bg-[#262626] border border-[#f4f4f4] inline-block" />
             Selected (Click or Shift+Click)
           </span>
         </div>
