@@ -3,7 +3,7 @@ import type {RgbColor} from '../types/lighting.ts';
 import keys from './apex200-physical-layout.json' with {type:'json'};
 /** One continuous physical path, alternating direction at each row end. */
 export const SNAKE_ROUTE=[...new Set(keys.map(k=>k.row))].sort((a,b)=>a-b).flatMap((row,n)=>keys.filter(k=>k.row===row).sort((a,b)=>n%2?b.x-a.x:a.x-b.x).map(k=>k.deviceIndex));
-export const snakeStepMs=(speed:number)=>240-Math.max(0,Math.min(100,speed))*1.6;
+export const snakeStepMs=(speed:number)=>245-Math.max(0,Math.min(100,speed))*1.8;
 function color(position:number,brightness:number):number[]{return vividHue(position/SNAKE_ROUTE.length,brightness);}
 /** Explicit per-key ON and OFF deadlines. A slow transport never skips head keys. */
 export class SnakeTimeline{

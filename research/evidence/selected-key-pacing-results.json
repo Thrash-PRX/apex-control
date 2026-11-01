@@ -1,0 +1,127 @@
+{
+  "date": "2026-11-01",
+  "device": "314B:1026",
+  "engine": "Playback update 7",
+  "writePacing": {
+    "results": [
+      {
+        "gap": 50,
+        "commands": 16,
+        "transferMs": 990.9135,
+        "updatesPerSecond": 16.146717145341142,
+        "allActiveRecordsMatch": true
+      }
+    ],
+    "error": "RGB timeout at command 0x10 page 1/1; reconnect and restore saved RGB settings",
+    "restoreConfirmed": true
+  },
+  "readbackTiming": {
+    "results": [
+      {
+        "settle": 65,
+        "frames": 12,
+        "elapsedMs": 1095.4125000000001,
+        "updatesPerSecond": 10.954777309917496,
+        "maxFrameMs": 95.12360000000012,
+        "allFramesReadbackMatch": true
+      },
+      {
+        "settle": 50,
+        "frames": 12,
+        "elapsedMs": 923.1693,
+        "updatesPerSecond": 12.998699155182045,
+        "maxFrameMs": 79.01420000000007,
+        "allFramesReadbackMatch": true
+      },
+      {
+        "settle": 35,
+        "frames": 12,
+        "elapsedMs": 742.8124000000003,
+        "updatesPerSecond": 16.154819171031605,
+        "maxFrameMs": 62.99140000000034,
+        "allFramesReadbackMatch": true
+      },
+      {
+        "settle": 20,
+        "frames": 12,
+        "elapsedMs": 25930.5073,
+        "updatesPerSecond": 0.4627753657561493,
+        "maxFrameMs": 2171.673499999999,
+        "allFramesReadbackMatch": true
+      }
+    ],
+    "restoreConfirmed": true
+  },
+  "boundedAppRuns": [
+    {
+      "effect": "wheel",
+      "frames": 48,
+      "packets": 53,
+      "fps": 9.524735161762349,
+      "transfer": "per-key-timeline",
+      "restorationConfirmedByApp": true
+    },
+    {
+      "effect": "windmill",
+      "frames": 49,
+      "packets": 54,
+      "fps": 9.734191414888164,
+      "transfer": "per-key-timeline",
+      "restorationConfirmedByApp": true
+    },
+    {
+      "effect": "storm",
+      "frames": 49,
+      "packets": 54,
+      "fps": 9.68999050677563,
+      "transfer": "per-key-timeline",
+      "restorationConfirmedByApp": true
+    },
+    {
+      "effect": "neon-stream",
+      "frames": 49,
+      "packets": 54,
+      "fps": 9.728532449490206,
+      "transfer": "per-key-timeline",
+      "restorationConfirmedByApp": true
+    },
+    {
+      "effect": "snake",
+      "frames": 51,
+      "packets": 76,
+      "fps": 9.983028264713035,
+      "transfer": "per-key-timeline",
+      "restorationConfirmedByApp": true
+    }
+  ],
+  "twentySecondLoop": [
+    {
+      "effect": "wheel",
+      "frames": 203,
+      "packets": 208,
+      "fps": 10.154375520411744,
+      "transfer": "per-key-timeline",
+      "restorationConfirmedByApp": true
+    }
+  ],
+  "whiteComparison": {
+    "nativeStaticBrightness": 100,
+    "customRawParameter": 100,
+    "rgb": [
+      255,
+      255,
+      255
+    ],
+    "phaseSeconds": 5,
+    "originalPaletteRestoredAndReadbackConfirmed": true,
+    "humanComparisonPending": true
+  },
+  "interpretation": [
+    "50ms after acknowledged0x10 writes passed;25ms caused an acknowledgement timeout, followed by verified restoration.",
+    "35ms post-ACK settling passed12 changed-page tests without long stalls;20ms showed repeated roughly2second stalls despite read-only recovery.",
+    "App now uses50ms inter-write pacing and35ms settling for up to16 changed keys, otherwise65ms settling.",
+    "Update batches/s are not whole-board video FPS.",
+    "Wheel,Windmill,Storm,NeonStream retain color on all keys; raw parameter stays100 and RGB stays0\u2013255.",
+    "No claim of measured physical luminance, exact vendor algorithm parity or60fps."
+  ]
+}
