@@ -1,0 +1,23 @@
+{
+  "kind": "paired-native-ui-and-readback-observation",
+  "date": "2026-11-02",
+  "device": "314B:1026",
+  "key": "W",
+  "keyIndex": 34,
+  "configurationMutations": 0,
+  "nativeUi": {
+    "actuationSlider": 240,
+    "actuationLabel": "2.40",
+    "rapidPressSlider": 240,
+    "rapidPressLabel": "2.40",
+    "rapidReleaseSlider": 100,
+    "rapidReleaseLabel": "2.40",
+    "keycapRapidReleaseLabel": "1.00"
+  },
+  "rawTrigger": {"threshold":240,"field4":true,"field5":true,"field6":240,"field8":100},
+  "limitations": [
+    "Single baseline observation, not an isolated parameter-change capture.",
+    "Native reset label is inconsistent with both its slider and keycap display.",
+    "No global mm conversion, boolean mode semantics or setter policy enabled."
+  ]
+}

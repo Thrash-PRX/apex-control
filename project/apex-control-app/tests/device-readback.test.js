@@ -1,6 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readDeviceState} from '../src/lib/read-device-state.ts';
+import {WebHidTransport} from '../src/lib/hid/webhid-transport.ts';
 function fake(mutate=()=>{}) {
  const handlers=new Set(), sent=[];
  const device={vendorId:0x314b,productId:0x1026,sent,
@@ -36,4 +37,20 @@ test('Changing page total, empty payload and malformed reply fail closed',async(
 });
 test('A failed getter send cleans up listeners and never attempts a setter or retry',async()=>{
  const d=fake();d.sendReport=async(_,p)=>{d.sent.push([...p]);throw Error('disconnected')};await assert.rejects(readDeviceState(d),/disconnected/);assert.equal(d.sent.length,1);assert.equal(d.listeners,0);
+});
+test('Readback excludes simultaneous RGB writes and a second read, then releases the transport lock',async()=>{
+ const d=fake();d.opened=true;d.collections=[{outputReports:[{reportId:0,items:[{reportSize:8,reportCount:64}]}]}];
+ const transport=new WebHidTransport();transport._device=d;
+ const pending=transport.readDeviceState();
+ await assert.rejects(transport.applyRgb(1,[255,255,255],100,50),/already in progress/);
+ await assert.rejects(transport.readDeviceState(),/already in progress/);
+ await pending;
+ assert.equal((await transport.readDeviceState()).sections.length,6);
+ assert.ok(d.sent.every(p=>[0x57,0x5e,0x2a,0x2b,0x2c].includes(p[1])));
+});
+test('Readback failure releases the shared device lock for recovery',async()=>{
+ const d=fake();d.opened=true;d.collections=[{outputReports:[{reportId:0,items:[{reportSize:8,reportCount:64}]}]}];
+ const transport=new WebHidTransport();transport._device=d;const send=d.sendReport;
+ d.sendReport=async()=>{throw Error('read failed')};await assert.rejects(transport.readDeviceState(),/read failed/);
+ d.sendReport=send;assert.equal((await transport.readDeviceState()).sections.length,6);
 });
