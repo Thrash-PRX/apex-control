@@ -5,6 +5,7 @@ import { useAppStore } from '../../stores/app-store';
 export function DeviceReadback() {
   const read = useAppStore(s => s.readDeviceState);
   const enabled = useAppStore(s => !s.useMock && s.connection.state === 'connected');
+  const occupied = useAppStore(s => s.deviceBusy);
   const snapshot = useAppStore(s => s.deviceSnapshot);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
@@ -20,7 +21,7 @@ export function DeviceReadback() {
   }
   return <section className="rounded-xl border border-[#292929] bg-[#101010] p-5 space-y-4" aria-labelledby="device-readback-title">
     <div><h2 id="device-readback-title" className="font-semibold flex items-center gap-2"><ScanLine size={17} className="text-[#f4f4f4]" />Read from keyboard</h2><p className="text-xs text-[#8e8e8e] mt-2">Read the actual profiles, keymaps, advanced keys and trigger records without changing settings. Close MKeyboard and stop playback first.</p></div>
-    <div className="flex flex-wrap items-center gap-3"><button onClick={capture} disabled={busy || !enabled} aria-busy={busy} className="rounded-md bg-[#f4f4f4] px-4 py-2 text-sm disabled:opacity-40">{busy ? 'Reading keyboard…' : 'Read device settings'}</button>{snapshot && <button onClick={download} className="flex items-center gap-2 rounded-md border border-[#292929] px-3 py-2 text-xs"><Download size={14} />Export raw readback</button>}</div>
+    <div className="flex flex-wrap items-center gap-3"><button onClick={capture} disabled={busy || occupied || !enabled} aria-busy={busy} className="ui-button primary">{busy ? 'Reading keyboard…' : 'Read device settings'}</button>{snapshot && <button onClick={download} className="ui-button"><Download size={14} />Export raw readback</button>}</div>
     {!enabled && <p className="text-xs text-[#8e8e8e]">Turn Demo off and pair your keyboard from Overview to read its settings.</p>}
     <div role="status" aria-live="polite">{error && <p className="text-sm text-red-300">{error}</p>}{snapshot && <p className="text-sm text-emerald-300">{snapshot.sections.length} sections read at {new Date(snapshot.capturedAt).toLocaleTimeString()}. Kept in this workspace only.</p>}</div>
     {snapshot && <div className="space-y-2">{snapshot.sections.map(section => <details key={`${section.command}-${section.selector}`} className="rounded border border-[#292929] p-3"><summary className="text-xs cursor-pointer">{section.name} · {section.pages.length} pages</summary><pre className="text-[11px] text-[#8e8e8e] mt-3 overflow-x-auto select-text">{section.pages.map((page, index) => `${index+1}: ${page.map(b => b.toString(16).padStart(2,'0')).join(' ')}`).join('\n')}</pre></details>)}</div>}

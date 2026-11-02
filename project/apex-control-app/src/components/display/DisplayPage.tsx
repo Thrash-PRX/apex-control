@@ -358,19 +358,11 @@ export function DisplayPage() {
         </div>
       </div>
 
-      {/* Warning banner */}
-      <div className="rounded-xl border border-amber-700 bg-amber-950/30 p-4 text-amber-200 flex items-start gap-3">
-        <AlertTriangle className="w-5 h-5 shrink-0 mt-0.5" />
-        <div className="space-y-1 text-sm">
-          <p className="font-bold">Display Hardware Support Unverified</p>
-          <p>This canvas is illustrative only. Panel resolution, color format, and upload commands are unknown. 
-             No live CPU/GPU/FPS telemetry is available without a verified local data provider and protocol.</p>
-        </div>
-      </div>
+      <p className="inline-note">Local design preview. Text and stat values are entered manually; this editor does not read system telemetry or upload to the keyboard.</p>
 
-      <div className="grid gap-6 lg:grid-cols-3">
+      <div className="oled-editor-layout">
         {/* Editor Panel */}
-        <div className="lg:col-span-1 space-y-5">
+        <div className="oled-controls space-y-5">
           {/* Text Fields */}
           <div className="rounded-xl border border-[#292929] bg-[#101010] p-5 space-y-4">
             <h2 className="text-sm font-semibold uppercase tracking-wider text-[#8e8e8e] flex items-center gap-2">
@@ -631,11 +623,11 @@ export function DisplayPage() {
         </div>
 
         {/* Preview Panel */}
-        <div className="lg:col-span-2 space-y-4">
+        <div className="oled-preview-column space-y-4">
           <div className="rounded-xl border border-[#292929] bg-[#101010] p-4">
             <div className="flex items-center justify-between mb-3">
               <span className="text-xs font-semibold text-[#8e8e8e] uppercase tracking-wider">
-                Live Preview (Layout: {LAYOUT_PRESETS[draft.layoutPreset].name})
+                Design Preview (Layout: {LAYOUT_PRESETS[draft.layoutPreset].name})
               </span>
               {draft.image && (
                 <span className="text-xs text-[#f4f4f4] font-mono">

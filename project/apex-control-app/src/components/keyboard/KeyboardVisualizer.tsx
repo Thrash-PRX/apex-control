@@ -24,7 +24,7 @@ export const KeyboardVisualizer: React.FC<KeyboardVisualizerProps> = ({
   interactive = true,
 }) => {
   // Base unit size in pixels for 1U
-  const unitSize = 44;
+  const unitSize = 36;
   const gap = 4;
   const padding = 14;
 

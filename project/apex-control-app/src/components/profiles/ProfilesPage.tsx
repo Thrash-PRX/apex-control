@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useEffect } from 'react';
+import React, { useState, useCallback, useEffect, useRef } from 'react';
 import {
   FolderOpen,
   Plus,
@@ -108,11 +108,15 @@ function saveProfiles(profiles: ProfileItem[]): void {
 export const ProfilesPage: React.FC = () => {
   const [profiles, setProfiles] = useState<ProfileItem[]>(() => loadProfiles());
   useEffect(() => { saveProfiles(profiles); }, [profiles]);
+  const [deletedProfile,setDeletedProfile] = useState<ProfileItem|null>(null);
+  const toastTimer = useRef<ReturnType<typeof setTimeout>|null>(null);
+  useEffect(()=>()=>{if(toastTimer.current)clearTimeout(toastTimer.current);},[]);
   const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' | 'info' } | null>(null);
 
   const showToast = useCallback((message: string, type: 'success' | 'error' | 'info' = 'info') => {
+    if(toastTimer.current)clearTimeout(toastTimer.current);
     setToast({ message, type });
-    setTimeout(() => setToast(null), 3000);
+    toastTimer.current=setTimeout(() => setToast(null), 3000);
   }, []);
 
   const activateProfile = (id: string) => {
@@ -139,6 +143,7 @@ export const ProfilesPage: React.FC = () => {
       return;
     }
     setProfiles((prev) => prev.filter((p) => p.id !== id));
+    setDeletedProfile(profileToDelete??null);
     showToast('Profile deleted', 'success');
   };
 
@@ -154,6 +159,12 @@ export const ProfilesPage: React.FC = () => {
     };
     setProfiles((prev) => [...prev, newProfile]);
     showToast('New profile created', 'success');
+  };
+  const undoDelete = () => {
+    if(!deletedProfile)return;
+    if(profiles.length>=100){showToast('Make space for the deleted draft first','error');return;}
+    const id=profiles.some(p=>p.id===deletedProfile.id)?`${deletedProfile.id}-restored-${Date.now()}`:deletedProfile.id;
+    setProfiles(previous=>[...previous,{...deletedProfile,id,active:false}]);setDeletedProfile(null);showToast('Profile restored','success');
   };
 
   const exportProfiles = () => {
@@ -175,6 +186,7 @@ export const ProfilesPage: React.FC = () => {
   };
 
   const importProfiles = (file: File) => {
+    if(file.size>1024*1024){showToast('Import a JSON file smaller than 1 MB','error');return;}
     const reader = new FileReader();
     reader.onload = (e) => {
       try {
@@ -274,6 +286,7 @@ export const ProfilesPage: React.FC = () => {
         </div>
       </div>
 
+      {deletedProfile && <div className="profile-undo" role="status"><span>Deleted “{deletedProfile.name}”</span><button type="button" className="ui-button" onClick={undoDelete}>Undo delete</button></div>}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         {profiles.map((prof) => (
           <div

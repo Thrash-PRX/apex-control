@@ -44,6 +44,7 @@ interface AppState {
   connection: ConnectionInfo;
   capabilities: DeviceCapabilities;
   deviceSnapshot: DeviceSnapshot | null;
+  deviceBusy: boolean;
   discoveredDevices: HidDeviceInfo[];
 
   // Transport mode
@@ -101,7 +102,18 @@ let logCounter = 0;
 
 function createDeviceManager(useMock: boolean): DeviceManager {
   const transport = useMock ? new MockHidTransport() : new WebHidTransport();
-  return new DeviceManager(transport);
+  const manager = new DeviceManager(transport);
+  manager.on(event => {
+    // Ignore a disposed/replaced controller; its late completion cannot repaint UI.
+    if(deviceManager!==manager)return;
+    if(event.type==='connection-changed'&&event.connection){
+      const next=event.connection;
+      useAppStore.setState(state=>({connection:next,...(next.state!==ConnectionState.Connected||next.device!==state.connection.device?{deviceSnapshot:null}:{})}));
+    }
+    if(event.type==='capabilities-updated'&&event.capabilities)useAppStore.setState({capabilities:event.capabilities});
+    if(event.type==='error'&&event.error)useAppStore.getState().addLog('error',event.error);
+  });
+  return manager;
 }
 
 function getOrCreateDeviceManager(useMock: boolean): DeviceManager {
@@ -117,6 +129,11 @@ function replaceDeviceManager(useMock: boolean): DeviceManager {
   }
   deviceManager = createDeviceManager(useMock);
   return deviceManager;
+}
+async function withDeviceOperation<T>(operation:()=>Promise<T>):Promise<T>{
+  if(useAppStore.getState().deviceBusy)throw Error('A device operation is already in progress');
+  useAppStore.setState({deviceBusy:true});
+  try{return await operation();}finally{useAppStore.setState({deviceBusy:false});}
 }
 
 // ─── Default configs ────────────────────────────────────────────────────────
@@ -168,12 +185,14 @@ export const useAppStore = create<AppState>((set, get) => ({
   },
   capabilities: createUnknownCapabilities(),
   deviceSnapshot: null,
+  deviceBusy: false,
   discoveredDevices: [],
 
   // Transport
   useMock: false,
   toggleMockMode: () => {
     const { useMock, connection } = get();
+    if(get().deviceBusy||connection.state===ConnectionState.Connecting||connection.state===ConnectionState.Scanning){get().addLog('warn','Finish the device operation before changing Demo mode');return;}
     if (connection.state === ConnectionState.Connected) {
       get().disconnectDevice();
     }
@@ -298,7 +317,7 @@ export const useAppStore = create<AppState>((set, get) => ({
   },
 
   // Lighting
-  readDeviceState: async () => {
+  readDeviceState: async () => withDeviceOperation(async()=>{
     if (get().useMock) throw new Error('Turn Demo off and connect your APEX first');
     const connectedDevice=get().connection.device;
     set({deviceSnapshot:null});
@@ -306,22 +325,22 @@ export const useAppStore = create<AppState>((set, get) => ({
     if(get().useMock||get().connection.state!==ConnectionState.Connected||get().connection.device!==connectedDevice)throw Error('Connection changed during readback');
     set({deviceSnapshot:snapshot});
     return snapshot;
-  },
-  readActuation: async () => {
+  }),
+  readActuation: async () => withDeviceOperation(async()=>{
     if (get().useMock) throw Error('Connect real APEX first');
     return getOrCreateDeviceManager(false).readActuation();
-  },
-  applyActuation: async (raw, keys, restoreOnly = false) => {
+  }),
+  applyActuation: async (raw, keys, restoreOnly = false) => withDeviceOperation(async()=>{
     if (get().useMock) throw Error('Connect real APEX first');
     return getOrCreateDeviceManager(false).applyActuation(raw, keys, restoreOnly);
-  },
-  playRgb: async (signal,restoreOnly=false,fast=false,loop=false) => {if(get().useMock)throw new Error('Pair real APEX first');await getOrCreateDeviceManager(false).playRgb(get().lightingConfig,signal,restoreOnly,fast,loop);},
-  applyRgb: async () => {
+  }),
+  playRgb: async (signal,restoreOnly=false,fast=false,loop=false) => withDeviceOperation(async()=>{if(get().useMock)throw new Error('Pair real APEX first');await getOrCreateDeviceManager(false).playRgb(get().lightingConfig,signal,restoreOnly,fast,loop);}),
+  applyRgb: async () => withDeviceOperation(async()=>{
     const s=get(),c=s.lightingConfig;if(s.useMock)throw new Error('Switch to hardware mode and connect APEX first');
     const mode=nativeRgbMode(c);
     if(mode===null)throw new Error('This effect is a browser preview; no verified APEX streaming protocol is available');
     await getOrCreateDeviceManager(false).applyRgb(mode,[c.primaryColor.r,c.primaryColor.g,c.primaryColor.b],c.brightness,c.speed);
-  },
+  }),
   lightingConfig: defaultLighting,
   updateLighting: (config) =>
     set((s) => ({

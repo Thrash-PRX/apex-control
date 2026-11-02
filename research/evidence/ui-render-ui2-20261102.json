@@ -1,0 +1,62 @@
+{
+  "method": "offline-react-server-render",
+  "browserVerification": false,
+  "deviceAccess": false,
+  "shellRendered": true,
+  "pages": [
+    {
+      "page": "dashboard",
+      "headingCount": 1,
+      "rendered": true,
+      "bytes": 53436
+    },
+    {
+      "page": "key-mapping",
+      "headingCount": 1,
+      "rendered": true,
+      "bytes": 49437
+    },
+    {
+      "page": "actuation",
+      "headingCount": 1,
+      "rendered": true,
+      "bytes": 48144
+    },
+    {
+      "page": "rapid-trigger",
+      "headingCount": 1,
+      "rendered": true,
+      "bytes": 46714
+    },
+    {
+      "page": "socd",
+      "headingCount": 1,
+      "rendered": true,
+      "bytes": 48094
+    },
+    {
+      "page": "lighting",
+      "headingCount": 1,
+      "rendered": true,
+      "bytes": 60260
+    },
+    {
+      "page": "display",
+      "headingCount": 1,
+      "rendered": true,
+      "bytes": 16442
+    },
+    {
+      "page": "profiles",
+      "headingCount": 1,
+      "rendered": true,
+      "bytes": 7789
+    },
+    {
+      "page": "settings",
+      "headingCount": 1,
+      "rendered": true,
+      "bytes": 5997
+    }
+  ]
+}
