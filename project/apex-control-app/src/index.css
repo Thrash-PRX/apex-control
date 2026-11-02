@@ -348,6 +348,27 @@ input[type='checkbox'], input[type='radio'] { accent-color: var(--accent); }
 .axis-stage-caption strong { font-weight: 500; color: #bbb; }
 .rt-draft-actions { padding: 20px 0; display: grid; gap: 10px; }
 .profile-undo { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; padding: 15px 20px; border: 1px solid #333; border-radius: 20px; color: #ccc; font-size: 12px; }
+.lighting-workspace { display: grid; grid-template-columns: minmax(0,1.5fr) minmax(280px,1fr); gap: 20px; align-items: start; order: 3; }
+.lighting-effect-panel,.lighting-adjustments > div { padding: 22px; border: 1px solid #252525; border-radius: 24px; background: #111; }
+.lighting-adjustments { display: grid; gap: 16px; }
+.effect-filter { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 16px; font-size: 11px; color: #888; }
+.lighting-effect-grid { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 8px; }
+.lighting-effect-option { display: flex; flex-direction: column; justify-content: center; gap: 6px; min-height: 65px; padding: 13px; border: 1px solid #292929; border-radius: 13px; background: #171717; color: #bbb; text-align: left; cursor: pointer; }
+.lighting-effect-option:hover { background: #222; border-color: #555; }
+.lighting-effect-option[aria-pressed='true'] { color: #fff; background: #2a2a2a; border-color: #ddd; }
+.lighting-effect-option:focus-visible { outline: 2px solid white; outline-offset: 3px; }
+.effect-kind { font-size: 10px; color: #888; }
+.lighting-preview-options { order: 4; display: flex; flex-wrap: wrap; align-items: center; gap: 16px; font-size: 11px; color: #888; }
+.lighting-preview-notes { flex-basis: 100%; line-height: 1.7; }
+.lighting-preview-notes summary,.lighting-backup-note summary { cursor: pointer; }
+.lighting-page > .lighting-controls { order: 5; display: flex; flex-flow: row wrap; align-items: center; padding: 18px 22px; gap: 12px; }
+.lighting-page > .lighting-controls > p:first-child { margin: 0 auto 0 0; }
+.lighting-controls .lighting-backup-note,.lighting-controls > .draft-disclosure { flex-basis: 100%; order: 3; font-size: 11px; color: #888; }
+.lighting-controls > p[role='status']:empty { display: none; }
+.lighting-controls > p[role='status'] { flex-basis: 100%; order: 2; font-size: 12px; }
+.lighting-controls button[class*='bg-'] { color: #111; }
+@media(max-width:1000px) { .lighting-workspace { grid-template-columns: 1fr; } .lighting-adjustments { grid-template-columns: repeat(2,minmax(0,1fr)); align-items: start; } }
+@media(max-width:600px) { .lighting-adjustments { grid-template-columns: 1fr; } .lighting-effect-grid { grid-template-columns: repeat(2,minmax(0,1fr)); } .lighting-effect-panel,.lighting-adjustments > div { padding: 17px; } }
 .oled-editor-layout { display: grid; grid-template-columns: 320px minmax(0,1fr); gap: 24px; align-items: start; }
 .oled-controls { grid-column: 1; grid-row: 1; }
 .oled-preview-column { grid-column: 2; grid-row: 1; position: sticky; top: 12px; }
